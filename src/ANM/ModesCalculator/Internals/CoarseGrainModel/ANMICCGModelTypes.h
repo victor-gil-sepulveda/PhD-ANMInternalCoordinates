@@ -1,0 +1,9 @@
+#ifndef __ANMICCGMODELTYPE__
+#define __ANMICCGMODELTYPE__
+
+enum ANMICCGModelType{
+	HA,
+	HA_FROZEN_SECONDARY
+};
+
+#endif

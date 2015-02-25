@@ -1,0 +1,10 @@
+#ifndef __ANMMOVERTYPES__
+#define __ANMMOVERTYPES__
+
+enum ANMICMoverType{
+	SIMPLE,
+	SIMPLE_PLUS_SIDECHAIN_MIN,
+	SIMPLE_PLUS_SIDECHAIN_MD
+};
+
+#endif

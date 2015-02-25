@@ -1,0 +1,77 @@
+/* [wxMaxima batch file version 1] [ DO NOT EDIT BY HAND! ]*/
+/* [ Created with wxMaxima version 11.08.0 ] */
+
+/* [wxMaxima: input   start ] */
+load("vect");
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+va: [xa, ya, za];
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+vb: [xb, yb, zb];
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+ab: express(vb - va);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+n: express(sqrt(ab.ab));
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+dxa: diff(n, xa);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+
+dya: diff(n, ya);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+dza: diff(n, za);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+dxb: diff(n, xb);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+dyb: diff(n, yb);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+dzb: diff(n, zb);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+printdecl(vars) := (
+        sprint("double", first(vars)),
+        for v in rest(vars) do sprint(",", v),
+        sprint(";"))$
+
+printdef(expr) := sprint(first(expr), "=", second(expr), ";")$
+
+block2c(expr) :=
+        if ?equal(op(expr), block) then (
+                printdecl(first(expr)),
+                for d in reverse(rest(reverse(rest(expr)))) do printdef(d),
+                sprint("return", string(last(expr)), ";"))
+        else
+                sprint("return", string(expr), ";")$
+
+expr2c(funcname, argstr, expr) := (
+        sprint("double", funcname, "(", argstr, ") {"),
+        block2c(subst(pow, "^", optimize(expr))),
+        sprint("}", "
+"))$
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+expr2c("test", "double xa, double ya, double za, double xb, double yb, double zb", dxa);
+/* [wxMaxima: input   end   ] */
+
+/* Maxima can't load/batch files which end with a comment! */
+"Created with wxMaxima"$

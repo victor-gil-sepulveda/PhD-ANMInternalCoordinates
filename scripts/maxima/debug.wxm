@@ -1,0 +1,23 @@
+/* [wxMaxima batch file version 1] [ DO NOT EDIT BY HAND! ]*/
+/* [ Created with wxMaxima version 11.08.0 ] */
+
+/* [wxMaxima: input   start ] */
+expr1(xa,ya,za,xb,yb,zb,xc,yc,zc,xd,yd,zd) := (ya-yb)*(zc-zb)-(yc-yb)*(za-zb);
+expr2(xa,ya,za,xb,yb,zb,xc,yc,zc,xd,yd,zd) := (yc-yb)*(zc-zd)-(yc-yd)*(zc-zb);
+expr3(xa,ya,za,xb,yb,zb,xc,yc,zc,xd,yd,zd) := (xc-xb)*(za-zb)-(xa-xb)*(zc-zb);
+expr4(xa,ya,za,xb,yb,zb,xc,yc,zc,xd,yd,zd) := (xc-xd)*(zc-zb)-(xc-xb)*(zc-zd);
+expr5(xa,ya,za,xb,yb,zb,xc,yc,zc,xd,yd,zd) := (xa-xb)*(yc-yb)-(xc-xb)*(ya-yb);
+expr6(xa,ya,za,xb,yb,zb,xc,yc,zc,xd,yd,zd) := (xc-xb)*(yc-yd)-(xc-xd)*(yc-yb);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+float(ev(expr1(-0.546,0.707,0,-1.804,0.072,0,-2.39,1.222,0,-3.651,0.589,0)));
+float(ev(expr2(-0.546,0.707,0,-1.804,0.072,0,-2.39,1.222,0,-3.651,0.589,0)));
+float(ev(expr3(-0.546,0.707,0,-1.804,0.072,0,-2.39,1.222,0,-3.651,0.589,0)));
+float(ev(expr4(-0.546,0.707,0,-1.804,0.072,0,-2.39,1.222,0,-3.651,0.589,0)));
+float(ev(expr5(-0.546,0.707,0,-1.804,0.072,0,-2.39,1.222,0,-3.651,0.589,0)));
+float(ev(expr6(-0.546,0.707,0,-1.804,0.072,0,-2.39,1.222,0,-3.651,0.589,0)));
+/* [wxMaxima: input   end   ] */
+
+/* Maxima can't load/batch files which end with a comment! */
+"Created with wxMaxima"$

@@ -1,0 +1,101 @@
+/* [wxMaxima batch file version 1] [ DO NOT EDIT BY HAND! ]*/
+/* [ Created with wxMaxima version 11.08.0 ] */
+
+/* [wxMaxima: title   start ]
+Fórmula de la energia
+   [wxMaxima: title   end   ] */
+
+/* [wxMaxima: comment start ]
+Ángulo
+   [wxMaxima: comment end   ] */
+
+/* [wxMaxima: input   start ] */
+angulo(xa,ya,za,xb,yb,zb,xc,yc,zc,xd,yd,zd) := (acos((((ya-yb)*(zc-zb)-(yc-yb)*(za-zb))*((yc-yb)*(zc-zd)-(yc-yd)*(zc-zb))+((xc-xb)*(za-zb)-(xa-xb)*(zc-zb))*
+((xc-xd)*(zc-zb)-(xc-xb)*(zc-zd))+((xa-xb)*(yc-yb)-(xc-xb)*(ya-yb))*((xc-xb)*(yc-yd)-(xc-xd)*(yc-yb)))/(
+sqrt(((ya-yb)*(zc-zb)-(yc-yb)*(za-zb))^2+((xc-xb)*(za-zb)-(xa-xb)*(zc-zb))^2+((xa-xb)*(yc-yb)-(xc-xb)*(ya-yb))^2)*
+sqrt(((yc-yb)*(zc-zd)-(yc-yd)*(zc-zb))^2+((xc-xd)*(zc-zb)-(xc-xb)*(zc-zd))^2+((xc-xb)*(yc-yd)-(xc-xd)*(yc-yb))^2))))$
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: comment start ]
+Fórmula: k(a - a_eq)²
+   [wxMaxima: comment end   ] */
+
+/* [wxMaxima: input   start ] */
+energia(k,xa,ya,za,xb,yb,zb,xc,yc,zc,xd,yd,zd,eq) := (
+    k * (angulo(xa,ya,za,xb,yb,zb,xc,yc,zc,xd,yd,zd) - eq)²
+)$
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+float(ev(angulo(0.11066705158694,0.45626282074449,0.80619042326319,0.56588397024514,0.32407588634037,0.7519810210074,0.36502038578479,0.6346316082848,0.87068114438964,0.57569392283309,0.086586556686489,0.54357867214547)));
+%*180/3.141592;
+float(ev(energia(0.98447689124799,0.11066705158694,0.45626282074449,0.80619042326319,0.56588397024514,0.32407588634037,0.7519810210074,0.36502038578479,0.6346316082848,0.87068114438964,0.57569392283309,0.086586556686489,0.54357867214547,0.70816445759027)));
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+/*OH -0.546 0.707 0
+  C  -1.804 0.072 0
+  CZ -2.39 1.222 0
+  O  -3.651 0.589 0*/
+float(ev(angulo(-0.546,0.707,0,-1.804,0.072,0,-2.39,1.222,0,-3.651,0.589,0)));
+float(ev(energia(0.98447689124799,0.11066705158694,0.45626282074449,0.80619042326319,0.56588397024514,0.32407588634037,0.7519810210074,0.36502038578479,0.6346316082848,0.87068114438964,0.57569392283309,0.086586556686489,0.54357867214547,0.70816445759027)));
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+printdecl(vars) := (
+        sprint("double", first(vars)),
+        for v in rest(vars) do sprint(",", v),
+        sprint(";"))$
+
+printdef(expr) := sprint(first(expr), "=", second(expr), ";")$
+
+block2c(expr) :=
+        if ?equal(op(expr), block) then (
+                printdecl(first(expr)),
+                for d in reverse(rest(reverse(rest(expr)))) do printdef(d),
+                sprint("return", string(last(expr)), ";"))
+        else
+                sprint("return", string(expr), ";")$
+
+expr2c(funcname, argstr, expr) := (
+        sprint("double", funcname, "(", argstr, ") {"),
+        block2c(subst(pow, "^", optimize(expr))),
+        sprint("}", "
+"))$
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+expr2c("energia", "double k, double xa, double ya, double za, double xb, double yb, double zb, double xc, double yc, double zc, double xd, double yd, double zd, double eq", energia(k,xa,ya,za,xb,yb,zb,xc,yc,zc,xd,yd,zd,eq));
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+with_stdout("/home/albarin/Dropbox/pfc/documentos/maxima/tmp.out",
+for x thru 8 do (
+    k: random(1.00),
+    eq: random(1.00),
+    xa: random(1.00),
+    ya: random(1.00),
+    za: random(1.00),
+    xb: random(1.00),
+    yb: random(1.00),
+    zb: random(1.00),
+    xc: random(1.00),
+    yc: random(1.00),
+    zc: random(1.00),
+    xd: random(1.00),
+    yd: random(1.00),
+    zd: random(1.00),
+
+    res: float(ev(energia(k,xa,ya,za,xb,yb,zb,xc,yc,zc,xd,yd,zd,eq))),
+    print(res,",",k,",",xa,",",ya,",",za,",",xb,",",yb,",",zb,",",xc,",",yc,",",zc,",",xd,",",yd,",",zd,",",eq)  
+)
+);
+printfile("/home/albarin/Dropbox/pfc/documentos/maxima/tmp.out");
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+;
+/* [wxMaxima: input   end   ] */
+
+/* Maxima can't load/batch files which end with a comment! */
+"Created with wxMaxima"$

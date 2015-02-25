@@ -1,0 +1,262 @@
+/* [wxMaxima batch file version 1] [ DO NOT EDIT BY HAND! ]*/
+/* [ Created with wxMaxima version 11.08.0 ] */
+
+/* [wxMaxima: input   start ] */
+printdecl(vars) := (
+        sprint("double", first(vars)),
+        for v in rest(vars) do sprint(",", v),
+        sprint(";"))$
+
+printdef(expr) := sprint(first(expr), "=", second(expr), ";")$
+
+block2c(expr) :=
+        if ?equal(op(expr), block) then (
+                printdecl(first(expr)),
+                for d in reverse(rest(reverse(rest(expr)))) do printdef(d),
+                sprint("return", string(last(expr)), ";"))
+        else
+                sprint("return", string(expr), ";")$
+
+expr2c(funcname, argstr, expr) := (
+        sprint("double", funcname, "(", argstr, ") {"),
+        block2c(subst(pow, "^", optimize(expr))),
+        sprint("}", "
+"))$
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+derivadas(expr, list_vars) := (
+    params: "",
+    params: concat(params, "double k, "),
+    for var in list_vars do (
+        params: concat(params, "double "),
+        params: concat(params, var),
+        params: concat(params, ", ")
+    ),
+    params: concat(params, "double eq"),
+
+    for var in list_vars do (
+        /*print(concat("derivada_",var)),*/
+        expr2c(concat("derivada2_",var), params, diff(expr, var)),
+        print("")
+        /*print(""),
+        print("")*/
+    )
+)$
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+angulo(xa,ya,za,xb,yb,zb,xc,yc,zc,xd,yd,zd) := (atan2(((
+(((xb-xc)*(za-zb)-(xa-xb)*(zb-zc))*(zb-zc))/(sqrt(((ya-yb)*(zb-zc)-(yb-yc)*(za-zb))^2+((xb-xc)*(za-zb)-(xa-xb)*(zb-zc))^2+((xa-xb)*(yb-yc)-(xb-xc)*(ya-yb))^2)*sqrt((zb-zc)^2+(yb-yc)^2+(xb-xc)^2))-
+(((xa-xb)*(yb-yc)-(xb-xc)*(ya-yb))*(yb-yc))/(sqrt(((ya-yb)*(zb-zc)-(yb-yc)*(za-zb))^2+((xb-xc)*(za-zb)-(xa-xb)*(zb-zc))^2+((xa-xb)*(yb-yc)-(xb-xc)*(ya-yb))^2)*sqrt((zb-zc)^2+(yb-yc)^2+(xb-xc)^2)))*
+((yb-yc)*(zc-zd)-(yc-yd)*(zb-zc)))/(
+sqrt(((yb-yc)*(zc-zd)-(yc-yd)*(zb-zc))^2+((xc-xd)*(zb-zc)-(xb-xc)*(zc-zd))^2+((xb-xc)*(yc-yd)-(xc-xd)*(yb-yc))^2))+((
+((xb-xc)*((xa-xb)*(yb-yc)-(xb-xc)*(ya-yb)))/(sqrt(((ya-yb)*(zb-zc)-(yb-yc)*(za-zb))^2+((xb-xc)*(za-zb)-(xa-xb)*(zb-zc))^2+((xa-xb)*(yb-yc)-(xb-xc)*(ya-yb))^2)*sqrt((zb-zc)^2+(yb-yc)^2+(xb-xc)^2))-
+(((ya-yb)*(zb-zc)-(yb-yc)*(za-zb))*(zb-zc))/(sqrt(((ya-yb)*(zb-zc)-(yb-yc)*(za-zb))^2+((xb-xc)*(za-zb)-(xa-xb)*(zb-zc))^2+((xa-xb)*(yb-yc)-(xb-xc)*(ya-yb))^2)*sqrt((zb-zc)^2+(yb-yc)^2+(xb-xc)^2)))*
+((xc-xd)*(zb-zc)-(xb-xc)*(zc-zd)))/(
+sqrt(((yb-yc)*(zc-zd)-(yc-yd)*(zb-zc))^2+((xc-xd)*(zb-zc)-(xb-xc)*(zc-zd))^2+((xb-xc)*(yc-yd)-(xc-xd)*(yb-yc))^2))+(
+((xb-xc)*(yc-yd)-(xc-xd)*(yb-yc))*(
+((yb-yc)*((ya-yb)*(zb-zc)-(yb-yc)*(za-zb)))/(sqrt(((ya-yb)*(zb-zc)-(yb-yc)*(za-zb))^2+((xb-xc)*(za-zb)-(xa-xb)*(zb-zc))^2+((xa-xb)*(yb-yc)-(xb-xc)*(ya-yb))^2)*sqrt((zb-zc)^2+(yb-yc)^2+(xb-xc)^2))-
+((xb-xc)*((xb-xc)*(za-zb)-(xa-xb)*(zb-zc)))/(sqrt(((ya-yb)*(zb-zc)-(yb-yc)*(za-zb))^2+((xb-xc)*(za-zb)-(xa-xb)*(zb-zc))^2+((xa-xb)*(yb-yc)-(xb-xc)*(ya-yb))^2)*sqrt((zb-zc)^2+(yb-yc)^2+(xb-xc)^2))))/(
+sqrt(((yb-yc)*(zc-zd)-(yc-yd)*(zb-zc))^2+((xc-xd)*(zb-zc)-(xb-xc)*(zc-zd))^2+((xb-xc)*(yc-yd)-(xc-xd)*(yb-yc))^2)),(
+((ya-yb)*(zb-zc)-(yb-yc)*(za-zb))*((yb-yc)*(zc-zd)-(yc-yd)*(zb-zc)))/(
+sqrt(((ya-yb)*(zb-zc)-(yb-yc)*(za-zb))^2+((xb-xc)*(za-zb)-(xa-xb)*(zb-zc))^2+((xa-xb)*(yb-yc)-(xb-xc)*(ya-yb))^2)*
+sqrt(((yb-yc)*(zc-zd)-(yc-yd)*(zb-zc))^2+((xc-xd)*(zb-zc)-(xb-xc)*(zc-zd))^2+((xb-xc)*(yc-yd)-(xc-xd)*(yb-yc))^2))+(
+((xb-xc)*(za-zb)-(xa-xb)*(zb-zc))*((xc-xd)*(zb-zc)-(xb-xc)*(zc-zd)))/(
+sqrt(((ya-yb)*(zb-zc)-(yb-yc)*(za-zb))^2+((xb-xc)*(za-zb)-(xa-xb)*(zb-zc))^2+((xa-xb)*(yb-yc)-(xb-xc)*(ya-yb))^2)*
+sqrt(((yb-yc)*(zc-zd)-(yc-yd)*(zb-zc))^2+((xc-xd)*(zb-zc)-(xb-xc)*(zc-zd))^2+((xb-xc)*(yc-yd)-(xc-xd)*(yb-yc))^2))+(
+((xa-xb)*(yb-yc)-(xb-xc)*(ya-yb))*((xb-xc)*(yc-yd)-(xc-xd)*(yb-yc)))/(
+sqrt(((ya-yb)*(zb-zc)-(yb-yc)*(za-zb))^2+((xb-xc)*(za-zb)-(xa-xb)*(zb-zc))^2+((xa-xb)*(yb-yc)-(xb-xc)*(ya-yb))^2)*
+sqrt(((yb-yc)*(zc-zd)-(yc-yd)*(zb-zc))^2+((xc-xd)*(zb-zc)-(xb-xc)*(zc-zd))^2+((xb-xc)*(yc-yd)-(xc-xd)*(yb-yc))^2))))$
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+energia(k,xa,ya,za,xb,yb,zb,xc,yc,zc,xd,yd,zd,eq) := (
+    k * (angulo(xa,ya,za,xb,yb,zb,xc,yc,zc,xd,yd,zd) - eq)²
+)$
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+derivadas(energia(k,xa,ya,za,xb,yb,zb,xc,yc,zc,xd,yd,zd,eq), [xa,ya,za,xb,yb,zb,xc,yc,zc,xd,yd,zd]);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+energia(k,xa,ya,za,xb,yb,zb,xc,yc,zc,xd,yd,zd,eq);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+diff(k*(atan2(((
+(((xb-xc)*(za-zb)-(xa-xb)*(zb-zc))*(zb-zc))/(sqrt(((ya-yb)*(zb-zc)-(yb-yc)*(za-zb))^2+((xb-xc)*(za-zb)-(xa-xb)*(zb-zc))^2+((xa-xb)*(yb-yc)-(xb-xc)*(ya-yb))^2)*sqrt((zb-zc)^2+(yb-yc)^2+(xb-xc)^2))-
+(((xa-xb)*(yb-yc)-(xb-xc)*(ya-yb))*(yb-yc))/(sqrt(((ya-yb)*(zb-zc)-(yb-yc)*(za-zb))^2+((xb-xc)*(za-zb)-(xa-xb)*(zb-zc))^2+((xa-xb)*(yb-yc)-(xb-xc)*(ya-yb))^2)*sqrt((zb-zc)^2+(yb-yc)^2+(xb-xc)^2)))*
+((yb-yc)*(zc-zd)-(yc-yd)*(zb-zc)))/(
+sqrt(((yb-yc)*(zc-zd)-(yc-yd)*(zb-zc))^2+((xc-xd)*(zb-zc)-(xb-xc)*(zc-zd))^2+((xb-xc)*(yc-yd)-(xc-xd)*(yb-yc))^2))+((
+((xb-xc)*((xa-xb)*(yb-yc)-(xb-xc)*(ya-yb)))/(sqrt(((ya-yb)*(zb-zc)-(yb-yc)*(za-zb))^2+((xb-xc)*(za-zb)-(xa-xb)*(zb-zc))^2+((xa-xb)*(yb-yc)-(xb-xc)*(ya-yb))^2)*sqrt((zb-zc)^2+(yb-yc)^2+(xb-xc)^2))-
+(((ya-yb)*(zb-zc)-(yb-yc)*(za-zb))*(zb-zc))/(sqrt(((ya-yb)*(zb-zc)-(yb-yc)*(za-zb))^2+((xb-xc)*(za-zb)-(xa-xb)*(zb-zc))^2+((xa-xb)*(yb-yc)-(xb-xc)*(ya-yb))^2)*sqrt((zb-zc)^2+(yb-yc)^2+(xb-xc)^2)))*
+((xc-xd)*(zb-zc)-(xb-xc)*(zc-zd)))/(
+sqrt(((yb-yc)*(zc-zd)-(yc-yd)*(zb-zc))^2+((xc-xd)*(zb-zc)-(xb-xc)*(zc-zd))^2+((xb-xc)*(yc-yd)-(xc-xd)*(yb-yc))^2))+(
+((xb-xc)*(yc-yd)-(xc-xd)*(yb-yc))*(
+((yb-yc)*((ya-yb)*(zb-zc)-(yb-yc)*(za-zb)))/(sqrt(((ya-yb)*(zb-zc)-(yb-yc)*(za-zb))^2+((xb-xc)*(za-zb)-(xa-xb)*(zb-zc))^2+((xa-xb)*(yb-yc)-(xb-xc)*(ya-yb))^2)*sqrt((zb-zc)^2+(yb-yc)^2+(xb-xc)^2))-
+((xb-xc)*((xb-xc)*(za-zb)-(xa-xb)*(zb-zc)))/(sqrt(((ya-yb)*(zb-zc)-(yb-yc)*(za-zb))^2+((xb-xc)*(za-zb)-(xa-xb)*(zb-zc))^2+((xa-xb)*(yb-yc)-(xb-xc)*(ya-yb))^2)*sqrt((zb-zc)^2+(yb-yc)^2+(xb-xc)^2))))/(
+sqrt(((yb-yc)*(zc-zd)-(yc-yd)*(zb-zc))^2+((xc-xd)*(zb-zc)-(xb-xc)*(zc-zd))^2+((xb-xc)*(yc-yd)-(xc-xd)*(yb-yc))^2)),(
+((ya-yb)*(zb-zc)-(yb-yc)*(za-zb))*((yb-yc)*(zc-zd)-(yc-yd)*(zb-zc)))/(
+sqrt(((ya-yb)*(zb-zc)-(yb-yc)*(za-zb))^2+((xb-xc)*(za-zb)-(xa-xb)*(zb-zc))^2+((xa-xb)*(yb-yc)-(xb-xc)*(ya-yb))^2)*
+sqrt(((yb-yc)*(zc-zd)-(yc-yd)*(zb-zc))^2+((xc-xd)*(zb-zc)-(xb-xc)*(zc-zd))^2+((xb-xc)*(yc-yd)-(xc-xd)*(yb-yc))^2))+(
+((xb-xc)*(za-zb)-(xa-xb)*(zb-zc))*((xc-xd)*(zb-zc)-(xb-xc)*(zc-zd)))/(
+sqrt(((ya-yb)*(zb-zc)-(yb-yc)*(za-zb))^2+((xb-xc)*(za-zb)-(xa-xb)*(zb-zc))^2+((xa-xb)*(yb-yc)-(xb-xc)*(ya-yb))^2)*
+sqrt(((yb-yc)*(zc-zd)-(yc-yd)*(zb-zc))^2+((xc-xd)*(zb-zc)-(xb-xc)*(zc-zd))^2+((xb-xc)*(yc-yd)-(xc-xd)*(yb-yc))^2))+(
+((xa-xb)*(yb-yc)-(xb-xc)*(ya-yb))*((xb-xc)*(yc-yd)-(xc-xd)*(yb-yc)))/(
+sqrt(((ya-yb)*(zb-zc)-(yb-yc)*(za-zb))^2+((xb-xc)*(za-zb)-(xa-xb)*(zb-zc))^2+((xa-xb)*(yb-yc)-(xb-xc)*(ya-yb))^2)*
+sqrt(((yb-yc)*(zc-zd)-(yc-yd)*(zb-zc))^2+((xc-xd)*(zb-zc)-(xb-xc)*(zc-zd))^2+((xb-xc)*(yc-yd)-(xc-xd)*(yb-yc))^2)))-eq)^(2),xd);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+	
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+der_xa(k,xa,ya,za,xb,yb,zb,xc,yc,zc,xd,yd,zd,eq) := (2*k*((((((yb-ya)*(zc-zb)-(yc-yb)*(zb-za))*((yc-yb)*(zd-zc)-(yd-yc)*(zc-zb)))/(
+sqrt(((yb-ya)*(zc-zb)-(yc-yb)*(zb-za))^2+((xc-xb)*(zb-za)-(xb-xa)*(zc-zb))^2+((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya))^2)*
+sqrt(((yc-yb)*(zd-zc)-(yd-yc)*(zc-zb))^2+((xd-xc)*(zc-zb)-(xc-xb)*(zd-zc))^2+((xc-xb)*(yd-yc)-(xd-xc)*(yc-yb))^2))+(
+((xc-xb)*(zb-za)-(xb-xa)*(zc-zb))*((xd-xc)*(zc-zb)-(xc-xb)*(zd-zc)))/(
+sqrt(((yb-ya)*(zc-zb)-(yc-yb)*(zb-za))^2+((xc-xb)*(zb-za)-(xb-xa)*(zc-zb))^2+((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya))^2)*
+sqrt(((yc-yb)*(zd-zc)-(yd-yc)*(zc-zb))^2+((xd-xc)*(zc-zb)-(xc-xb)*(zd-zc))^2+((xc-xb)*(yd-yc)-(xd-xc)*(yc-yb))^2))+(
+((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya))*((xc-xb)*(yd-yc)-(xd-xc)*(yc-yb)))/(
+sqrt(((yb-ya)*(zc-zb)-(yc-yb)*(zb-za))^2+((xc-xb)*(zb-za)-(xb-xa)*(zc-zb))^2+((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya))^2)*
+sqrt(((yc-yb)*(zd-zc)-(yd-yc)*(zc-zb))^2+((xd-xc)*(zc-zb)-(xc-xb)*(zd-zc))^2+((xc-xb)*(yd-yc)-(xd-xc)*(yc-yb))^2)))*(((
+(zc-zb)^2/(sqrt((zc-zb)^2+(yc-yb)^2+(xc-xb)^2)*sqrt(((yb-ya)*(zc-zb)-(yc-yb)*(zb-za))^2+((xc-xb)*(zb-za)-(xb-xa)*(zc-zb))^2+((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya))^2))-
+((yb-yc)*(yc-yb))/(sqrt((zc-zb)^2+(yc-yb)^2+(xc-xb)^2)*sqrt(((yb-ya)*(zc-zb)-(yc-yb)*(zb-za))^2+((xc-xb)*(zb-za)-(xb-xa)*(zc-zb))^2+((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya))^2))-
+((zc-zb)*((xc-xb)*(zb-za)-(xb-xa)*(zc-zb))*(2*(zc-zb)*((xc-xb)*(zb-za)-(xb-xa)*(zc-zb))+2*(yb-yc)*((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya))))/(2*sqrt((zc-zb)^2+(yc-yb)^2+(xc-xb)^2)*(((yb-ya)*(zc-zb)-(yc-yb)*(zb-za))^2+((xc-xb)*(zb-za)-(xb-xa)*(zc-zb))^2+((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya))^2)^(3/2))+
+((yc-yb)*((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya))*(2*(zc-zb)*((xc-xb)*(zb-za)-(xb-xa)*(zc-zb))+2*(yb-yc)*((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya))))/(2*sqrt((zc-zb)^2+(yc-yb)^2+(xc-xb)^2)*(((yb-ya)*(zc-zb)-(yc-yb)*(zb-za))^2+((xc-xb)*(zb-za)-(xb-xa)*(zc-zb))^2+((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya))^2)^(3/2)))*
+((yc-yb)*(zd-zc)-(yd-yc)*(zc-zb)))/(
+sqrt(((yc-yb)*(zd-zc)-(yd-yc)*(zc-zb))^2+((xd-xc)*(zc-zb)-(xc-xb)*(zd-zc))^2+((xc-xb)*(yd-yc)-(xd-xc)*(yc-yb))^2))+((
+((xc-xb)*(yb-yc))/(sqrt((zc-zb)^2+(yc-yb)^2+(xc-xb)^2)*sqrt(((yb-ya)*(zc-zb)-(yc-yb)*(zb-za))^2+((xc-xb)*(zb-za)-(xb-xa)*(zc-zb))^2+((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya))^2))+
+((zc-zb)*((yb-ya)*(zc-zb)-(yc-yb)*(zb-za))*(2*(zc-zb)*((xc-xb)*(zb-za)-(xb-xa)*(zc-zb))+2*(yb-yc)*((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya))))/(2*sqrt((zc-zb)^2+(yc-yb)^2+(xc-xb)^2)*(((yb-ya)*(zc-zb)-(yc-yb)*(zb-za))^2+((xc-xb)*(zb-za)-(xb-xa)*(zc-zb))^2+((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya))^2)^(3/2))-
+((xc-xb)*((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya))*(2*(zc-zb)*((xc-xb)*(zb-za)-(xb-xa)*(zc-zb))+2*(yb-yc)*((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya))))/(2*sqrt((zc-zb)^2+(yc-yb)^2+(xc-xb)^2)*(((yb-ya)*(zc-zb)-(yc-yb)*(zb-za))^2+((xc-xb)*(zb-za)-(xb-xa)*(zc-zb))^2+((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya))^2)^(3/2)))*
+((xd-xc)*(zc-zb)-(xc-xb)*(zd-zc)))/(
+sqrt(((yc-yb)*(zd-zc)-(yd-yc)*(zc-zb))^2+((xd-xc)*(zc-zb)-(xc-xb)*(zd-zc))^2+((xc-xb)*(yd-yc)-(xd-xc)*(yc-yb))^2))+(
+((xc-xb)*(yd-yc)-(xd-xc)*(yc-yb))*(-
+((xc-xb)*(zc-zb))/(sqrt((zc-zb)^2+(yc-yb)^2+(xc-xb)^2)*sqrt(((yb-ya)*(zc-zb)-(yc-yb)*(zb-za))^2+((xc-xb)*(zb-za)-(xb-xa)*(zc-zb))^2+((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya))^2))-
+((yc-yb)*((yb-ya)*(zc-zb)-(yc-yb)*(zb-za))*(2*(zc-zb)*((xc-xb)*(zb-za)-(xb-xa)*(zc-zb))+2*(yb-yc)*((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya))))/(2*sqrt((zc-zb)^2+(yc-yb)^2+(xc-xb)^2)*(((yb-ya)*(zc-zb)-(yc-yb)*(zb-za))^2+((xc-xb)*(zb-za)-(xb-xa)*(zc-zb))^2+((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya))^2)^(3/2))+
+((xc-xb)*((xc-xb)*(zb-za)-(xb-xa)*(zc-zb))*(2*(zc-zb)*((xc-xb)*(zb-za)-(xb-xa)*(zc-zb))+2*(yb-yc)*((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya))))/(2*sqrt((zc-zb)^2+(yc-yb)^2+(xc-xb)^2)*(((yb-ya)*(zc-zb)-(yc-yb)*(zb-za))^2+((xc-xb)*(zb-za)-(xb-xa)*(zc-zb))^2+((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya))^2)^(3/2))))/(
+sqrt(((yc-yb)*(zd-zc)-(yd-yc)*(zc-zb))^2+((xd-xc)*(zc-zb)-(xc-xb)*(zd-zc))^2+((xc-xb)*(yd-yc)-(xd-xc)*(yc-yb))^2))))/((((
+((zc-zb)*((xc-xb)*(zb-za)-(xb-xa)*(zc-zb)))/(sqrt((zc-zb)^2+(yc-yb)^2+(xc-xb)^2)*sqrt(((yb-ya)*(zc-zb)-(yc-yb)*(zb-za))^2+((xc-xb)*(zb-za)-(xb-xa)*(zc-zb))^2+((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya))^2))-
+((yc-yb)*((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya)))/(sqrt((zc-zb)^2+(yc-yb)^2+(xc-xb)^2)*sqrt(((yb-ya)*(zc-zb)-(yc-yb)*(zb-za))^2+((xc-xb)*(zb-za)-(xb-xa)*(zc-zb))^2+((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya))^2)))*
+((yc-yb)*(zd-zc)-(yd-yc)*(zc-zb)))/(
+sqrt(((yc-yb)*(zd-zc)-(yd-yc)*(zc-zb))^2+((xd-xc)*(zc-zb)-(xc-xb)*(zd-zc))^2+((xc-xb)*(yd-yc)-(xd-xc)*(yc-yb))^2))+((
+((xc-xb)*((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya)))/(sqrt((zc-zb)^2+(yc-yb)^2+(xc-xb)^2)*sqrt(((yb-ya)*(zc-zb)-(yc-yb)*(zb-za))^2+((xc-xb)*(zb-za)-(xb-xa)*(zc-zb))^2+((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya))^2))-
+((zc-zb)*((yb-ya)*(zc-zb)-(yc-yb)*(zb-za)))/(sqrt((zc-zb)^2+(yc-yb)^2+(xc-xb)^2)*sqrt(((yb-ya)*(zc-zb)-(yc-yb)*(zb-za))^2+((xc-xb)*(zb-za)-(xb-xa)*(zc-zb))^2+((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya))^2)))*
+((xd-xc)*(zc-zb)-(xc-xb)*(zd-zc)))/(
+sqrt(((yc-yb)*(zd-zc)-(yd-yc)*(zc-zb))^2+((xd-xc)*(zc-zb)-(xc-xb)*(zd-zc))^2+((xc-xb)*(yd-yc)-(xd-xc)*(yc-yb))^2))+(
+((xc-xb)*(yd-yc)-(xd-xc)*(yc-yb))*(
+((yc-yb)*((yb-ya)*(zc-zb)-(yc-yb)*(zb-za)))/(sqrt((zc-zb)^2+(yc-yb)^2+(xc-xb)^2)*sqrt(((yb-ya)*(zc-zb)-(yc-yb)*(zb-za))^2+((xc-xb)*(zb-za)-(xb-xa)*(zc-zb))^2+((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya))^2))-
+((xc-xb)*((xc-xb)*(zb-za)-(xb-xa)*(zc-zb)))/(sqrt((zc-zb)^2+(yc-yb)^2+(xc-xb)^2)*sqrt(((yb-ya)*(zc-zb)-(yc-yb)*(zb-za))^2+((xc-xb)*(zb-za)-(xb-xa)*(zc-zb))^2+((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya))^2))))/(
+sqrt(((yc-yb)*(zd-zc)-(yd-yc)*(zc-zb))^2+((xd-xc)*(zc-zb)-(xc-xb)*(zd-zc))^2+((xc-xb)*(yd-yc)-(xd-xc)*(yc-yb))^2)))^(2)+((
+((yb-ya)*(zc-zb)-(yc-yb)*(zb-za))*((yc-yb)*(zd-zc)-(yd-yc)*(zc-zb)))/(
+sqrt(((yb-ya)*(zc-zb)-(yc-yb)*(zb-za))^2+((xc-xb)*(zb-za)-(xb-xa)*(zc-zb))^2+((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya))^2)*
+sqrt(((yc-yb)*(zd-zc)-(yd-yc)*(zc-zb))^2+((xd-xc)*(zc-zb)-(xc-xb)*(zd-zc))^2+((xc-xb)*(yd-yc)-(xd-xc)*(yc-yb))^2))+(
+((xc-xb)*(zb-za)-(xb-xa)*(zc-zb))*((xd-xc)*(zc-zb)-(xc-xb)*(zd-zc)))/(
+sqrt(((yb-ya)*(zc-zb)-(yc-yb)*(zb-za))^2+((xc-xb)*(zb-za)-(xb-xa)*(zc-zb))^2+((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya))^2)*
+sqrt(((yc-yb)*(zd-zc)-(yd-yc)*(zc-zb))^2+((xd-xc)*(zc-zb)-(xc-xb)*(zd-zc))^2+((xc-xb)*(yd-yc)-(xd-xc)*(yc-yb))^2))+(
+((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya))*((xc-xb)*(yd-yc)-(xd-xc)*(yc-yb)))/(
+sqrt(((yb-ya)*(zc-zb)-(yc-yb)*(zb-za))^2+((xc-xb)*(zb-za)-(xb-xa)*(zc-zb))^2+((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya))^2)*
+sqrt(((yc-yb)*(zd-zc)-(yd-yc)*(zc-zb))^2+((xd-xc)*(zc-zb)-(xc-xb)*(zd-zc))^2+((xc-xb)*(yd-yc)-(xd-xc)*(yc-yb))^2)))^(2))-((-(
+((yb-ya)*(zc-zb)-(yc-yb)*(zb-za))*(2*(zc-zb)*((xc-xb)*(zb-za)-(xb-xa)*(zc-zb))+2*(yb-yc)*((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya)))*
+((yc-yb)*(zd-zc)-(yd-yc)*(zc-zb)))/(2*
+(((yb-ya)*(zc-zb)-(yc-yb)*(zb-za))^2+((xc-xb)*(zb-za)-(xb-xa)*(zc-zb))^2+((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya))^2)^(3/2)*
+sqrt(((yc-yb)*(zd-zc)-(yd-yc)*(zc-zb))^2+((xd-xc)*(zc-zb)-(xc-xb)*(zd-zc))^2+((xc-xb)*(yd-yc)-(xd-xc)*(yc-yb))^2))+((zc-zb)*
+((xd-xc)*(zc-zb)-(xc-xb)*(zd-zc)))/(
+sqrt(((yb-ya)*(zc-zb)-(yc-yb)*(zb-za))^2+((xc-xb)*(zb-za)-(xb-xa)*(zc-zb))^2+((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya))^2)*
+sqrt(((yc-yb)*(zd-zc)-(yd-yc)*(zc-zb))^2+((xd-xc)*(zc-zb)-(xc-xb)*(zd-zc))^2+((xc-xb)*(yd-yc)-(xd-xc)*(yc-yb))^2))-(
+((xc-xb)*(zb-za)-(xb-xa)*(zc-zb))*(2*(zc-zb)*((xc-xb)*(zb-za)-(xb-xa)*(zc-zb))+2*(yb-yc)*((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya)))*
+((xd-xc)*(zc-zb)-(xc-xb)*(zd-zc)))/(2*
+(((yb-ya)*(zc-zb)-(yc-yb)*(zb-za))^2+((xc-xb)*(zb-za)-(xb-xa)*(zc-zb))^2+((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya))^2)^(3/2)*
+sqrt(((yc-yb)*(zd-zc)-(yd-yc)*(zc-zb))^2+((xd-xc)*(zc-zb)-(xc-xb)*(zd-zc))^2+((xc-xb)*(yd-yc)-(xd-xc)*(yc-yb))^2))+((yb-yc)*
+((xc-xb)*(yd-yc)-(xd-xc)*(yc-yb)))/(
+sqrt(((yb-ya)*(zc-zb)-(yc-yb)*(zb-za))^2+((xc-xb)*(zb-za)-(xb-xa)*(zc-zb))^2+((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya))^2)*
+sqrt(((yc-yb)*(zd-zc)-(yd-yc)*(zc-zb))^2+((xd-xc)*(zc-zb)-(xc-xb)*(zd-zc))^2+((xc-xb)*(yd-yc)-(xd-xc)*(yc-yb))^2))-(
+((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya))*((xc-xb)*(yd-yc)-(xd-xc)*(yc-yb))*
+(2*(zc-zb)*((xc-xb)*(zb-za)-(xb-xa)*(zc-zb))+2*(yb-yc)*((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya))))/(2*
+(((yb-ya)*(zc-zb)-(yc-yb)*(zb-za))^2+((xc-xb)*(zb-za)-(xb-xa)*(zc-zb))^2+((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya))^2)^(3/2)*
+sqrt(((yc-yb)*(zd-zc)-(yd-yc)*(zc-zb))^2+((xd-xc)*(zc-zb)-(xc-xb)*(zd-zc))^2+((xc-xb)*(yd-yc)-(xd-xc)*(yc-yb))^2)))*(((
+((zc-zb)*((xc-xb)*(zb-za)-(xb-xa)*(zc-zb)))/(sqrt((zc-zb)^2+(yc-yb)^2+(xc-xb)^2)*sqrt(((yb-ya)*(zc-zb)-(yc-yb)*(zb-za))^2+((xc-xb)*(zb-za)-(xb-xa)*(zc-zb))^2+((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya))^2))-
+((yc-yb)*((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya)))/(sqrt((zc-zb)^2+(yc-yb)^2+(xc-xb)^2)*sqrt(((yb-ya)*(zc-zb)-(yc-yb)*(zb-za))^2+((xc-xb)*(zb-za)-(xb-xa)*(zc-zb))^2+((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya))^2)))*
+((yc-yb)*(zd-zc)-(yd-yc)*(zc-zb)))/(
+sqrt(((yc-yb)*(zd-zc)-(yd-yc)*(zc-zb))^2+((xd-xc)*(zc-zb)-(xc-xb)*(zd-zc))^2+((xc-xb)*(yd-yc)-(xd-xc)*(yc-yb))^2))+((
+((xc-xb)*((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya)))/(sqrt((zc-zb)^2+(yc-yb)^2+(xc-xb)^2)*sqrt(((yb-ya)*(zc-zb)-(yc-yb)*(zb-za))^2+((xc-xb)*(zb-za)-(xb-xa)*(zc-zb))^2+((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya))^2))-
+((zc-zb)*((yb-ya)*(zc-zb)-(yc-yb)*(zb-za)))/(sqrt((zc-zb)^2+(yc-yb)^2+(xc-xb)^2)*sqrt(((yb-ya)*(zc-zb)-(yc-yb)*(zb-za))^2+((xc-xb)*(zb-za)-(xb-xa)*(zc-zb))^2+((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya))^2)))*
+((xd-xc)*(zc-zb)-(xc-xb)*(zd-zc)))/(
+sqrt(((yc-yb)*(zd-zc)-(yd-yc)*(zc-zb))^2+((xd-xc)*(zc-zb)-(xc-xb)*(zd-zc))^2+((xc-xb)*(yd-yc)-(xd-xc)*(yc-yb))^2))+(
+((xc-xb)*(yd-yc)-(xd-xc)*(yc-yb))*(
+((yc-yb)*((yb-ya)*(zc-zb)-(yc-yb)*(zb-za)))/(sqrt((zc-zb)^2+(yc-yb)^2+(xc-xb)^2)*sqrt(((yb-ya)*(zc-zb)-(yc-yb)*(zb-za))^2+((xc-xb)*(zb-za)-(xb-xa)*(zc-zb))^2+((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya))^2))-
+((xc-xb)*((xc-xb)*(zb-za)-(xb-xa)*(zc-zb)))/(sqrt((zc-zb)^2+(yc-yb)^2+(xc-xb)^2)*sqrt(((yb-ya)*(zc-zb)-(yc-yb)*(zb-za))^2+((xc-xb)*(zb-za)-(xb-xa)*(zc-zb))^2+((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya))^2))))/(
+sqrt(((yc-yb)*(zd-zc)-(yd-yc)*(zc-zb))^2+((xd-xc)*(zc-zb)-(xc-xb)*(zd-zc))^2+((xc-xb)*(yd-yc)-(xd-xc)*(yc-yb))^2))))/((((
+((zc-zb)*((xc-xb)*(zb-za)-(xb-xa)*(zc-zb)))/(sqrt((zc-zb)^2+(yc-yb)^2+(xc-xb)^2)*sqrt(((yb-ya)*(zc-zb)-(yc-yb)*(zb-za))^2+((xc-xb)*(zb-za)-(xb-xa)*(zc-zb))^2+((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya))^2))-
+((yc-yb)*((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya)))/(sqrt((zc-zb)^2+(yc-yb)^2+(xc-xb)^2)*sqrt(((yb-ya)*(zc-zb)-(yc-yb)*(zb-za))^2+((xc-xb)*(zb-za)-(xb-xa)*(zc-zb))^2+((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya))^2)))*
+((yc-yb)*(zd-zc)-(yd-yc)*(zc-zb)))/(
+sqrt(((yc-yb)*(zd-zc)-(yd-yc)*(zc-zb))^2+((xd-xc)*(zc-zb)-(xc-xb)*(zd-zc))^2+((xc-xb)*(yd-yc)-(xd-xc)*(yc-yb))^2))+((
+((xc-xb)*((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya)))/(sqrt((zc-zb)^2+(yc-yb)^2+(xc-xb)^2)*sqrt(((yb-ya)*(zc-zb)-(yc-yb)*(zb-za))^2+((xc-xb)*(zb-za)-(xb-xa)*(zc-zb))^2+((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya))^2))-
+((zc-zb)*((yb-ya)*(zc-zb)-(yc-yb)*(zb-za)))/(sqrt((zc-zb)^2+(yc-yb)^2+(xc-xb)^2)*sqrt(((yb-ya)*(zc-zb)-(yc-yb)*(zb-za))^2+((xc-xb)*(zb-za)-(xb-xa)*(zc-zb))^2+((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya))^2)))*
+((xd-xc)*(zc-zb)-(xc-xb)*(zd-zc)))/(
+sqrt(((yc-yb)*(zd-zc)-(yd-yc)*(zc-zb))^2+((xd-xc)*(zc-zb)-(xc-xb)*(zd-zc))^2+((xc-xb)*(yd-yc)-(xd-xc)*(yc-yb))^2))+(
+((xc-xb)*(yd-yc)-(xd-xc)*(yc-yb))*(
+((yc-yb)*((yb-ya)*(zc-zb)-(yc-yb)*(zb-za)))/(sqrt((zc-zb)^2+(yc-yb)^2+(xc-xb)^2)*sqrt(((yb-ya)*(zc-zb)-(yc-yb)*(zb-za))^2+((xc-xb)*(zb-za)-(xb-xa)*(zc-zb))^2+((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya))^2))-
+((xc-xb)*((xc-xb)*(zb-za)-(xb-xa)*(zc-zb)))/(sqrt((zc-zb)^2+(yc-yb)^2+(xc-xb)^2)*sqrt(((yb-ya)*(zc-zb)-(yc-yb)*(zb-za))^2+((xc-xb)*(zb-za)-(xb-xa)*(zc-zb))^2+((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya))^2))))/(
+sqrt(((yc-yb)*(zd-zc)-(yd-yc)*(zc-zb))^2+((xd-xc)*(zc-zb)-(xc-xb)*(zd-zc))^2+((xc-xb)*(yd-yc)-(xd-xc)*(yc-yb))^2)))^(2)+((
+((yb-ya)*(zc-zb)-(yc-yb)*(zb-za))*((yc-yb)*(zd-zc)-(yd-yc)*(zc-zb)))/(
+sqrt(((yb-ya)*(zc-zb)-(yc-yb)*(zb-za))^2+((xc-xb)*(zb-za)-(xb-xa)*(zc-zb))^2+((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya))^2)*
+sqrt(((yc-yb)*(zd-zc)-(yd-yc)*(zc-zb))^2+((xd-xc)*(zc-zb)-(xc-xb)*(zd-zc))^2+((xc-xb)*(yd-yc)-(xd-xc)*(yc-yb))^2))+(
+((xc-xb)*(zb-za)-(xb-xa)*(zc-zb))*((xd-xc)*(zc-zb)-(xc-xb)*(zd-zc)))/(
+sqrt(((yb-ya)*(zc-zb)-(yc-yb)*(zb-za))^2+((xc-xb)*(zb-za)-(xb-xa)*(zc-zb))^2+((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya))^2)*
+sqrt(((yc-yb)*(zd-zc)-(yd-yc)*(zc-zb))^2+((xd-xc)*(zc-zb)-(xc-xb)*(zd-zc))^2+((xc-xb)*(yd-yc)-(xd-xc)*(yc-yb))^2))+(
+((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya))*((xc-xb)*(yd-yc)-(xd-xc)*(yc-yb)))/(
+sqrt(((yb-ya)*(zc-zb)-(yc-yb)*(zb-za))^2+((xc-xb)*(zb-za)-(xb-xa)*(zc-zb))^2+((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya))^2)*
+sqrt(((yc-yb)*(zd-zc)-(yd-yc)*(zc-zb))^2+((xd-xc)*(zc-zb)-(xc-xb)*(zd-zc))^2+((xc-xb)*(yd-yc)-(xd-xc)*(yc-yb))^2)))^(2)))*(atan2(((
+((zc-zb)*((xc-xb)*(zb-za)-(xb-xa)*(zc-zb)))/(sqrt((zc-zb)^2+(yc-yb)^2+(xc-xb)^2)*sqrt(((yb-ya)*(zc-zb)-(yc-yb)*(zb-za))^2+((xc-xb)*(zb-za)-(xb-xa)*(zc-zb))^2+((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya))^2))-
+((yc-yb)*((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya)))/(sqrt((zc-zb)^2+(yc-yb)^2+(xc-xb)^2)*sqrt(((yb-ya)*(zc-zb)-(yc-yb)*(zb-za))^2+((xc-xb)*(zb-za)-(xb-xa)*(zc-zb))^2+((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya))^2)))*
+((yc-yb)*(zd-zc)-(yd-yc)*(zc-zb)))/(
+sqrt(((yc-yb)*(zd-zc)-(yd-yc)*(zc-zb))^2+((xd-xc)*(zc-zb)-(xc-xb)*(zd-zc))^2+((xc-xb)*(yd-yc)-(xd-xc)*(yc-yb))^2))+((
+((xc-xb)*((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya)))/(sqrt((zc-zb)^2+(yc-yb)^2+(xc-xb)^2)*sqrt(((yb-ya)*(zc-zb)-(yc-yb)*(zb-za))^2+((xc-xb)*(zb-za)-(xb-xa)*(zc-zb))^2+((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya))^2))-
+((zc-zb)*((yb-ya)*(zc-zb)-(yc-yb)*(zb-za)))/(sqrt((zc-zb)^2+(yc-yb)^2+(xc-xb)^2)*sqrt(((yb-ya)*(zc-zb)-(yc-yb)*(zb-za))^2+((xc-xb)*(zb-za)-(xb-xa)*(zc-zb))^2+((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya))^2)))*
+((xd-xc)*(zc-zb)-(xc-xb)*(zd-zc)))/(
+sqrt(((yc-yb)*(zd-zc)-(yd-yc)*(zc-zb))^2+((xd-xc)*(zc-zb)-(xc-xb)*(zd-zc))^2+((xc-xb)*(yd-yc)-(xd-xc)*(yc-yb))^2))+(
+((xc-xb)*(yd-yc)-(xd-xc)*(yc-yb))*(
+((yc-yb)*((yb-ya)*(zc-zb)-(yc-yb)*(zb-za)))/(sqrt((zc-zb)^2+(yc-yb)^2+(xc-xb)^2)*sqrt(((yb-ya)*(zc-zb)-(yc-yb)*(zb-za))^2+((xc-xb)*(zb-za)-(xb-xa)*(zc-zb))^2+((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya))^2))-
+((xc-xb)*((xc-xb)*(zb-za)-(xb-xa)*(zc-zb)))/(sqrt((zc-zb)^2+(yc-yb)^2+(xc-xb)^2)*sqrt(((yb-ya)*(zc-zb)-(yc-yb)*(zb-za))^2+((xc-xb)*(zb-za)-(xb-xa)*(zc-zb))^2+((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya))^2))))/(
+sqrt(((yc-yb)*(zd-zc)-(yd-yc)*(zc-zb))^2+((xd-xc)*(zc-zb)-(xc-xb)*(zd-zc))^2+((xc-xb)*(yd-yc)-(xd-xc)*(yc-yb))^2)),(
+((yb-ya)*(zc-zb)-(yc-yb)*(zb-za))*((yc-yb)*(zd-zc)-(yd-yc)*(zc-zb)))/(
+sqrt(((yb-ya)*(zc-zb)-(yc-yb)*(zb-za))^2+((xc-xb)*(zb-za)-(xb-xa)*(zc-zb))^2+((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya))^2)*
+sqrt(((yc-yb)*(zd-zc)-(yd-yc)*(zc-zb))^2+((xd-xc)*(zc-zb)-(xc-xb)*(zd-zc))^2+((xc-xb)*(yd-yc)-(xd-xc)*(yc-yb))^2))+(
+((xc-xb)*(zb-za)-(xb-xa)*(zc-zb))*((xd-xc)*(zc-zb)-(xc-xb)*(zd-zc)))/(
+sqrt(((yb-ya)*(zc-zb)-(yc-yb)*(zb-za))^2+((xc-xb)*(zb-za)-(xb-xa)*(zc-zb))^2+((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya))^2)*
+sqrt(((yc-yb)*(zd-zc)-(yd-yc)*(zc-zb))^2+((xd-xc)*(zc-zb)-(xc-xb)*(zd-zc))^2+((xc-xb)*(yd-yc)-(xd-xc)*(yc-yb))^2))+(
+((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya))*((xc-xb)*(yd-yc)-(xd-xc)*(yc-yb)))/(
+sqrt(((yb-ya)*(zc-zb)-(yc-yb)*(zb-za))^2+((xc-xb)*(zb-za)-(xb-xa)*(zc-zb))^2+((xb-xa)*(yc-yb)-(xc-xb)*(yb-ya))^2)*
+sqrt(((yc-yb)*(zd-zc)-(yd-yc)*(zc-zb))^2+((xd-xc)*(zc-zb)-(xc-xb)*(zd-zc))^2+((xc-xb)*(yd-yc)-(xd-xc)*(yc-yb))^2)))-eq))$
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+der_xa(2, -3.057, -0.573, 0.000, -2.390, 1.222, 0.000, -3.651, 0.589, 0.000, -1.804, 0.072, 0.000, 45*3.141592/180);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+expr2c("angulo", "double xa, double ya, double za, double xb, double yb, double zb, double xc, double yc, double zc, double xd, double yd, double zd", der_xa);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+der_xa(k,xa,ya,za,xb,yb,zb,xc,yc,zc,xd,yd,zd,eq) := k+xa+ya+za+xb+yb+zb+xc+yc+zc+xd+yd+zd+eq;
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+der_xa(2, -3.057, -0.573, 0.000, -2.390, 1.222, 0.000, -3.651, 0.589, 0.000, -1.804, 0.072, 0.000, 45*3.141592/180);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+float(ev(der_xa(96,18,72,44,36,45,96,19,48,3,82,75,60,86)));
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+xa;
+/* [wxMaxima: input   end   ] */
+
+/* Maxima can't load/batch files which end with a comment! */
+"Created with wxMaxima"$

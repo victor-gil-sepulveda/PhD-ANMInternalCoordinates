@@ -1,0 +1,174 @@
+/* [wxMaxima batch file version 1] [ DO NOT EDIT BY HAND! ]*/
+/* [ Created with wxMaxima version 11.08.0 ] */
+
+/* [wxMaxima: title   start ]
+Cálculo del ángulo dados 4 puntos
+   [wxMaxima: title   end   ] */
+
+/* [wxMaxima: input   start ] */
+load(vect)$
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: comment start ]
+1. Se definen los 4 puntos
+   [wxMaxima: comment end   ] */
+
+/* [wxMaxima: input   start ] */
+a: [xa,ya,za]$
+b: [xb,yb,zb]$
+c: [xc,yc,zc]$
+d: [xd,yd,zd]$
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: comment start ]
+2. Se calculan los vectores
+   [wxMaxima: comment end   ] */
+
+/* [wxMaxima: input   start ] */
+ba: a-b;
+bc: c-b;
+dc: c-d;
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: comment start ]
+3. Se calcula el producto vectorial para obtener los vectores normales a los planos que definen los 4 puntos
+   [wxMaxima: comment end   ] */
+
+/* [wxMaxima: input   start ] */
+u: express(ba~bc);
+v: express(bc~dc);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: comment start ]
+4. Se obtiene el numerador de la fórmula, el producto escalar de las normales (u.v)
+   [wxMaxima: comment end   ] */
+
+/* [wxMaxima: input   start ] */
+uv: express(u.v);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: comment start ]
+5. Se calcula la longitud de los vectores normales
+   [wxMaxima: comment end   ] */
+
+/* [wxMaxima: input   start ] */
+ulen: express(sqrt(express(u.u)));
+vlen: express(sqrt(express(v.v)));
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: comment start ]
+6. Se obtiene la fórmula del ángulo usando los resultados anteriores
+   [wxMaxima: comment end   ] */
+
+/* [wxMaxima: input   start ] */
+ang = express(acos(express(uv/express(ulen*vlen))));
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: comment start ]
+7. Se expresa en forma de función
+   [wxMaxima: comment end   ] */
+
+/* [wxMaxima: input   start ] */
+angulo(xa,ya,za,xb,yb,zb,xc,yc,zc,xd,yd,zd) := acos((((ya-yb)*(zc-zb)-(yc-yb)*(za-zb))*((yc-yb)*(zc-zd)-(yc-yd)*(zc-zb))+((xc-xb)*(za-zb)-(xa-xb)*(zc-zb))*
+((xc-xd)*(zc-zb)-(xc-xb)*(zc-zd))+((xa-xb)*(yc-yb)-(xc-xb)*(ya-yb))*((xc-xb)*(yc-yd)-(xc-xd)*(yc-yb)))/(
+sqrt(((ya-yb)*(zc-zb)-(yc-yb)*(za-zb))^2+((xc-xb)*(za-zb)-(xa-xb)*(zc-zb))^2+((xa-xb)*(yc-yb)-(xc-xb)*(ya-yb))^2)*
+sqrt(((yc-yb)*(zc-zd)-(yc-yd)*(zc-zb))^2+((xc-xd)*(zc-zb)-(xc-xb)*(zc-zd))^2+((xc-xb)*(yc-yd)-(xc-xd)*(yc-yb))^2)));
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+den(xa,ya,za,xb,yb,zb,xc,yc,zc,xd,yd,zd) := (sqrt(((ya-yb)*(zc-zb)-(yc-yb)*(za-zb))^2+((xc-xb)*(za-zb)-(xa-xb)*(zc-zb))^2+((xa-xb)*(yc-yb)-(xc-xb)*(ya-yb))^2)*
+sqrt(((yc-yb)*(zc-zd)-(yc-yd)*(zc-zb))^2+((xc-xd)*(zc-zb)-(xc-xb)*(zc-zd))^2+((xc-xb)*(yc-yd)-(xc-xd)*(yc-yb))^2));
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+float(ev(den(-0.546,0.707,0,-1.804,0.072,0,-2.39,1.222,0,-3.651,0.589,0)));
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+num(xa,ya,za,xb,yb,zb,xc,yc,zc,xd,yd,zd) := (((ya-yb)*(zc-zb)-(yc-yb)*(za-zb))*((yc-yb)*(zc-zd)-(yc-yd)*(zc-zb))+
+((xc-xb)*(za-zb)-(xa-xb)*(zc-zb))*((xc-xd)*(zc-zb)-(xc-xb)*(zc-zd))+((xa-xb)*(yc-yb)-(xc-xb)*(ya-yb))*((xc-xb)*(yc-yd)-(xc-xd)*(yc-yb)));
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+float(ev(num(-0.546,0.707,0,-1.804,0.072,0,-2.39,1.222,0,-3.651,0.589,0)));
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+float(ev(angulo(-0.546,0.707,0,-1.804,0.072,0,-2.39,1.222,0,-3.651,0.589,0)));
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+float(%*180/%pi);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+triginverses(acos(10*x+y));
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+printdecl(vars) := (
+        sprint("double", first(vars)),
+        for v in rest(vars) do sprint(",", v),
+        sprint(";"))$
+
+printdef(expr) := sprint(first(expr), "=", second(expr), ";")$
+
+block2c(expr) :=
+        if ?equal(op(expr), block) then (
+                printdecl(first(expr)),
+                for d in reverse(rest(reverse(rest(expr)))) do printdef(d),
+                sprint("return", string(last(expr)), ";"))
+        else
+                sprint("return", string(expr), ";")$
+
+expr2c(funcname, argstr, expr) := (
+        sprint("double", funcname, "(", argstr, ") {"),
+        block2c(subst(pow, "^", optimize(expr))),
+        sprint("}", "
+"))$
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+expr2c("angulo", "double xa, double ya, double za, double xb, double yb, double zb, double xc, double yc, double zc, double xd, double yd, double zd", acos((((ya-yb)*(zc-zb)-(yc-yb)*(za-zb))*((yc-yb)*(zc-zd)-(yc-yd)*(zc-zb))+((xc-xb)*(za-zb)-(xa-xb)*(zc-zb))*
+((xc-xd)*(zc-zb)-(xc-xb)*(zc-zd))+((xa-xb)*(yc-yb)-(xc-xb)*(ya-yb))*((xc-xb)*(yc-yd)-(xc-xd)*(yc-yb)))/(
+sqrt(((ya-yb)*(zc-zb)-(yc-yb)*(za-zb))^2+((xc-xb)*(za-zb)-(xa-xb)*(zc-zb))^2+((xa-xb)*(yc-yb)-(xc-xb)*(ya-yb))^2)*
+sqrt(((yc-yb)*(zc-zd)-(yc-yd)*(zc-zb))^2+((xc-xd)*(zc-zb)-(xc-xb)*(zc-zd))^2+((xc-xb)*(yc-yd)-(xc-xd)*(yc-yb))^2))));
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+for x thru 8 do (
+    v: "",
+    for y thru 12 do (        
+        r: random(100),
+        v: concat(v, r),
+        v: concat(v, ", ")
+    ),
+    print(v),
+    print("")
+);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+ev(float(angulo(85, 35, 45, 53, 24, 75, 14, 95, 51, 92, 84, 77)));
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+ev(float(angulo(2, 3, 4, 5, 6, 7, 8, 9, 10,11,12,13)));
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+acos((((ya-yb)*(zc-zb)-(yc-yb)*(za-zb))*((yc-yb)*(zc-zd)-(yc-yd)*(zc-zb))+((xc-xb)*(za-zb)-(xa-xb)*(zc-zb))*
+((xc-xd)*(zc-zb)-(xc-xb)*(zc-zd))+((xa-xb)*(yc-yb)-(xc-xb)*(ya-yb))*((xc-xb)*(yc-yd)-(xc-xd)*(yc-yb)))/(
+sqrt(((ya-yb)*(zc-zb)-(yc-yb)*(za-zb))^2+((xc-xb)*(za-zb)-(xa-xb)*(zc-zb))^2+((xa-xb)*(yc-yb)-(xc-xb)*(ya-yb))^2)*
+sqrt(((yc-yb)*(zc-zd)-(yc-yd)*(zc-zb))^2+((xc-xd)*(zc-zb)-(xc-xb)*(zc-zd))^2+((xc-xb)*(yc-yd)-(xc-xd)*(yc-yb))^2)));
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+diff(acos((((ya-yb)*(zc-zb)-(yc-yb)*(za-zb))*((yc-yb)*(zc-zd)-(yc-yd)*(zc-zb))+((xc-xb)*(za-zb)-(xa-xb)*(zc-zb))*
+((xc-xd)*(zc-zb)-(xc-xb)*(zc-zd))+((xa-xb)*(yc-yb)-(xc-xb)*(ya-yb))*((xc-xb)*(yc-yd)-(xc-xd)*(yc-yb)))/(
+sqrt(((ya-yb)*(zc-zb)-(yc-yb)*(za-zb))^2+((xc-xb)*(za-zb)-(xa-xb)*(zc-zb))^2+((xa-xb)*(yc-yb)-(xc-xb)*(ya-yb))^2)*
+sqrt(((yc-yb)*(zc-zd)-(yc-yd)*(zc-zb))^2+((xc-xd)*(zc-zb)-(xc-xb)*(zc-zd))^2+((xc-xb)*(yc-yd)-(xc-xd)*(yc-yb))^2))), xa);
+/* [wxMaxima: input   end   ] */
+
+/* Maxima can't load/batch files which end with a comment! */
+"Created with wxMaxima"$

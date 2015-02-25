@@ -11,7 +11,7 @@ This collection of classes were developed as part of the PELE++ project in a sep
 - Do not contain sensible information about PELE++, but can help to understand the ANM IC code.
 - Implement changes/improvements from the base PELE++ code.  
 
-The ANM IC code rights go to their authors, the Barcelona Supercomputing Center (BSC-CNS) and Universitat Politécnica de Barcelona (UPC). Any piece of code containing functions that were not developed in the context of the ANM IC and are part of the PELE++ project are under the PELE++ copyright license (included) and may not be used without express consent of their owner/s.  
+The ANM IC code rights go to their authors, the Barcelona Supercomputing Center (BSC-CNS) and Universitat Politécnica de Barcelona (UPC). Any piece of code containing functions that were not developed in the context of the ANM IC and are part of the PELE++ project are under the PELE++ copyright license (included as 'COPYRIGHT' in the root folder) and may not be used without express consent of their owner/s.  
 
 # Authors
 Main authors: Alba Ricón Muñoz and [Víctor A. Gil Sepúlveda](http://victor-gil-sepulveda.github.io/)

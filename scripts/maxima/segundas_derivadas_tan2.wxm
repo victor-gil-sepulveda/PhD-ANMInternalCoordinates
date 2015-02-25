@@ -1,0 +1,214 @@
+/* [wxMaxima batch file version 1] [ DO NOT EDIT BY HAND! ]*/
+/* [ Created with wxMaxima version 11.08.0 ] */
+
+/* [wxMaxima: title   start ]
+Segundas derivadas
+   [wxMaxima: title   end   ] */
+
+/* [wxMaxima: comment start ]
+Ángulo
+   [wxMaxima: comment end   ] */
+
+/* [wxMaxima: input   start ] */
+angulo(xa,ya,za,xb,yb,zb,xc,yc,zc,xd,yd,zd) := (atan2(((
+(((xb-xc)*(za-zb)-(xa-xb)*(zb-zc))*(zb-zc))/(sqrt(((ya-yb)*(zb-zc)-(yb-yc)*(za-zb))^2+((xb-xc)*(za-zb)-(xa-xb)*(zb-zc))^2+((xa-xb)*(yb-yc)-(xb-xc)*(ya-yb))^2)*sqrt((zb-zc)^2+(yb-yc)^2+(xb-xc)^2))-
+(((xa-xb)*(yb-yc)-(xb-xc)*(ya-yb))*(yb-yc))/(sqrt(((ya-yb)*(zb-zc)-(yb-yc)*(za-zb))^2+((xb-xc)*(za-zb)-(xa-xb)*(zb-zc))^2+((xa-xb)*(yb-yc)-(xb-xc)*(ya-yb))^2)*sqrt((zb-zc)^2+(yb-yc)^2+(xb-xc)^2)))*
+((yb-yc)*(zc-zd)-(yc-yd)*(zb-zc)))/(
+sqrt(((yb-yc)*(zc-zd)-(yc-yd)*(zb-zc))^2+((xc-xd)*(zb-zc)-(xb-xc)*(zc-zd))^2+((xb-xc)*(yc-yd)-(xc-xd)*(yb-yc))^2))+((
+((xb-xc)*((xa-xb)*(yb-yc)-(xb-xc)*(ya-yb)))/(sqrt(((ya-yb)*(zb-zc)-(yb-yc)*(za-zb))^2+((xb-xc)*(za-zb)-(xa-xb)*(zb-zc))^2+((xa-xb)*(yb-yc)-(xb-xc)*(ya-yb))^2)*sqrt((zb-zc)^2+(yb-yc)^2+(xb-xc)^2))-
+(((ya-yb)*(zb-zc)-(yb-yc)*(za-zb))*(zb-zc))/(sqrt(((ya-yb)*(zb-zc)-(yb-yc)*(za-zb))^2+((xb-xc)*(za-zb)-(xa-xb)*(zb-zc))^2+((xa-xb)*(yb-yc)-(xb-xc)*(ya-yb))^2)*sqrt((zb-zc)^2+(yb-yc)^2+(xb-xc)^2)))*
+((xc-xd)*(zb-zc)-(xb-xc)*(zc-zd)))/(
+sqrt(((yb-yc)*(zc-zd)-(yc-yd)*(zb-zc))^2+((xc-xd)*(zb-zc)-(xb-xc)*(zc-zd))^2+((xb-xc)*(yc-yd)-(xc-xd)*(yb-yc))^2))+(
+((xb-xc)*(yc-yd)-(xc-xd)*(yb-yc))*(
+((yb-yc)*((ya-yb)*(zb-zc)-(yb-yc)*(za-zb)))/(sqrt(((ya-yb)*(zb-zc)-(yb-yc)*(za-zb))^2+((xb-xc)*(za-zb)-(xa-xb)*(zb-zc))^2+((xa-xb)*(yb-yc)-(xb-xc)*(ya-yb))^2)*sqrt((zb-zc)^2+(yb-yc)^2+(xb-xc)^2))-
+((xb-xc)*((xb-xc)*(za-zb)-(xa-xb)*(zb-zc)))/(sqrt(((ya-yb)*(zb-zc)-(yb-yc)*(za-zb))^2+((xb-xc)*(za-zb)-(xa-xb)*(zb-zc))^2+((xa-xb)*(yb-yc)-(xb-xc)*(ya-yb))^2)*sqrt((zb-zc)^2+(yb-yc)^2+(xb-xc)^2))))/(
+sqrt(((yb-yc)*(zc-zd)-(yc-yd)*(zb-zc))^2+((xc-xd)*(zb-zc)-(xb-xc)*(zc-zd))^2+((xb-xc)*(yc-yd)-(xc-xd)*(yb-yc))^2)),(
+((ya-yb)*(zb-zc)-(yb-yc)*(za-zb))*((yb-yc)*(zc-zd)-(yc-yd)*(zb-zc)))/(
+sqrt(((ya-yb)*(zb-zc)-(yb-yc)*(za-zb))^2+((xb-xc)*(za-zb)-(xa-xb)*(zb-zc))^2+((xa-xb)*(yb-yc)-(xb-xc)*(ya-yb))^2)*
+sqrt(((yb-yc)*(zc-zd)-(yc-yd)*(zb-zc))^2+((xc-xd)*(zb-zc)-(xb-xc)*(zc-zd))^2+((xb-xc)*(yc-yd)-(xc-xd)*(yb-yc))^2))+(
+((xb-xc)*(za-zb)-(xa-xb)*(zb-zc))*((xc-xd)*(zb-zc)-(xb-xc)*(zc-zd)))/(
+sqrt(((ya-yb)*(zb-zc)-(yb-yc)*(za-zb))^2+((xb-xc)*(za-zb)-(xa-xb)*(zb-zc))^2+((xa-xb)*(yb-yc)-(xb-xc)*(ya-yb))^2)*
+sqrt(((yb-yc)*(zc-zd)-(yc-yd)*(zb-zc))^2+((xc-xd)*(zb-zc)-(xb-xc)*(zc-zd))^2+((xb-xc)*(yc-yd)-(xc-xd)*(yb-yc))^2))+(
+((xa-xb)*(yb-yc)-(xb-xc)*(ya-yb))*((xb-xc)*(yc-yd)-(xc-xd)*(yb-yc)))/(
+sqrt(((ya-yb)*(zb-zc)-(yb-yc)*(za-zb))^2+((xb-xc)*(za-zb)-(xa-xb)*(zb-zc))^2+((xa-xb)*(yb-yc)-(xb-xc)*(ya-yb))^2)*
+sqrt(((yb-yc)*(zc-zd)-(yc-yd)*(zb-zc))^2+((xc-xd)*(zb-zc)-(xb-xc)*(zc-zd))^2+((xb-xc)*(yc-yd)-(xc-xd)*(yb-yc))^2))))$
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: comment start ]
+Fórmula: k(a - a_eq)²
+   [wxMaxima: comment end   ] */
+
+/* [wxMaxima: input   start ] */
+energia(k,xa,ya,za,xb,yb,zb,xc,yc,zc,xd,yd,zd,eq) := (
+    k * (angulo(xa,ya,za,xb,yb,zb,xc,yc,zc,xd,yd,zd) - eq)²
+)$
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: comment start ]
+
+   [wxMaxima: comment end   ] */
+
+/* [wxMaxima: input   start ] */
+k=k,xa=xa,ya=ya,za=za,xb=xb,yb=yb,zb=zb,xc=xc,yc=yc,zc=zc,xd=xd,yd=yd,zd=za,eq=eq;
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+/*compare(diff(diff(angulo(xa,ya,za,xb,yb,zb,xc,yc,zc,xd,yd,zd),xa),xa), diff(angulo(xa,ya,za,xb,yb,zb,xc,yc,zc,xd,yd,zd),xa,2));*/;
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+/*xaxa: diff(angulo(xa,ya,za,xb,yb,zb,xc,yc,zc,xd,yd,zd),xa,1,xa,1)$
+xaya: diff(angulo(xa,ya,za,xb,yb,zb,xc,yc,zc,xd,yd,zd),xa,1,ya,1)$
+xaza: diff(angulo(xa,ya,za,xb,yb,zb,xc,yc,zc,xd,yd,zd),xa,1,za,1)$
+print(expr2c("hess","double xa, double ya, double za, double xb, double yb, double zb, double xc, double yc, double zc, double xd, double yd, double zd", expr));*/;
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+hess() := (
+    c: 1,
+    /*k=55,a=85,b=42,c=35,d=81,e=30,f=20,g=56,h=38,l=51,m=74,n=70,o=8,eq=5,*/
+    /*print(k,",",a,",",b,",",c,",",d,",",e,",",f,",",g,",",h,",",l,",",m,",",n,",",o,",",eq),*/
+    vars: [xa,ya,za,xb,yb,zb,xc,yc,zc,xd,yd,zd],
+    for i:1 step 1 while i<13 do (
+        for j:i step 1 while j<13 do (
+            /*print(vars[i],vars[j]),*/
+            expr: diff(energia(k,xa,ya,za,xb,yb,zb,xc,yc,zc,xd,yd,zd,eq),vars[i],1,vars[j],1),            
+            /*print(float(ev(expr,k=k,xa=a,ya=b,za=c,xb=d,yb=e,zb=f,xc=g,yc=h,zc=l,xd=m,yd=n,zd=o,eq=eq))),*/
+
+            name: concat(vars[i], "_"),
+            name: concat(name, vars[j]),
+
+            /*print(c),*/
+            c: c+1,
+            /*print(name)*/
+            print(expr2c(concat("HarmonicDihedralConstraintFunctions::hessian_",name),"double k, double xa, double ya, double za, double xb, double yb, double zb, double xc, double yc, double zc, double xd, double yd, double zd, double eq", expr))
+        )
+    )
+)$
+hess();
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+55,85,42,35,81,30,20,56,38,51,74,70,8,5;
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+caca: diff(energia(k,xa,ya,za,xb,yb,zb,xc,yc,zc,xd,yd,zd,eq),xa,1,ya,1)$
+float(ev(caca,k=55,xa=85,ya=42,za=35,xb=81,yb=30,zb=20,xc=56,yc=38,zc=51,xd=74,yd=70,zd=8,eq=5));
+expr2c("Hessian::hessian_xa_ya","double k, double xa, double ya, double za, double xb, double yb, double zb, double xc, double yc, double zc, double xd, double yd, double zd, double eq", caca);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+print((expr(16,27,34,84,39,61,26,8,52,50,12,52,1,73)));
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+expr(k,xa,ya,za,xb,yb,zb,xc,yc,zc,xd,yd,zd,eq);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+s;
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+print(float(ev(expr,k=1,xa=1,ya=1,za=1,xb=1,yb=1,zb=1,xc=1,yc=1,zc=1,xd=1,yd=1,zd=1,eq=1)));
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+energia(k,xa,ya,za,xb,yb,zb,xc,yc,zc,xd,yd,zd,eq);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+for x thru 1 do (
+    k: random(100),
+    a: random(100),
+    b: random(100),
+    c: random(100),
+    d: random(100),
+    e: random(100),
+    f: random(100),
+    g: random(100),
+    h: random(100),
+    i: random(100),
+    j: random(100),
+    k: random(100),
+    l: random(100),
+    eq: random(100),
+    res: float(ev(diff(energia(k,a,b,c,d,e,f,g,h,i,j,k,l,eq),xa,1))),
+    print(res,",",k,",",a,",",b,",",c,",",d,",",e,",",f,",",g,",",h,",",i,",",j,",",k,",",l,",",eq),
+    
+    print("")
+);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+/*hess() := (
+    c: 1,
+    vars: [xa,ya,za,xb,yb,zb,xc,yc,zc,xd,yd,zd],
+    for i in vars do (
+        for j in vars do (
+            expr: diff(angulo(xa,ya,za,xb,yb,zb,xc,yc,zc,xd,yd,zd),i,1,j,1),
+            print(c),
+            print(i,j),
+            c:c+1
+        )
+    )
+)$*/;
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+/*hess();*/;
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+/*compare(xaxa,xaya);*/;
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: comment start ]
+
+   [wxMaxima: comment end   ] */
+
+/* [wxMaxima: input   start ] */
+printdecl(vars) := (
+        sprint("double", first(vars)),
+        for v in rest(vars) do sprint(",", v),
+        sprint(";"))$
+
+printdef(expr) := sprint(first(expr), "=", second(expr), ";")$
+
+block2c(expr) :=
+        if ?equal(op(expr), block) then (
+                printdecl(first(expr)),
+                for d in reverse(rest(reverse(rest(expr)))) do printdef(d),
+                sprint("return", string(last(expr)), ";"))
+        else
+                sprint("return", string(expr), ";")$
+
+expr2c(funcname, argstr, expr) := (
+        sprint("double", funcname, "(", argstr, ") {"),
+        block2c(subst(pow, "^", optimize(expr))),
+        sprint("}", "
+"))$
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+/*expr2c("hessian","double xa, double ya, double za, double xb, double yb, double zb, double xc, double yc, double zc, double xd, double yd, double zd",hessian(acos((((ya-yb)*(zc-zb)-(yc-yb)*(za-zb))*((yc-yb)*(zc-zd)-(yc-yd)*(zc-zb))+((xc-xb)*(za-zb)-(xa-xb)*(zc-zb))*
+((xc-xd)*(zc-zb)-(xc-xb)*(zc-zd))+((xa-xb)*(yc-yb)-(xc-xb)*(ya-yb))*((xc-xb)*(yc-yd)-(xc-xd)*(yc-yb)))/(
+sqrt(((ya-yb)*(zc-zb)-(yc-yb)*(za-zb))^2+((xc-xb)*(za-zb)-(xa-xb)*(zc-zb))^2+((xa-xb)*(yc-yb)-(xc-xb)*(ya-yb))^2)*
+sqrt(((yc-yb)*(zc-zd)-(yc-yd)*(zc-zb))^2+((xc-xd)*(zc-zb)-(xc-xb)*(zc-zd))^2+((xc-xb)*(yc-yd)-(xc-xd)*(yc-yb))^2))),[xa,ya,za,xb,yb,zb,xc,yc,zc,xd,yd,zd]));*/;
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+exp: hessian(energia(xa,ya,za,xb,yb,zb,xc,yc,zc,xd,yd,zd), [xa,ya,za,xb,yb,zb,xc,yc,zc,xd,yd,zd]);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+float(ev(expr,ya=20))$
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+expr;
+/* [wxMaxima: input   end   ] */
+
+/* Maxima can't load/batch files which end with a comment! */
+"Created with wxMaxima"$

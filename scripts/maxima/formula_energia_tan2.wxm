@@ -1,0 +1,106 @@
+/* [wxMaxima batch file version 1] [ DO NOT EDIT BY HAND! ]*/
+/* [ Created with wxMaxima version 11.08.0 ] */
+
+/* [wxMaxima: title   start ]
+Fórmula de la energia
+   [wxMaxima: title   end   ] */
+
+/* [wxMaxima: input   start ] */
+printdecl(vars) := (
+        sprint("double", first(vars)),
+        for v in rest(vars) do sprint(",", v),
+        sprint(";"))$
+
+printdef(expr) := sprint(first(expr), "=", second(expr), ";")$
+
+block2c(expr) :=
+        if ?equal(op(expr), block) then (
+                printdecl(first(expr)),
+                for d in reverse(rest(reverse(rest(expr)))) do printdef(d),
+                sprint("return", string(last(expr)), ";"))
+        else
+                sprint("return", string(expr), ";")$
+
+expr2c(funcname, argstr, expr) := (
+        sprint("double", funcname, "(", argstr, ") {"),
+        block2c(subst(pow, "^", optimize(expr))),
+        sprint("}", "
+"))$
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: comment start ]
+Fórmula: k(a - a_eq)²
+   [wxMaxima: comment end   ] */
+
+/* [wxMaxima: input   start ] */
+angulo(xa,ya,za,xb,yb,zb,xc,yc,zc,xd,yd,zd) := (atan2(((
+(((xb-xc)*(za-zb)-(xa-xb)*(zb-zc))*(zb-zc))/(sqrt(((ya-yb)*(zb-zc)-(yb-yc)*(za-zb))^2+((xb-xc)*(za-zb)-(xa-xb)*(zb-zc))^2+((xa-xb)*(yb-yc)-(xb-xc)*(ya-yb))^2)*sqrt((zb-zc)^2+(yb-yc)^2+(xb-xc)^2))-
+(((xa-xb)*(yb-yc)-(xb-xc)*(ya-yb))*(yb-yc))/(sqrt(((ya-yb)*(zb-zc)-(yb-yc)*(za-zb))^2+((xb-xc)*(za-zb)-(xa-xb)*(zb-zc))^2+((xa-xb)*(yb-yc)-(xb-xc)*(ya-yb))^2)*sqrt((zb-zc)^2+(yb-yc)^2+(xb-xc)^2)))*
+((yb-yc)*(zc-zd)-(yc-yd)*(zb-zc)))/(
+sqrt(((yb-yc)*(zc-zd)-(yc-yd)*(zb-zc))^2+((xc-xd)*(zb-zc)-(xb-xc)*(zc-zd))^2+((xb-xc)*(yc-yd)-(xc-xd)*(yb-yc))^2))+((
+((xb-xc)*((xa-xb)*(yb-yc)-(xb-xc)*(ya-yb)))/(sqrt(((ya-yb)*(zb-zc)-(yb-yc)*(za-zb))^2+((xb-xc)*(za-zb)-(xa-xb)*(zb-zc))^2+((xa-xb)*(yb-yc)-(xb-xc)*(ya-yb))^2)*sqrt((zb-zc)^2+(yb-yc)^2+(xb-xc)^2))-
+(((ya-yb)*(zb-zc)-(yb-yc)*(za-zb))*(zb-zc))/(sqrt(((ya-yb)*(zb-zc)-(yb-yc)*(za-zb))^2+((xb-xc)*(za-zb)-(xa-xb)*(zb-zc))^2+((xa-xb)*(yb-yc)-(xb-xc)*(ya-yb))^2)*sqrt((zb-zc)^2+(yb-yc)^2+(xb-xc)^2)))*
+((xc-xd)*(zb-zc)-(xb-xc)*(zc-zd)))/(
+sqrt(((yb-yc)*(zc-zd)-(yc-yd)*(zb-zc))^2+((xc-xd)*(zb-zc)-(xb-xc)*(zc-zd))^2+((xb-xc)*(yc-yd)-(xc-xd)*(yb-yc))^2))+(
+((xb-xc)*(yc-yd)-(xc-xd)*(yb-yc))*(
+((yb-yc)*((ya-yb)*(zb-zc)-(yb-yc)*(za-zb)))/(sqrt(((ya-yb)*(zb-zc)-(yb-yc)*(za-zb))^2+((xb-xc)*(za-zb)-(xa-xb)*(zb-zc))^2+((xa-xb)*(yb-yc)-(xb-xc)*(ya-yb))^2)*sqrt((zb-zc)^2+(yb-yc)^2+(xb-xc)^2))-
+((xb-xc)*((xb-xc)*(za-zb)-(xa-xb)*(zb-zc)))/(sqrt(((ya-yb)*(zb-zc)-(yb-yc)*(za-zb))^2+((xb-xc)*(za-zb)-(xa-xb)*(zb-zc))^2+((xa-xb)*(yb-yc)-(xb-xc)*(ya-yb))^2)*sqrt((zb-zc)^2+(yb-yc)^2+(xb-xc)^2))))/(
+sqrt(((yb-yc)*(zc-zd)-(yc-yd)*(zb-zc))^2+((xc-xd)*(zb-zc)-(xb-xc)*(zc-zd))^2+((xb-xc)*(yc-yd)-(xc-xd)*(yb-yc))^2)),(
+((ya-yb)*(zb-zc)-(yb-yc)*(za-zb))*((yb-yc)*(zc-zd)-(yc-yd)*(zb-zc)))/(
+sqrt(((ya-yb)*(zb-zc)-(yb-yc)*(za-zb))^2+((xb-xc)*(za-zb)-(xa-xb)*(zb-zc))^2+((xa-xb)*(yb-yc)-(xb-xc)*(ya-yb))^2)*
+sqrt(((yb-yc)*(zc-zd)-(yc-yd)*(zb-zc))^2+((xc-xd)*(zb-zc)-(xb-xc)*(zc-zd))^2+((xb-xc)*(yc-yd)-(xc-xd)*(yb-yc))^2))+(
+((xb-xc)*(za-zb)-(xa-xb)*(zb-zc))*((xc-xd)*(zb-zc)-(xb-xc)*(zc-zd)))/(
+sqrt(((ya-yb)*(zb-zc)-(yb-yc)*(za-zb))^2+((xb-xc)*(za-zb)-(xa-xb)*(zb-zc))^2+((xa-xb)*(yb-yc)-(xb-xc)*(ya-yb))^2)*
+sqrt(((yb-yc)*(zc-zd)-(yc-yd)*(zb-zc))^2+((xc-xd)*(zb-zc)-(xb-xc)*(zc-zd))^2+((xb-xc)*(yc-yd)-(xc-xd)*(yb-yc))^2))+(
+((xa-xb)*(yb-yc)-(xb-xc)*(ya-yb))*((xb-xc)*(yc-yd)-(xc-xd)*(yb-yc)))/(
+sqrt(((ya-yb)*(zb-zc)-(yb-yc)*(za-zb))^2+((xb-xc)*(za-zb)-(xa-xb)*(zb-zc))^2+((xa-xb)*(yb-yc)-(xb-xc)*(ya-yb))^2)*
+sqrt(((yb-yc)*(zc-zd)-(yc-yd)*(zb-zc))^2+((xc-xd)*(zb-zc)-(xb-xc)*(zc-zd))^2+((xb-xc)*(yc-yd)-(xc-xd)*(yb-yc))^2))))$
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+energia(k,xa,ya,za,xb,yb,zb,xc,yc,zc,xd,yd,zd,eq) := (
+    k * (angulo(xa,ya,za,xb,yb,zb,xc,yc,zc,xd,yd,zd) - eq)²
+)$
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+float(ev(energia(2,-3.057,-0.573,0.000,-2.390,1.222,0.000,-3.651,0.589,0.000,-1.804,0.072,0.000, 1.57079633)));
+float(ev(energia(2,-2.689, -0.385, -0.996, -1.804, 0.072, 0.000, -2.390, 1.222, 0.000, -3.651, 0.589, 0.000, 1.57079633)));
+float(ev(energia(2,-1.802, 0.067, -1.409, -1.804, 0.072, 0.000, -2.390, 1.222, 0.000, -3.651, 0.589, 0.000, 1.57079633)));
+float(ev(energia(2,-0.546, 0.707, 0.000, -1.804, 0.072, 0.000, -2.390, 1.222, 0.000, -3.648, 0.590, -0.092, 1.57079633)));
+float(ev(energia(2,-0.546, 0.707, 0.000, -1.804, 0.072, 0.000, -2.390, 1.222, 0.000, -3.651, 0.589, 0.000, 1.57079633)));
+float(ev(energia(2,-0.557, 0.702, 0.184, -1.804, 0.072, 0.000, -2.390, 1.222, 0.000, -3.648, 0.590, -0.092, 1.57079633)));
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+expr2c("energia", "double k, double xa, double ya, double za, double xb, double yb, double zb, double xc, double yc, double zc, double xd, double yd, double zd, double eq", energia(k,xa,ya,za,xb,yb,zb,xc,yc,zc,xd,yd,zd,eq));
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+with_stdout("/home/albarin/Dropbox/pfc/documentos/maxima/tmp.out",
+for x thru 8 do (
+    k: random(1.00),
+    eq: random(1.00),
+    xa: random(1.00),
+    ya: random(1.00),
+    za: random(1.00),
+    xb: random(1.00),
+    yb: random(1.00),
+    zb: random(1.00),
+    xc: random(1.00),
+    yc: random(1.00),
+    zc: random(1.00),
+    xd: random(1.00),
+    yd: random(1.00),
+    zd: random(1.00),
+
+    res: float(ev(energia(k,xa,ya,za,xb,yb,zb,xc,yc,zc,xd,yd,zd,eq))),
+    print(res,",",k,",",xa,",",ya,",",za,",",xb,",",yb,",",zb,",",xc,",",yc,",",zc,",",xd,",",yd,",",zd,",",eq)  
+)
+);
+printfile("/home/albarin/Dropbox/pfc/documentos/maxima/tmp.out");
+/* [wxMaxima: input   end   ] */
+
+/* Maxima can't load/batch files which end with a comment! */
+"Created with wxMaxima"$
