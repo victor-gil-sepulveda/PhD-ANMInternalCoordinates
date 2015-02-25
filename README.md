@@ -20,4 +20,4 @@ Also contributed: [Manuel Rivero](http://garajeando.blogspot.com.es/), Jorge Est
 # Special Thanks
 We would like to thank Jose Ramón López Blanco for his help and endless patience (and of course, for the code he led us!). It would have been impossible to do it without him.
 
-* The C++ rewrite of PELE (J. Comp. Chem., 31:1224-35 (2010))
+\* The C++ rewrite of PELE (J. Comp. Chem., 31:1224-35 (2010))
