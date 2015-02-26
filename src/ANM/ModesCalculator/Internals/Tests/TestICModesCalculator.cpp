@@ -93,14 +93,6 @@ void TestICModesCalculator::run()
 			"src/ANM/ModesCalculator/Internals/Tests/data/conversion/1SU4/cc_evec.txt",
 			0.08);
 
-      // Completely failing, maybe because of OXT and TER
-      // must be kept as study case
-//    TEST_FUNCTION(testInternalToCartesian,
-//			"src/ANM/ModesCalculator/Internals/Tests/data/conversion/1DDT/1ddt.pdb",
-//			"src/ANM/ModesCalculator/Internals/Tests/data/conversion/1DDT/ic_evec.txt",
-//			"src/ANM/ModesCalculator/Internals/Tests/data/conversion/1DDT/cc_evec.txt",
-//			0.001);
-
     finish();
 }
 

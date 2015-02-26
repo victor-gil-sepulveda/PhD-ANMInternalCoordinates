@@ -131,7 +131,6 @@ void AnmEigen::initialize(std::vector<double>& eigenValues,
 	}
 
 	this->numberOfModes = values.size();
-	cout<<"DBG: Creating AnmEigen from vector<double>. "<< this->numberOfModes <<" Modes read."<<endl;
 
 	if(usingCartesian){
 		this->numberOfNodes = vectors[0].size()/3;
@@ -139,6 +138,8 @@ void AnmEigen::initialize(std::vector<double>& eigenValues,
 	else{
 		this->numberOfNodes = vectors[0].size();
 	}
+
+	cout<<"DBG: AnmEigen created from vector<double>. "<< this->numberOfModes <<" Modes read."<<endl;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////

@@ -186,6 +186,7 @@ void ModesWriter::getCAsFromUnits(vector<Unit*>& units, vector<int>& ca_atom_ind
 	bool onlyHeavyAtoms = true;
 	vector<Atom*> unit_atoms;
 	UnitTools::getAllAtomsFromUnits(units, unit_atoms, onlyHeavyAtoms);
+	cout<<"unit_atoms total "<<unit_atoms.size()<<endl;
 	for (unsigned int i =0; i< unit_atoms.size();++i){
 		if(unit_atoms[i]->name == AtomNames::CA){
 			ca_atom_indices.push_back(i);
@@ -206,7 +207,9 @@ void ModesWriter::getBBAtomsFromUnits(vector<Unit*>& units, vector<Atom*>& bb_at
 	}
 }
 
-void ModesWriter::filterEigenvectors(AnmEigen* original, AnmEigen* filtered, vector<int>& ca_atom_indices){
+void ModesWriter::filterEigenvectors(AnmEigen* original,
+		AnmEigen* filtered,
+		vector<int>& ca_atom_indices){
 
 	std::vector<std::vector<double> > filtered_evectors;
 	vector<std::vector<double> >& original_evectors = original->vectors;
@@ -214,9 +217,10 @@ void ModesWriter::filterEigenvectors(AnmEigen* original, AnmEigen* filtered, vec
 	for (unsigned int i = 0; i < original_evectors.size(); ++i){
 		vector<double> one_eigen_filtered;
 		for (unsigned int j = 0; j < ca_atom_indices.size(); ++j){
-			one_eigen_filtered.push_back(original_evectors[i][j*3]);
-			one_eigen_filtered.push_back(original_evectors[i][(j*3)+1]);
-			one_eigen_filtered.push_back(original_evectors[i][(j*3)+2]);
+			int index_offset = ca_atom_indices[j] * 3;
+			one_eigen_filtered.push_back(original_evectors[i][index_offset]);
+			one_eigen_filtered.push_back(original_evectors[i][index_offset+1]);
+			one_eigen_filtered.push_back(original_evectors[i][index_offset+2]);
 		}
 		filtered_evectors.push_back(one_eigen_filtered);
 	}
