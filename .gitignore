@@ -20,7 +20,6 @@ scripts/
 # PELE specific files not related to ANM
 src/AtomPulling/
 src/CheckFix/
-src/Energy/
 src/Exceptions/
 src/GPU/
 src/HydrogenBond/
@@ -73,6 +72,41 @@ src/System/System.h
 src/System/SystemVars.cpp
 src/System/SystemVars.h
 src/System/Test/
+src/Energy/EnergyAlgorithms/
+src/Energy/EnergyCalculator.cpp
+src/Energy/EnergyCalculator.h
+src/Energy/EnergyCalculatorBuilder.cpp
+src/Energy/EnergyCalculatorBuilder.h
+src/Energy/EnergyReports/
+src/Energy/EnergyValues/
+src/Energy/ForceField/
+src/Energy/HessianMatrix/
+src/Energy/NonBondingLists/
+src/Energy/Potential.cpp
+src/Energy/Potential.h
+src/Energy/PotentialConstants.h
+src/Energy/PotentialConstraint/ConstrainedTerms.cpp
+src/Energy/PotentialConstraint/ConstrainedTerms.h
+src/Energy/PotentialConstraint/ConstraintTerms/ConstraintTerm.h
+src/Energy/PotentialConstraint/ConstraintTerms/ConstraintTermBuilder.cpp
+src/Energy/PotentialConstraint/ConstraintTerms/ConstraintTermBuilder.h
+src/Energy/PotentialConstraint/ConstraintTerms/ConstraintTermsFactory.cpp
+src/Energy/PotentialConstraint/ConstraintTerms/ConstraintTermsFactory.h
+src/Energy/PotentialConstraint/ConstraintTerms/GaussianConstraint/
+src/Energy/PotentialConstraint/ConstraintTerms/HarmonicAngleConstraint/
+src/Energy/PotentialConstraint/ConstraintTerms/HarmonicConstraint/
+src/Energy/PotentialConstraint/ConstraintTerms/Tests/
+src/Energy/PotentialConstraint/ConstraintsListBuilder.cpp
+src/Energy/PotentialConstraint/ConstraintsListBuilder.h
+src/Energy/PotentialConstraint/ConstraintsLists.cpp
+src/Energy/PotentialConstraint/ConstraintsLists.h
+src/Energy/PotentialConstraint/ConstraintsListsTypes.h
+src/Energy/PotentialConstraint/Tests/
+src/Energy/PotentialFactory.cpp
+src/Energy/PotentialFactory.h
+src/Energy/PotentialPlusSGB/
+src/Energy/TermCalculators/
+src/Energy/Tests/
 
 # Compiled Object files
 *.slo
