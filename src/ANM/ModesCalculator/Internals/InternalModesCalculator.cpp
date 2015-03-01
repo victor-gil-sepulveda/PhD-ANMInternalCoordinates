@@ -86,7 +86,7 @@ void InternalModesCalculator::calculateEigenValuesAndVectors(AnmParameters * anm
 			false); // Skip OXT
 
 	TriangularMatrix* H = ANMICHessianCalculator::calculateH(units,  U);
-	//ANM TODO: Mejor que esto sea una opcion!
+	//ANM TODO: This must be an option !!
 	//ANMICHessianCalculator::modifyHessianWithExtraTorsion(H);
 
 	TriangularMatrix* K = ANMICKineticMatrixCalculator::calculateK(units, INMA);
@@ -261,6 +261,58 @@ AnmEigen* InternalModesCalculator::internalToCartesian(vector<Unit*>& units, Anm
 	return out;
 }
 
+///////////////////////////////////////////////////////////////
+/// \remarks
+/// Converts a collection of modes expressed in cartesian coordinates in torsional rotations (can be
+/// seen as their conversion to IC.
+///
+/// \param units [In] Coarse grain representation of the structure in Unit objects.
+/// \param in [In / Out] AnmEigen object containing modes (or forces or whatever) in cartesian coordinates.
+///
+/// \return The AnmEigen object holding the converted modes.
+///
+/// \author vgil
+/// \date 01/03/2015
+///////////////////////////////////////////////////////////////
+AnmEigen* InternalModesCalculator::cartesianToInternal(vector<Unit*>& units, AnmEigen* in){
+	AnmEigen* out = new AnmEigen;
+	unsigned int number_of_modes = in->getNumberOfModes();
+	unsigned int number_of_coordinates = in->getEigenVectorsDimension();
+
+	// Calculate Jacobi
+	vector<vector<double> > J;
+	ANMICKineticMatrixCalculator::Jacobi(units, J, M);
+
+	// Calculate K
+	TriangularMatrix* K = ANMICKineticMatrixCalculator::calculateK(units, INMA);
+
+	// Invert K
+	TriangularMatrix* K_inv;
+
+	// Get all masses
+	bool onlyHeavyAtoms = true;
+	vector<Atom*> all_atoms;
+	UnitTools::getAllAtomsFromUnits(units, all_atoms, onlyHeavyAtoms);
+	vector<double> M;
+	for (unsigned int i = 0; i < all_atoms.size(); ++i){
+		M.push_back(all_atoms[i]->getMass());
+		M.push_back(all_atoms[i]->getMass());
+		M.push_back(all_atoms[i]->getMass());
+	}
+
+	// We do this for every of the modes we have in cartesian coordinates
+	for (unsigned int i = 0;i < number_of_modes; ++i){
+		vector<double> torsion_rotations;
+		vector<double>& original_mode = in->vectors[i];
+		// Multiply M by r
+
+
+	}
+
+
+
+	return out;
+}
 
 std::string InternalModesCalculator::generateReport() const {
 	return "Modes calculated using internal coordinates";

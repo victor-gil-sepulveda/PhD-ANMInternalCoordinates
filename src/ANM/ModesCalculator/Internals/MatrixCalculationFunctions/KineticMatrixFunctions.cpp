@@ -506,7 +506,10 @@ TriangularMatrix* ANMICKineticMatrixCalculator::calculateK( vector<Unit*>& units
 	return K;
 }
 
-void ANMICKineticMatrixCalculator::Jacobi(vector<Unit*>& units){
+void ANMICKineticMatrixCalculator::Jacobi(vector<Unit*>& units, vector< vector<double> >& J){
+
+	J.clear();
+
 	// Global stuff
 	unsigned int number_of_torsions = units.size() - 1;
 	double M = calculateM(units, pair<int,int>(0, units.size()-1), false);
@@ -514,7 +517,6 @@ void ANMICKineticMatrixCalculator::Jacobi(vector<Unit*>& units){
 	calculateI(I, units, pair<int,int>(0, units.size()-1), INMA);
 	ANMICMath::invertMatrix(I,I_inv);
 
-	vector<vector<double> > J;
 	// Precalculated values
 	for (unsigned int alpha_torsion = 0; alpha_torsion < number_of_torsions; ++alpha_torsion){
 		// I_a
@@ -535,10 +537,9 @@ void ANMICKineticMatrixCalculator::Jacobi(vector<Unit*>& units){
 		// When getting the atoms we assume same ordering every time
 		vector<Atom*> left_atoms;
 		bool onlyHeavyAtoms = true;
-		UnitTools::getAllAtomsFromUnits(units, left_atoms, onlyHeavyAtoms);
+		UnitTools::getAllAtomsFromUnitRange(units, left_atoms, 0, alpha_torsion, onlyHeavyAtoms);
 		vector<Atom*> right_atoms;
-		bool onlyHeavyAtoms = true;
-		UnitTools::getAllAtomsFromUnits(units, right_atoms, onlyHeavyAtoms);
+		UnitTools::getAllAtomsFromUnitRange(units, right_atoms,alpha_torsion+1, number_of_torsions, onlyHeavyAtoms);
 
 		vector<double> J_row;
 		// Calculate Jia

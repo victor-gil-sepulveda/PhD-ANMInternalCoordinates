@@ -56,7 +56,7 @@ namespace ANMICKineticMatrixCalculator {
 							ICalcType tensor_calc_type);
 
 	// Jacobian
-	void Jacobi(std::vector<Unit*>& units);
+	void Jacobi(std::vector<Unit*>& units, std::vector< std::vector<double> >& J);
 
 	// Derivatives
 	void  dri_dq(std::vector<Unit*>& units,
