@@ -54,6 +54,10 @@ namespace ANMICKineticMatrixCalculator {
 
 	TriangularMatrix* calculateK( std::vector<Unit*>& units,
 							ICalcType tensor_calc_type);
+
+	// Jacobian
+	void Jacobi(std::vector<Unit*>& units);
+
 	// Derivatives
 	void  dri_dq(std::vector<Unit*>& units,
 			unsigned int alpha,

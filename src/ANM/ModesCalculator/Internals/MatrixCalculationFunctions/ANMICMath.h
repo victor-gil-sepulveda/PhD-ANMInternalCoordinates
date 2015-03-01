@@ -57,6 +57,8 @@ namespace ANMICMath {
 
 	Point multiplyIMatrixByEVector(double const I[3][3], double e[3]);
 
+	Point multiplyIMatrixByEVector(double const I[3][3], Point& e);
+
 	void invertMatrix(double matrix[3][3], double result[3][3]);
 
 	void invertMatrix(double *matrix, double *result, unsigned int size);

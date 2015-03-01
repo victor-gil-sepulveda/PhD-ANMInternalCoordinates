@@ -23,6 +23,7 @@
 #include <string>
 #include "../../../../Molecules/AtomNames.h"
 #include "../../../../Molecules/AtomSetsTree/Links/LinkNames.h"
+#include "../../../../Tools/Math/Point.h"
 
 using namespace std;
 
@@ -503,6 +504,98 @@ TriangularMatrix* ANMICKineticMatrixCalculator::calculateK( vector<Unit*>& units
 	}
 
 	return K;
+}
+
+void ANMICKineticMatrixCalculator::Jacobi(vector<Unit*>& units){
+	// Global stuff
+	unsigned int number_of_torsions = units.size() - 1;
+	double M = calculateM(units, pair<int,int>(0, units.size()-1), false);
+	double I[3][3], I_inv[3][3];
+	calculateI(I, units, pair<int,int>(0, units.size()-1), INMA);
+	ANMICMath::invertMatrix(I,I_inv);
+
+	vector<vector<double> > J;
+	// Precalculated values
+	for (unsigned int alpha_torsion = 0; alpha_torsion < number_of_torsions; ++alpha_torsion){
+		// I_a
+		double I_alpha[3][3];
+		calculateI(I_alpha, units, pair<int,int>(0, alpha_torsion), INMA);
+
+		// r1_0
+		CenterOfMass r_a_0 = calculateMobileBodyCOM(units, pair<int,int>(0,alpha_torsion), false);
+		Point r_alpha_0(r_a_0.getX(), r_a_0.getY(), r_a_0.getZ());
+		double Ma = r_a_0.getMass();
+
+		Point* e_alpha = units[alpha_torsion]->e_right;
+		Point* r_alpha = units[alpha_torsion]->r_right;
+
+		Point ra0_ra = Point::subtract(r_alpha_0, *r_alpha);
+		Point eaxra0_ra = ANMICMath::crossProduct(*e_alpha, ra0_ra);
+
+		// When getting the atoms we assume same ordering every time
+		vector<Atom*> left_atoms;
+		bool onlyHeavyAtoms = true;
+		UnitTools::getAllAtomsFromUnits(units, left_atoms, onlyHeavyAtoms);
+		vector<Atom*> right_atoms;
+		bool onlyHeavyAtoms = true;
+		UnitTools::getAllAtomsFromUnits(units, right_atoms, onlyHeavyAtoms);
+
+		vector<double> J_row;
+		// Calculate Jia
+		unsigned int i = 0;
+		for(i = 0; i < left_atoms.size(); i++){
+			Point ri = left_atoms[i]->toPoint();
+			Point ri_ra = Point::subtract(ri,*r_alpha);
+			Point eaxri_ra = ANMICMath::crossProduct(*e_alpha, ri_ra);
+
+			// t calculation
+			Point t = Point::multiplyByScalar(eaxri_ra, Ma/M);
+
+			// A calculation
+			Point Iaea = ANMICMath::multiplyIMatrixByEVector(I_alpha, *e_alpha);
+			Point ra0eaxri_ra = ANMICMath::crossProduct(r_alpha_0,eaxri_ra);
+			Point _Mara0eaxri_ra = Point::multiplyByScalar(ra0eaxri_ra, -Ma);
+			Point p = Point::subtract(_Mara0eaxri_ra, Iaea);
+			Point pxri = ANMICMath::crossProduct(p,ri);
+			Point A = ANMICMath::multiplyIMatrixByEVector(I_inv, pxri);
+
+			// Jia
+			Point Jia = Point::add(eaxri_ra,Point::subtract(A, t));
+			J_row.push_back(Jia.getX());
+			J_row.push_back(Jia.getY());
+			J_row.push_back(Jia.getZ());
+
+		}
+
+		for(unsigned int j = i; i < right_atoms.size(); j++){
+			Point ri = left_atoms[i]->toPoint();
+			Point ri_ra = Point::subtract(ri,*r_alpha);
+			Point eaxri_ra = ANMICMath::crossProduct(*e_alpha, ri_ra);
+
+			// t calculation
+			Point t = Point::multiplyByScalar(eaxri_ra, Ma/M);
+
+			// A calculation
+			Point Iaea = ANMICMath::multiplyIMatrixByEVector(I_alpha, *e_alpha);
+			Point ra0eaxri_ra = ANMICMath::crossProduct(r_alpha_0,eaxri_ra);
+			Point _Mara0eaxri_ra = Point::multiplyByScalar(ra0eaxri_ra, -Ma);
+			Point p = Point::subtract(_Mara0eaxri_ra, Iaea);
+			Point pxri = ANMICMath::crossProduct(p,ri);
+			Point A = ANMICMath::multiplyIMatrixByEVector(I_inv, pxri);
+
+			// Jia
+			Point Jia = Point::subtract(A, t);
+			J_row.push_back(Jia.getX());
+			J_row.push_back(Jia.getY());
+			J_row.push_back(Jia.getZ());
+		}
+
+		// K (n_di, n_di)   J (n_coords, n_di) M() r (n_coords) KJMr
+		// J r -> (n_di, 1) KJr -> (n_di, 1)
+		J.push_back(J_row);
+	}
+
+	delete J;
 }
 
 

@@ -410,6 +410,12 @@ Point ANMICMath::multiplyIMatrixByEVector(double const I[3][3], double e[3]) {
 	return Point(result[0], result[1], result[2]);
 }
 
+Point ANMICMath::multiplyIMatrixByEVector(double const I[3][3], Point& e){
+	vector<double> coordinates = e.getCoordinates();
+	return multiplyIMatrixByEVector(I, Utils::vectorToPointer(coordinates));
+}
+
+
 ///////////////////////////////////////////////////////////////
 /// \remarks
 /// This function calculates the inverse of a 3x3 matrix
