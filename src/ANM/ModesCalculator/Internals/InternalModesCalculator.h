@@ -38,7 +38,7 @@ class InternalModesCalculator : public ModesCalculator
 		std::string generateReport() const;
 		
 		static AnmEigen* internalToCartesian(std::vector<Unit*>& units, AnmEigen* in, bool onlyHeavy);
-		AnmEigen* cartesianToInternal(std::vector<Unit*>& units, AnmEigen* in);
+		static AnmEigen* cartesianToInternal(std::vector<Unit*>& units, AnmEigen* in);
 
 	private:
 		static void calculate_modes(AnmParameters * anmParameters, TriangularMatrix* H,

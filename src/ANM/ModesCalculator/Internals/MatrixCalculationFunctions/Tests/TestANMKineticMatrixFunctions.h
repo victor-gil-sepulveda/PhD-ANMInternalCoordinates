@@ -28,6 +28,7 @@ class TestANMKineticMatrixFunctions : public Test
 
         bool testCalculateI(const char* ,const char* ,ICalcType ,bool ,double);
         bool testCalculateK(const char*,const char*, ICalcType, double);
+        bool testJacobi(const char*,	double );
 
 };
 

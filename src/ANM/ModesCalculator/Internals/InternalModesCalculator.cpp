@@ -41,9 +41,9 @@ extern "C" {
 			int* il, int* iu, double* abstol, int* M, double*W, double* Z, int* ldz, double* work,	int* iwork, int* ifail,
 			int* info);
 	double dlamch_(char* cmach);
+	double dpptri_(char* uplo, int* n, double* ap, int* info);
 }
 //--------------------------------
-
 
 InternalModesCalculator::InternalModesCalculator() : ModesCalculator() {
 }
@@ -277,18 +277,27 @@ AnmEigen* InternalModesCalculator::internalToCartesian(vector<Unit*>& units, Anm
 AnmEigen* InternalModesCalculator::cartesianToInternal(vector<Unit*>& units, AnmEigen* in){
 	AnmEigen* out = new AnmEigen;
 	unsigned int number_of_modes = in->getNumberOfModes();
-	unsigned int number_of_coordinates = in->getEigenVectorsDimension();
+	// K (n_di, n_di)   J (n_coords, n_di) M() r (n_coords) KJMr
+	// J r -> (n_di, 1) KJr -> (n_di, 1)
 
 	// Calculate Jacobi
+	cout<<"Jacobi calculation..."<<endl;
 	vector<vector<double> > J;
-	ANMICKineticMatrixCalculator::Jacobi(units, J, M);
+	ANMICKineticMatrixCalculator::Jacobi(units, J);
 
 	// Calculate K
+	cout<<"K calculation..."<<endl;
 	TriangularMatrix* K = ANMICKineticMatrixCalculator::calculateK(units, INMA);
 
+	cout<<"K inversion..."<<endl;
 	// Invert K
-	TriangularMatrix* K_inv;
+	char uplo = 'U';
+	int info = 0;
+	int N = K->size1();
+	dpptri_(&uplo, &N, K->data().begin(), &info);
+	cout<< "INFO: "<<info<<endl;
 
+	cout<<"M calculation..."<<endl;
 	// Get all masses
 	bool onlyHeavyAtoms = true;
 	vector<Atom*> all_atoms;
@@ -300,14 +309,57 @@ AnmEigen* InternalModesCalculator::cartesianToInternal(vector<Unit*>& units, Anm
 		M.push_back(all_atoms[i]->getMass());
 	}
 
+
+	cout<<"Conversion..."<<endl;
 	// We do this for every of the modes we have in cartesian coordinates
-	for (unsigned int i = 0;i < number_of_modes; ++i){
+	vector< vector<double> > new_evectors;
+
+	for (unsigned int i = 0; i < number_of_modes; ++i){
 		vector<double> torsion_rotations;
 		vector<double>& original_mode = in->vectors[i];
+
 		// Multiply M by r
+		cout<<"DBG: M  "<< M.size()<<"original_mode "<< original_mode.size()<<endl;
+		vector<double> Mr;
+		for (unsigned j = 0; j < original_mode.size(); ++j){
+			Mr.push_back(M[j]*original_mode[j]);
+		}
 
+		// JMr (matrix multiplication) (JMr (n_dihedrals x1) )
+		vector<double> JMr;
+		for (unsigned int j_row = 0; j_row < J.size(); ++j_row){
+			double dot = 0;
+			for (unsigned int m_index = 0; m_index < M.size(); ++m_index){
+				dot += J[j_row][m_index]*Mr[m_index];
+			}
+			JMr.push_back(dot);
+		}
 
+		// K^-1JMr (n_dihedrals x 1)
+		vector<double> KinvJMr;
+		for (unsigned int k_row = 0; k_row < K->size1()/*n_dihedrals*/; ++k_row){
+			double dot = 0;
+			for (unsigned int jmr_index = 0; jmr_index < JMr.size(); ++jmr_index){
+				double Kab;
+				if (k_row >= jmr_index ){
+					Kab = (*K)( jmr_index, k_row);
+				}
+				else{
+					Kab = (*K)( k_row, jmr_index);
+				}
+				dot += Kab * JMr[jmr_index];
+			}
+			KinvJMr.push_back(dot);
+		}
+
+		new_evectors.push_back(KinvJMr);
 	}
+
+	delete K;
+
+	cout<<"Creating anmeigen object..."<<endl;
+	bool notUsingCartesian = false;
+	out->initialize(in->values, new_evectors, notUsingCartesian);
 
 
 

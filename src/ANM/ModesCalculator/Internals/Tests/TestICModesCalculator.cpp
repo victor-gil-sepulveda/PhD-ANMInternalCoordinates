@@ -48,50 +48,56 @@ void TestICModesCalculator::run()
 {
     Test::run();
 
-    TEST_FUNCTION(testCompleteEigencalculation,
-			"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/1AKE/1AKE.pdb",
-			"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/1AKE/eigenvalues.txt",
-			"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/1AKE/6_eigenvectors.txt",
-			1e-4,1e-7);
+//    TEST_FUNCTION(testCompleteEigencalculation,
+//			"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/1AKE/1AKE.pdb",
+//			"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/1AKE/eigenvalues.txt",
+//			"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/1AKE/6_eigenvectors.txt",
+//			1e-4,1e-7);
+//
+//    TEST_FUNCTION(testCompleteEigencalculation,
+//			"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/9WVG/9WVG.pdb",
+//			"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/9WVG/eigenvalues.txt",
+//			"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/9WVG/6_eigenvectors.txt",
+//			1e-4,1e-7);
+//
+//    TEST_FUNCTION(testEigencalculation,
+//    		"src/ANM/ModesCalculator/Internals/Tests/data/eigencalc1/h.txt",
+//    		"src/ANM/ModesCalculator/Internals/Tests/data/eigencalc1/k.txt",
+//    		"src/ANM/ModesCalculator/Internals/Tests/data/eigencalc1/eigenvalues.txt",
+//    		"src/ANM/ModesCalculator/Internals/Tests/data/eigencalc1/eigenvectors.txt",
+//    		1e-4,1e-6);
+//
+//    // Our calculated evectors can reproduce iNMA eigenstuff
+//    TEST_FUNCTION(testEigencalculation,
+//			"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/1AKE/H.txt",
+//			"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/1AKE/K.txt",
+//			"src/ANM/ModesCalculator/Internals/Tests/data/eigencalc2/eigenvalues.txt",
+//			"src/ANM/ModesCalculator/Internals/Tests/data/eigencalc2/eigenvectors.txt",
+//			1e-4,1e-6);
+//
+//    TEST_FUNCTION(testInternalToCartesian,
+//    		"src/ANM/ModesCalculator/Internals/Tests/data/conversion/4AKE/4AKE.pdb",
+//    		"src/ANM/ModesCalculator/Internals/Tests/data/conversion/4AKE/4akeicevec.txt",
+//    		"src/ANM/ModesCalculator/Internals/Tests/data/conversion/4AKE/4akeccevec.txt",
+//    		0.005);
+//
+//    TEST_FUNCTION(testInternalToCartesian,
+//			"src/ANM/ModesCalculator/Internals/Tests/data/conversion/1DDT_s1/1DDT_s1.pdb",
+//			"src/ANM/ModesCalculator/Internals/Tests/data/conversion/1DDT_s1/ic_evec.txt",
+//			"src/ANM/ModesCalculator/Internals/Tests/data/conversion/1DDT_s1/cc_evec.txt",
+//			0.05);
+//
+//    TEST_FUNCTION(testInternalToCartesian,
+//			"src/ANM/ModesCalculator/Internals/Tests/data/conversion/1SU4/1su4.pdb",
+//			"src/ANM/ModesCalculator/Internals/Tests/data/conversion/1SU4/ic_evec.txt",
+//			"src/ANM/ModesCalculator/Internals/Tests/data/conversion/1SU4/cc_evec.txt",
+//			0.08);
 
-    TEST_FUNCTION(testCompleteEigencalculation,
-			"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/9WVG/9WVG.pdb",
-			"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/9WVG/eigenvalues.txt",
-			"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/9WVG/6_eigenvectors.txt",
-			1e-4,1e-7);
-
-    TEST_FUNCTION(testEigencalculation,
-    		"src/ANM/ModesCalculator/Internals/Tests/data/eigencalc1/h.txt",
-    		"src/ANM/ModesCalculator/Internals/Tests/data/eigencalc1/k.txt",
-    		"src/ANM/ModesCalculator/Internals/Tests/data/eigencalc1/eigenvalues.txt",
-    		"src/ANM/ModesCalculator/Internals/Tests/data/eigencalc1/eigenvectors.txt",
-    		1e-4,1e-6);
-
-    // Our calculated evectors can reproduce iNMA eigenstuff
-    TEST_FUNCTION(testEigencalculation,
-			"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/1AKE/H.txt",
-			"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/1AKE/K.txt",
-			"src/ANM/ModesCalculator/Internals/Tests/data/eigencalc2/eigenvalues.txt",
-			"src/ANM/ModesCalculator/Internals/Tests/data/eigencalc2/eigenvectors.txt",
-			1e-4,1e-6);
-
-    TEST_FUNCTION(testInternalToCartesian,
-    		"src/ANM/ModesCalculator/Internals/Tests/data/conversion/4AKE/4AKE.pdb",
-    		"src/ANM/ModesCalculator/Internals/Tests/data/conversion/4AKE/4akeicevec.txt",
-    		"src/ANM/ModesCalculator/Internals/Tests/data/conversion/4AKE/4akeccevec.txt",
-    		0.005);
-
-    TEST_FUNCTION(testInternalToCartesian,
-			"src/ANM/ModesCalculator/Internals/Tests/data/conversion/1DDT_s1/1DDT_s1.pdb",
-			"src/ANM/ModesCalculator/Internals/Tests/data/conversion/1DDT_s1/ic_evec.txt",
-			"src/ANM/ModesCalculator/Internals/Tests/data/conversion/1DDT_s1/cc_evec.txt",
-			0.05);
-
-    TEST_FUNCTION(testInternalToCartesian,
-			"src/ANM/ModesCalculator/Internals/Tests/data/conversion/1SU4/1su4.pdb",
-			"src/ANM/ModesCalculator/Internals/Tests/data/conversion/1SU4/ic_evec.txt",
-			"src/ANM/ModesCalculator/Internals/Tests/data/conversion/1SU4/cc_evec.txt",
-			0.08);
+    TEST_FUNCTION(testCartesianToInternal,
+    			"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala3/ala3.pdb",
+    			"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala3/cc_evec.txt",
+    			"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala3/ic_evec.txt",
+    			1e-12);
 
     finish();
 }
@@ -262,4 +268,36 @@ bool TestICModesCalculator::testInternalToCartesian(const char* prot_path,
 	delete complex;
 	Utils::clearVector<Unit>(units);
 	return ok;
+}
+
+bool TestICModesCalculator::testCartesianToInternal(const char* prot_path,
+       		const char* initial_cc_path,
+       		const char* final_ic_path,
+       		double tolerance){
+
+	// Load structure
+	System sys;
+	vector<Unit*> units;
+	Complex* complex;
+	cout << "Loading model"<<endl;
+	TestANMICTools::createUnitsFromFile(prot_path, units, complex, false);
+
+
+	// Load input and golden
+	vector<vector<double> > input_cartesian, output_internal, expected_internal;
+	TestTools::load_vector_of_vectors(input_cartesian, initial_cc_path);
+	TestTools::load_vector_of_vectors(expected_internal, final_ic_path);
+
+	// Create a AnmEigen object to hold input data
+	vector<double> eigenvalues(input_cartesian.size(), 1);
+	AnmEigen input_cc;
+	bool usingCC = true;
+	input_cc.initialize(eigenvalues, input_cartesian, usingCC);
+
+	AnmEigen* output_eigen =  InternalModesCalculator::cartesianToInternal(units, &input_cc);
+
+	for (unsigned int i = 0; i < output_eigen->vectors.size();++i){
+		ANMICMath::printVector(Utils::vectorToPointer(output_eigen->vectors[i]), output_eigen->vectors[i].size());
+	}
+	delete output_eigen;
 }
