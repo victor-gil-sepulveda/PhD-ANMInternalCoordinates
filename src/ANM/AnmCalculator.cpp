@@ -97,7 +97,7 @@ AnmCalculator::~AnmCalculator()
 ///////////////////////////////////////////////////////////////
 void AnmCalculator::computeTargetCoordinatesForAnmNodes()
 {
-	cout<<"anm compute"<<endl;
+	cout<<"DBG: Entering AnmCalculator::computeTargetCoordinatesForAnmNodes()"<<endl;
 
 	if(isTimeToUpdateModes()) {
 		SystemVars::SIMULATION_LOGGER->logLine("Computing Eigenvalues and Eigenvectors...");
@@ -112,7 +112,7 @@ void AnmCalculator::computeTargetCoordinatesForAnmNodes()
 		directionSelector->updateDirection();
 	}
 
-	cout<<"Calculate move vector and new targets coords..."<<endl;
+	cout<<"Calculate move vector and new target coords..."<<endl;
 
 	algorithm->calculateTargetCoords(anmParameters, eigen, *nodeList, targetCoords, chosenModeIndex);
 

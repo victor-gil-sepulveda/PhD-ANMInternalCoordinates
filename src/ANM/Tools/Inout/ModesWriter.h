@@ -27,7 +27,7 @@ class ModesWriter {
 
 		void setPath(std::string full_path);
 
-		AnmEigen* 	getEigenFromArray( std::vector<double> &  one_eigen_v);
+static AnmEigen* 	getEigenFromArray( std::vector<double> &  one_eigen_v);
 		void 		writeCartesianModes( AnmEigen * eigen, std::vector<double>& coordinates);
 		void 		writeCartesianModes(AnmEigen * eigen, const AnmNodeList* nodeList);
 		void 		writeCartesianModes(AnmEigen * eigen, std::vector<Atom*>& atoms);

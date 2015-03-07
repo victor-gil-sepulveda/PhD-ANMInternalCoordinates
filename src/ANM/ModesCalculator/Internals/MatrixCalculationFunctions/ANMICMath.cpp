@@ -385,6 +385,45 @@ void ANMICMath::multiplyMatrixByMatrix(double *first, double *second, double *re
 
 ///////////////////////////////////////////////////////////////
 /// \remarks
+/// Multiplies two matrices of arbitrary size and compatible dimensions.
+///
+/// \param first [In] matrix as a vector of vectors (inner vector is the row)
+/// \param second [In] matrix as a vector of vectors (inner vector is the row)
+///
+/// \param result [Out]
+///
+/// \author vgil
+/// \date 03/03/2015
+///////////////////////////////////////////////////////////////
+void ANMICMath::multiplyMatrixByMatrix(std::vector<std::vector<double> >& first,
+		std::vector<std::vector<double> >& second,
+		std::vector<std::vector<double> >& out){
+
+	out.clear();
+
+	// check dimensions (first's row size must be equal to second's colum size)
+	if (first[0].size() != second.size()){
+		cout<<"ERROR matrix dimensions are not compatible (row x column) ("<<first[0].size()<<"x"<<first.size()
+				<<" and "<<second[0].size()<<"x"<<second.size()<<")"<<endl;
+		exit(-1);
+	}
+
+	for (unsigned int col_index=0; col_index < first.size(); ++col_index){
+		// The row is first[col_index]
+		vector<double> new_row;
+		for (unsigned int col_2_index=0; col_2_index < second[0].size(); ++col_2_index){
+			double dot = 0;
+			for (unsigned int i=0; i < first[0].size(); ++i){ // row size
+				dot += first[col_index][i]*second[i][col_2_index];
+			}
+			new_row.push_back(dot);
+		}
+		out.push_back(new_row);
+	}
+}
+
+///////////////////////////////////////////////////////////////
+/// \remarks
 /// This function calculates the multiplication of the
 /// "I" matrix by the "e" vector
 ///
@@ -428,7 +467,7 @@ Point ANMICMath::multiplyIMatrixByEVector(double const I[3][3], Point& e){
 /// \author arincon
 /// \date 10/08/2013
 ///////////////////////////////////////////////////////////////
-void ANMICMath::invertMatrix(double a[3][3], double result[3][3]) {
+void ANMICMath::invertIMatrix(double a[3][3], double result[3][3]) {
 	Point x0(a[0][0], a[1][0], a[2][0]);
 	Point x1(a[0][1], a[1][1], a[2][1]);
 	Point x2(a[0][2], a[1][2], a[2][2]);
@@ -739,4 +778,18 @@ Unit * ANMICMath::getDummyUnit(double x, double y, double z) {
 	Unit* u = new Unit(dummy_atoms, dummy_atoms, NULL, NULL, NULL, NULL, NULL, NULL, NULL,""); //e_left, e_right, r_left, r_right
 
 	return u;
+}
+
+
+void ANMICMath::transpose(std::vector<std::vector<double> >& in,
+			std::vector<std::vector<double> >& out){
+	out.clear();
+
+	for(unsigned int i = 0; i < in[0].size(); ++i){
+		vector<double> new_row;
+		for(unsigned int j = 0; j < in.size(); ++j){
+			new_row.push_back(in[j][i]);
+		}
+		out.push_back(new_row);
+	}
 }

@@ -98,7 +98,7 @@ void UnitsBuilder::merge_prolines(vector<Unit*>& in, vector<Unit*>& out){
 		// unit is a full PRO unit, then it means that current unit owns the N atom of this residue.
 		// as we want to freeze the N-CA torsion, we merge both units.
 		// C-O=N and CA-SIDE
-		if(i<in.size()-1 && i%2 == 1 && in[i+1]->resname == LinkNames::PRO){
+		if(i < in.size()-1 && i%2 == 1 && in[i+1]->resname == LinkNames::PRO){
 			Unit* merged_unit = merge_units(in[i], in[i+1]);
 			out.push_back(merged_unit);
 			delete in[i];

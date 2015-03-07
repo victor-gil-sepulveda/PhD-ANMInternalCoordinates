@@ -74,6 +74,6 @@ void AnmNormalizer::normalizeByLargestValue(std::vector<double> & eigenVector){
 	double min_element = std::abs(*(std::min_element(eigenVector.begin(), eigenVector.end())));
 	double largest = std::max(min_element, max_element);
 	double factorNormalization = 1. / largest;
-	cout<<"DBG: largest value for scaling:"<<largest<<endl;
+	cout<<"DBG: (normalizeByLargestValue)Largest value for scaling:"<<largest<<endl;
 	Math::multiplyVectorByScalar(&eigenVector[0], factorNormalization, eigenVectorsDimension);
 }

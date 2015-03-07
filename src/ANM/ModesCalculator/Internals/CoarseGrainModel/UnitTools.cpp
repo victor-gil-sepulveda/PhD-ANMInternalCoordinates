@@ -38,6 +38,18 @@ void UnitTools::getAllAtomsFromUnitRange(vector<Unit*>& units, vector<Atom*>& at
 	}
 }
 
+int UnitTools::getNumberOfAtomsOfUnitRange(vector<Unit*>& units, int start, int end, bool onlyHeavy){
+	unsigned int num_atoms = 0;
+	for (unsigned int i = start; i <= end; ++i){
+		num_atoms += units[i]->atoms.size();
+		if (!onlyHeavy){
+			num_atoms += units[i]->hydrogens.size();
+		}
+	}
+	return num_atoms;
+}
+
+
 void UnitTools::printUnits(std::vector<Unit*>& units){
 	for (unsigned int i = 0; i < units.size(); ++i){
 		Unit* unit = units[i];

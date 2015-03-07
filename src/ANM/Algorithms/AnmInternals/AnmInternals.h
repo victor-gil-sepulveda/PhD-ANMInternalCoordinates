@@ -54,19 +54,25 @@ class AnmInternals : public AnmAlgorithm
 
 		std::string generateReport(AnmParameters * anmParameters) const;
 
-		virtual void calculateModes(AnmParameters * anmParameters,
+		void calculateModes(AnmParameters * anmParameters,
 									 const AnmNodeList & node_list, AnmEigen * eigen);
 
-		virtual void logVectorAsMode(std::string name, std::vector<double>& vector_mode,const AnmNodeList* nodeList){};
+		void resetFrequencies(AnmParameters * anmParameters, AnmEigen * eigen);
+
+		void calculateTargetCoords(AnmParameters * anmParameters, AnmEigen * eigen,
+								const AnmNodeList & nodeList, std::vector<double> & targetCoords,
+								unsigned int chosenMode);
+
+		void logVectorAsMode(std::string name, std::vector<double>& vector_mode,const AnmNodeList* nodeList);
 
 	private:
 		// Atributes
 		AnmInternals(const AnmInternals&);
 		AnmInternals& operator=(const AnmInternals&);
-
 		void normalizeEigenVectors(AnmEigen * eigen);
 
-
+		std::vector<unsigned int> mode_frequency;
+		std::vector<unsigned int> mode_frequency_counter;
 };
 
 #endif /* ANMINTERNALS_H_ */

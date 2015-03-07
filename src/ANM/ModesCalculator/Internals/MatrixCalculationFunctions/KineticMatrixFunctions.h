@@ -57,15 +57,16 @@ namespace ANMICKineticMatrixCalculator {
 
 	// Jacobian
 	void Jacobi(std::vector<Unit*>& units, std::vector< std::vector<double> >& J);
+	void Jacobi2(std::vector<Unit*>& units, std::vector< std::vector<double> >& J);
 
 	// Derivatives
-	void  dri_dq(std::vector<Unit*>& units,
+	void  dr1dq(std::vector<Unit*>& units,
 			unsigned int alpha,
 			double const I_inv[3][3],
 			std::vector<Point>& term1_v,
 			std::vector<Point>& term2_v);
 
-	void  dri_dq_2(std::vector<Unit*>& units,
+	void  dr2dq(std::vector<Unit*>& units,
 				unsigned int beta,
 				double const I_inv[3][3],
 				std::vector<Point>& term1_v,

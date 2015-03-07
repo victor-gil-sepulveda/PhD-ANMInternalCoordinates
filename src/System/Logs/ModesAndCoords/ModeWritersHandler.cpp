@@ -12,6 +12,7 @@
 #include <map>
 #include <sstream>
 #include "../../../Molecules/AtomSet/AtomSet.h"
+#include <iostream>
 
 using namespace std;
 
@@ -28,6 +29,7 @@ ModesWriterHandler::~ModesWriterHandler() {
 
 void ModesWriterHandler::setDirectory(string directory){
 	this->directory = directory;
+	cout<<"DBG: Setting mode logging directoy to: "<<directory<<endl;
 }
 
 void ModesWriterHandler::setCounter(unsigned int c){

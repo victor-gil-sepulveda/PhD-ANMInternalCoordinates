@@ -43,5 +43,5 @@ void ANMICSimpleMover::perform_one_movement_cycle(std::vector<Unit*>& units, std
 
 		cout<<"DBG: ANM IC Metropolis "<<m_criterion.generateReport()<<endl;
 	}
-	cout<<"DBG: "<<m<<" iterations performed."<<endl;
+	cout<<"DBG: "<<m<<" of "<<this->anmParameters->getICMaximumStepsPerCycle() <<" iterations performed."<<endl;
 }

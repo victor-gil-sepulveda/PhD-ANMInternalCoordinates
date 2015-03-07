@@ -1,8 +1,8 @@
 # PhD-ANMInternalCoordinates
 
-This is an implementation of an anisotropic network model (ANM) for proteins performed in internal coordinates (IC) for PELE++*. The code is based on the formulae shown in the [PhD thesis](http://tdx.cat/handle/10803/81963) of José Ramón López Blanco (JRB). It has been tuned using the code of iNMA v1.2, developed by José Ramón López Blanco himself,  and  the [imods](http://imods.chaconlab.org/) server from Pablo Chacon group.
+This is an implementation of an anisotropic network model (ANM) for proteins performed in internal coordinates (IC) for PELE++*. The code is based on the formulae shown in the [PhD thesis](http://tdx.cat/handle/10803/81963) of José Ramón López Blanco (JRLB). It has been tuned using the code of iNMA v1.2, developed by JRLB himself,  and  the [imods](http://imods.chaconlab.org/) server from Pablo Chacon group.
 
-The goal of this project was to implement the ANM IC analysis in PELE++, but also to do it in an educational manner, as it was planned as a BAchelor Thesis. Because of this, functions have been implemented the more similar we could to their formulae counterparts. Obviously, this makes our code to be really inneficient compared with JRB's implementation. I will try to increse its performance in a close future without sacrificing its readability.
+The goal of this project was to implement the ANM IC analysis in PELE++, but also to do it in an educational manner, as it was planned as a Bachelor Thesis. Because of this, functions have been implemented the more similar we could to their formulae counterparts. Obviously, this makes our code to be really inneficient compared with JRLB's implementation. I will try to increse its performance in a close future without sacrificing its readability.
 
 Our code was started in late 2013 by me and Alba Rincón. This repository contains a slightly improved version of the one presented  as her Computer Engineering Bachelor Thesis ([published here](http://hdl.handle.net/2099.1/24417)) at the Barcelona Faculty of Computer Sciences (FIB, UPC). 
 

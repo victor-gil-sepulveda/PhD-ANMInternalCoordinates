@@ -145,7 +145,7 @@ void AnmAlgorithm::calculateTargetCoords(AnmParameters * anmParameters, AnmEigen
 	anmTargetUpdater->updateTargetCoordinates(targetCoords, anmParameters, eigen, nodesList,
 											  	  chosenModeIndex);
 
-
+	cout<<"DBG: Logging targetCoords vector "<<endl;
 	logVectorAsMode("translation_proposal", targetCoords, &nodesList);
 
 }

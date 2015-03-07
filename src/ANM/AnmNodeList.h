@@ -25,6 +25,7 @@ class AnmNodeList {
 		virtual std::string showNodeList() = 0;
 
 		virtual unsigned int size() = 0;
+
 };
 
 

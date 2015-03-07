@@ -93,33 +93,33 @@ void ANMICKineticMatrixCalculator::calculateI(	double I[3][3],
 		break;
 
 		case INMA_NO_OXT:
-				{
-					// Ec 22 Noguti & Go 1983
-					// Based in INMA Code by Jose Ramon Lopez Sanchez
-					for (unsigned int i = range.first; i <= range.second; ++i){
-						vector<Atom*>& atoms = units[i]->atoms;
-						for (unsigned int j = 0; j < atoms.size(); ++j){
-							if (atoms[j]->name != " OXT"){
-								double mass = atoms[j]->getMass();
-								double coords[3];
-								coords[0] = atoms[j]->getX();
-								coords[1] = atoms[j]->getY();
-								coords[2] = atoms[j]->getZ();
+		{
+			// Ec 22 Noguti & Go 1983
+			// Based in INMA Code by Jose Ramon Lopez Sanchez
+			for (unsigned int i = range.first; i <= range.second; ++i){
+				vector<Atom*>& atoms = units[i]->atoms;
+				for (unsigned int j = 0; j < atoms.size(); ++j){
+					if (atoms[j]->name != " OXT"){
+						double mass = atoms[j]->getMass();
+						double coords[3];
+						coords[0] = atoms[j]->getX();
+						coords[1] = atoms[j]->getY();
+						coords[2] = atoms[j]->getZ();
 
-								double tmp1 = coords[0]*coords[0] + coords[1]*coords[1] + coords[2]*coords[2];
-								for(unsigned int m = 0; m < 3; ++m){
-									for(unsigned int n = 0; n < 3; ++n){
-										double tmp2 = -coords[m] * coords[n];
-										if ( m == n) tmp2 += tmp1;
-										I[m][n] += mass*tmp2;
-									}
-								}
+						double tmp1 = coords[0]*coords[0] + coords[1]*coords[1] + coords[2]*coords[2];
+						for(unsigned int m = 0; m < 3; ++m){
+							for(unsigned int n = 0; n < 3; ++n){
+								double tmp2 = -coords[m] * coords[n];
+								if ( m == n) tmp2 += tmp1;
+								I[m][n] += mass*tmp2;
 							}
 						}
 					}
-
 				}
-				break;
+			}
+
+		}
+		break;
 
 		case LU:
 		{
@@ -486,7 +486,7 @@ TriangularMatrix* ANMICKineticMatrixCalculator::calculateK( vector<Unit*>& units
 	double M = calculateM(units, pair<int,int>(0, units.size()-1), skip_OXT); // sum m_i for i in [0,number_of_units-1]
 
 	calculateI(I, units, pair<int,int>(0, units.size()-1), tensor_calc_type); // calculate I for all units i in [0,number_of_units-1]
-	ANMICMath::invertMatrix(I,I_inv);
+	ANMICMath::invertIMatrix(I,I_inv);
 
 	int number_of_dihedrals = units.size() - 1;
 
@@ -509,37 +509,50 @@ TriangularMatrix* ANMICKineticMatrixCalculator::calculateK( vector<Unit*>& units
 
 void ANMICKineticMatrixCalculator::Jacobi(vector<Unit*>& units, vector< vector<double> >& J){
 
-	J.clear();
-
-	// Global stuff
-	bool doNotSkipOXT = false;
 	unsigned int number_of_torsions = units.size() - 1;
+
+	// Total mass
+	bool doNotSkipOXT = false;
 	double M = calculateM(units, pair<int,int>(0, units.size()-1), doNotSkipOXT);
+
+	// Intertia tensor
 	double I[3][3], I_inv[3][3];
 	calculateI(I, units, pair<int,int>(0, number_of_torsions), INMA);
-	ANMICMath::invertMatrix(I,I_inv);
+	ANMICMath::invertIMatrix(I,I_inv);
 
-	// Precalculated values
-	for (unsigned int alpha_torsion = 0; alpha_torsion < number_of_torsions; ++alpha_torsion){
+	// Atoms
+	vector<Atom*> atoms;
+	bool onlyHeavyAtoms = true;
+	UnitTools::getAllAtomsFromUnits(units, atoms, onlyHeavyAtoms);
+	unsigned int number_of_atoms = atoms.size();
+
+	// Give J the correct size
+	J.clear();
+	J.resize(number_of_atoms*3);
+	for (unsigned int i =0; i <J.size(); ++i){
+		J[i].resize(number_of_torsions);
+	}
+
+	for (unsigned int alpha = 0; alpha < number_of_torsions; ++alpha){
 		// I_a
 		double Ia[3][3];
-		calculateI(Ia, units, pair<int,int>(0, alpha_torsion), INMA);
+		calculateI(Ia, units, pair<int,int>(0, alpha), INMA);
 
 		// r1_0
-		CenterOfMass r_a_0_c = calculateMobileBodyCOM(units, pair<int,int>(0,alpha_torsion), doNotSkipOXT);
+		CenterOfMass r_a_0_c = calculateMobileBodyCOM(units, pair<int,int>(0,alpha), doNotSkipOXT);
 		Point ra0(r_a_0_c.getX(), r_a_0_c.getY(), r_a_0_c.getZ());
 		double Ma = r_a_0_c.getMass();
 
-		Point* ea = units[alpha_torsion]->e_right;
-		Point* ra = units[alpha_torsion]->r_right;
+		Point* ea = units[alpha]->e_right;
+		Point* ra = units[alpha]->r_right;
 
 		Point ra0_ra = Point::subtract(ra0, *ra);
 		Point eaxra0_ra = ANMICMath::crossProduct(*ea, ra0_ra);
 
-		// t calculation
+		// ta calculation
 		Point t = Point::multiplyByScalar(eaxra0_ra, -Ma/M);
 
-		// A calculation
+		// Aa calculation
 		Point Iaea = ANMICMath::multiplyIMatrixByEVector(Ia, *ea);
 		Point ra0eaxra0_ra = ANMICMath::crossProduct(ra0,eaxra0_ra);
 		Point _Mara0eaxra0_ra = Point::multiplyByScalar(ra0eaxra0_ra, -Ma);
@@ -547,47 +560,91 @@ void ANMICKineticMatrixCalculator::Jacobi(vector<Unit*>& units, vector< vector<d
 		Point A = ANMICMath::multiplyIMatrixByEVector(I_inv, p);
 
 		// When getting the atoms we assume same ordering every time
-		vector<Atom*> left_atoms;
 		bool onlyHeavyAtoms = true;
-		UnitTools::getAllAtomsFromUnitRange(units, left_atoms, 0, alpha_torsion, onlyHeavyAtoms);
-		vector<Atom*> right_atoms;
-		UnitTools::getAllAtomsFromUnitRange(units, right_atoms, alpha_torsion+1, number_of_torsions, onlyHeavyAtoms);
+		unsigned int num_left_atoms = UnitTools::getNumberOfAtomsOfUnitRange(units, 0, alpha, onlyHeavyAtoms);
 
 		// Calculate Jia for each atom (i)
-		vector<double> J_row;
-		for(unsigned int i = 0; i < left_atoms.size(); ++i){
-			Point ri = left_atoms[i]->toPoint();
-			Point ri_ra = Point::subtract(ri,*ra);
-			Point eaxri_ra = ANMICMath::crossProduct(*ea, ri_ra);
+		for (unsigned int i = 0; i < number_of_atoms; ++i){
+			Point Jia;
+			Point ri = atoms[i]->toPoint();
+			if (i < (unsigned int) num_left_atoms){
+				Point ri_ra = Point::subtract(ri,*ra);
+				Point eaxri_ra = ANMICMath::crossProduct(*ea, ri_ra);
+				Jia = Point::add(eaxri_ra, Point::add(ANMICMath::crossProduct(A,ri),t));
+			}
+			else{
+				Jia = Point::add(ANMICMath::crossProduct(A,ri),t);
+			}
 
-			// Jia
-			Point Jia = Point::add(eaxri_ra, Point::add(ANMICMath::crossProduct(A,ri),t));
-			J_row.push_back(Jia.getX());
-			J_row.push_back(Jia.getY());
-			J_row.push_back(Jia.getZ());
+			unsigned int offset = i*3;
+			J[offset][alpha]   = Jia.getX();
+			J[offset+1][alpha] = Jia.getY();
+			J[offset+2][alpha] = Jia.getZ();
 		}
-
-		for(unsigned int i = 0; i < right_atoms.size(); ++i){
-			Point ri = right_atoms[i]->toPoint();
-
-			// Jia
-			Point Jia = Point::add(ANMICMath::crossProduct(A,ri),t);
-			J_row.push_back(Jia.getX());
-			J_row.push_back(Jia.getY());
-			J_row.push_back(Jia.getZ());
-		}
-
-		J.push_back(J_row);
 	}
 }
 
+void ANMICKineticMatrixCalculator::Jacobi2(std::vector<Unit*>& units, std::vector< std::vector<double> >& J){
+	J.clear();
 
+	unsigned int number_of_torsions = units.size()-1;
+	double I[3][3], I_inv[3][3];
+	calculateI(I, units, pair<int,int>(0, number_of_torsions), INMA);
+	ANMICMath::invertIMatrix(I,I_inv);
+
+	vector<Atom*> atoms;
+	bool onlyHeavyAtoms = true;
+	UnitTools::getAllAtomsFromUnits(units, atoms, onlyHeavyAtoms);
+
+	unsigned int number_of_atoms = atoms.size();
+	J.resize(number_of_atoms*3);
+	for (unsigned int i =0; i <J.size(); ++i){
+		J[i].resize(number_of_torsions);
+	}
+
+//  .----- d --->
+//	|
+//	|
+//	n
+//	|
+//  \/
+//
+
+	std::vector<Point> terms1l,terms2l, terms1r, terms2r;
+	for (unsigned int alpha = 0; alpha < number_of_torsions; ++alpha){
+			dr1dq(units, alpha, I_inv, terms1l, terms2l);
+			dr2dq(units, alpha, I_inv, terms1r, terms2r);
+	}
+
+	for (unsigned int alpha = 0; alpha< number_of_torsions; ++alpha){
+		bool onlyHeavyAtoms = true;
+		unsigned int num_left_atoms = UnitTools::getNumberOfAtomsOfUnitRange(units, 0, alpha, onlyHeavyAtoms);
+
+		for (unsigned int i = 0; i < number_of_atoms; ++i){
+			Point drdq;
+			Point ri = atoms[i]->toPoint();
+
+			if (i < (unsigned int) num_left_atoms){
+				drdq = Point::subtract(terms1l[alpha], ANMICMath::crossProduct(terms2l[alpha],ri));
+			}
+			else{
+				drdq = Point::subtract(ANMICMath::crossProduct(terms2r[alpha],ri), terms1r[alpha]);
+			}
+
+			int offset = i*3;
+			J[offset][alpha]   = drdq.getX();
+			J[offset+1][alpha] = drdq.getY();
+			J[offset+2][alpha] = drdq.getZ();
+		}
+	}
+
+}
 /////////////////
 /// Functions used for the CI -> CC  modes conversion (rewriting of K functions).
 ///
 ///////////////
 // Eq 4.1.12 de JR, calculates "left" contributions
-void  ANMICKineticMatrixCalculator::dri_dq(vector<Unit*>& units,
+void  ANMICKineticMatrixCalculator::dr1dq(vector<Unit*>& units,
 												unsigned int alpha,
 												double const I_inv[3][3],
 												std::vector<Point>& term1_v,
@@ -627,7 +684,7 @@ void  ANMICKineticMatrixCalculator::dri_dq(vector<Unit*>& units,
 }
 
 // Eq 4.1.13 de JR, calculates "right" contributions
-void  ANMICKineticMatrixCalculator::dri_dq_2(vector<Unit*>& units,
+void  ANMICKineticMatrixCalculator::dr2dq(vector<Unit*>& units,
 												unsigned int beta,
 												double const I_inv[3][3],
 												std::vector<Point>& term1_v,

@@ -235,56 +235,36 @@ bool TestANMKineticMatrixFunctions::testJacobi(const char* prot_path, double tol
 	TriangularMatrix* K = ANMICKineticMatrixCalculator::calculateK(units, INMA);
 
 	// If the Jacobi is ok, K => T = JtMJ
-	vector<vector<double> > J;
-	ANMICKineticMatrixCalculator::Jacobi(units, J);// Transposed Jacobi
+	vector<vector<double> > J,Jt,JtM,JtMJ;
+	ANMICKineticMatrixCalculator::Jacobi2(units, J);// Transposed Jacobi
+	ANMICMath::transpose(J,Jt);
 
-	// Get M matrix
+	// M matrix
 	bool onlyHeavyAtoms = true;
 	vector<Atom*> all_atoms;
 	UnitTools::getAllAtomsFromUnits(units, all_atoms, onlyHeavyAtoms);
-	vector<double> M;
+	vector<vector<double> > M(all_atoms.size()*3, vector<double>(all_atoms.size()*3,0));
 	for (unsigned int i = 0; i < all_atoms.size(); ++i){
-		M.push_back(all_atoms[i]->getMass());
-		M.push_back(all_atoms[i]->getMass());
-		M.push_back(all_atoms[i]->getMass());
+		unsigned int offset = i*3;
+		M[offset][offset] = all_atoms[i]->getMass();
+		M[offset+1][offset+1] = all_atoms[i]->getMass();
+		M[offset+2][offset+2] = all_atoms[i]->getMass();
 	}
 
-	// M is diagonal matrix of the masses
-	vector<vector<double> > JtM;
-	for (unsigned int i =0; i< J.size(); ++i){ // d
-		vector<double> row;
-		for (unsigned int j =0; j< M.size(); ++j){ // n
-			row.push_back(J[i][j]*M[j]);
+
+	ANMICMath::multiplyMatrixByMatrix(Jt,M,JtM);
+	ANMICMath::multiplyMatrixByMatrix(JtM,J,JtMJ);
+
+	cout<<"DBG: K size ("<<K->size1()<<", "<<K->size2()<<")"<<endl;
+	for (unsigned int i = 0; i < K->size1(); ++i){
+		TriangularMatrixRow K_r (*K,i);
+		for (unsigned int j = i; j < K->size2(); ++j){
+			cout<<K_r(j)<<", ";
 		}
-		JtM.push_back(row);
+		cout<<endl;
 	}
 
-	// Now get JtMJ (regular multiplication, remember that J is already trasposed,
-	// so we have to retranspose during the mult.)
-	vector<vector<double> > JtMJ;
-	for (unsigned int i =0; i< JtM.size(); ++i){ //n
-		vector<double> row;
-		for (unsigned int j =0; j< J.size(); ++j){//d
-			// perform dot between row and column of J (row too)
-			double dot = 0;
-			for (unsigned int k=0; k< J[0].size(); ++k){
-				dot += JtM[i][k]*J[j][k];
-			}
-			row.push_back(dot);
-		}
-		JtMJ.push_back(row);
-	}
-
-		cout<<"DBG: K size ("<<K->size1()<<", "<<K->size2()<<")"<<endl;
-		for (unsigned int i = 0; i < K->size1(); ++i){
-			TriangularMatrixRow K_r (*K,i);
-			for (unsigned int j = i; j < K->size2(); ++j){
-				cout<<K_r(j)<<", ";
-			}
-			cout<<endl;
-		}
-
-		cout <<"--------"<<endl;
+	cout <<"--------"<<endl;
 	for (unsigned int i = 0; i< JtMJ.size(); ++i){
 		for (unsigned int j = 0; j< JtMJ[0].size(); ++j){
 			cout<<JtMJ[i][j]<<", ";
@@ -292,5 +272,26 @@ bool TestANMKineticMatrixFunctions::testJacobi(const char* prot_path, double tol
 		cout<<endl;
 	}
 
-}
+	// Also, sum(MiJia) = 0
+	for (unsigned int alpha = 0; alpha < Jt.size(); ++alpha){
+		double total = 0;
+		for  (unsigned int i = 0; i< Jt[alpha].size(); ++i){
+			total += M[i][i]*Jt[alpha][i];
+		}
+		cout<<"** "<<total<<endl;
+	}
 
+	// And sum(mi rixJia) = 0
+	for (unsigned int alpha = 0; alpha < Jt.size(); ++alpha){
+		double total = 0;
+		for  (unsigned int i = 0; i< Jt[alpha].size()/3; ++i){
+			Point ri = all_atoms[i]->toPoint();
+			Point Jia(Jt[alpha][i*3],Jt[alpha][i*3+1],Jt[alpha][i*3+2]);
+			Point rixJia = ANMICMath::crossProduct(ri, Jia);
+			total += M[i][i]* rixJia.getX();
+			total += M[i][i]* rixJia.getY();
+			total += M[i][i]* rixJia.getZ();
+		}
+		cout<<"xx "<<total<<endl;
+	}
+}

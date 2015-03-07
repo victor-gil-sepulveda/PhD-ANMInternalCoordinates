@@ -19,6 +19,7 @@ class Atom;
 namespace UnitTools {
 	void getAllAtomsFromUnits(std::vector<Unit*>& units, std::vector<Atom*>& atoms, bool onlyHeavy);
 	void getAllAtomsFromUnitRange(std::vector<Unit*>& units, std::vector<Atom*>& atoms, int i, int j, bool onlyHeavy);
+	int  getNumberOfAtomsOfUnitRange(std::vector<Unit*>& units, int start, int end, bool onlyHeavy);
 	void printUnits(std::vector<Unit*>& units);
 }
 #endif /* UNITTOOLS_H_ */

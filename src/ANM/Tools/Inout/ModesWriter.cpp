@@ -37,6 +37,7 @@ AnmEigen* ModesWriter::getEigenFromArray(vector<double>&  one_eigen_v){
 	AnmEigen*  eigen_mock = new AnmEigen;
 	vector<vector<double> > eigenvectors;
 	vector<double> eigenvalues(1, 1);
+	cout<<"DBG:: eigensize "<<one_eigen_v.size()<<endl;
 	eigenvectors.push_back(one_eigen_v);
 	bool isCartesian = true;
 	eigen_mock->initialize(eigenvalues, eigenvectors, isCartesian);
@@ -186,7 +187,6 @@ void ModesWriter::getCAsFromUnits(vector<Unit*>& units, vector<int>& ca_atom_ind
 	bool onlyHeavyAtoms = true;
 	vector<Atom*> unit_atoms;
 	UnitTools::getAllAtomsFromUnits(units, unit_atoms, onlyHeavyAtoms);
-	cout<<"unit_atoms total "<<unit_atoms.size()<<endl;
 	for (unsigned int i =0; i< unit_atoms.size();++i){
 		if(unit_atoms[i]->name == AtomNames::CA){
 			ca_atom_indices.push_back(i);

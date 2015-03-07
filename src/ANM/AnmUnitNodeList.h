@@ -13,16 +13,23 @@
 #include "AnmNodeList.h"
 
 class Unit;
-
+class AtomSet;
 class AnmUnitNodeList : public AnmNodeList {
 	public:
+		AnmUnitNodeList();
 		std::vector<Unit*> getNodeList() const;
-		void setNodeList(const std::vector<Unit*> &nodeList);
+		void setNodeList(AtomSet* atomSet);
 		std::string showNodeList();
 		unsigned int size();
 
+		void updateUnitList();
+
+		// TODO: must handle Unit deletion when destructed?
+
 	private:
 		std::vector<Unit*> nodeList;
+		AtomSet* sourceAtomSet;
+		bool updated;
 };
 
 

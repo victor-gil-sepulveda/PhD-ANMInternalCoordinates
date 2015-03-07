@@ -44,6 +44,7 @@ class InternalModesCalculator : public ModesCalculator
 		static void calculate_modes(AnmParameters * anmParameters, TriangularMatrix* H,
 				 TriangularMatrix* K, AnmEigen* eigen);
 
+
 	friend class TestICModesCalculator;
 };
 

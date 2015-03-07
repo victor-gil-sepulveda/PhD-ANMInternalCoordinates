@@ -278,7 +278,7 @@ TriangularMatrix* ANMICHessianCalculator::calculateH(std::vector<Unit*>& units, 
 
 ///////////////////////////////////////////////////////////////
 /// \remarks
-/// This function calculates...
+/// It tries to lower the tip effect adding extra dihedral constraints to the hessian.
 ///
 /// \param H [In] Hessian matrix
 ///
@@ -289,23 +289,19 @@ TriangularMatrix* ANMICHessianCalculator::calculateH(std::vector<Unit*>& units, 
 void ANMICHessianCalculator::modifyHessianWithExtraTorsion(TriangularMatrix* H){
 	vector<double> diagonal;
 	vector<double> unsigned_diagonal;
-//	cout<<"DBG: diagonal ";
 	for (unsigned int i = 0; i < H->size1(); ++i) {
 		//ANM TODO:
-		// Cambiado a valor absoluto: Las modificaciones deberían ser independientes del signo
-		// global! esto es: modif(-H) == -modif(H)
 		diagonal.push_back((*H)(i,i));
-		unsigned_diagonal.push_back(abs((*H)(i,i)));
-//		cout<<(*H)(i,i)<<" ";
+		unsigned_diagonal.push_back((*H)(i,i));
 	}
-//	cout<<endl;
+
 	double min = *min_element(unsigned_diagonal.begin(), unsigned_diagonal.end());
 	unsigned int index_of_min = 0;
-
 	for(unsigned int i =0; i < unsigned_diagonal.size(); ++i){
 		if(min == unsigned_diagonal[i])
 			index_of_min = i;
 	}
+
 	min = diagonal[index_of_min];
 	double omega = 3*(min);
 //	cout<<"DBG: Omega "<<omega<<endl;

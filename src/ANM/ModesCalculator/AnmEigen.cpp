@@ -91,11 +91,6 @@ void AnmEigen::initialize(const double * const eigenValues, const double * const
 		// In this case it is not the number of nodes (which would be numberOfNodes+1) but
 		// the real length of the vector.
 		eigenvector_length = numberOfNodes;
-//		cout<<"DBG: EIGENVECTORS "<<endl;
-//		for (unsigned int i = 0; i < eigenvector_length; ++i){
-//			cout<<eigenVectors[i]<<" ";
-//		}
-//		cout<<endl;
 	}
 
 	Utils::convertArrayOfDoubleToVectorOfVectors(eigenVectors, vectors, numberOfModes, eigenvector_length);
@@ -125,9 +120,7 @@ void AnmEigen::initialize(std::vector<double>& eigenValues,
 
 	VectorTools::copy(values, eigenValues);
 	for(unsigned i = 0; i < eigenVectors.size(); ++i){
-		vector<double> eigenvector;
-		VectorTools::copy(eigenvector,eigenVectors[i]);
-		vectors.push_back(eigenvector);
+		vectors.push_back(eigenVectors[i]);
 	}
 
 	this->numberOfModes = values.size();
@@ -139,7 +132,7 @@ void AnmEigen::initialize(std::vector<double>& eigenValues,
 		this->numberOfNodes = vectors[0].size();
 	}
 
-	cout<<"DBG: AnmEigen created from vector<double>. "<< this->numberOfModes <<" Modes read."<<endl;
+	cout<<"DBG: AnmEigen initialized from vector<double>. "<< this->numberOfModes <<" modes read."<<endl;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -272,7 +265,7 @@ AnmEigen& AnmEigen::operator=(const AnmEigen& other){
 void AnmEigen::normalizeByLargestValue()
 {
 
-	cout<<"DBG normalizing... Modes: "<<getNumberOfModes()<<" Nodes:"<<numberOfNodes<<endl;
+	cout<<"DBG: Normalizing modes (Modes: "<<getNumberOfModes()<<", Nodes:"<<numberOfNodes<<")"<<endl;
 	for(unsigned int i=0; i < getNumberOfModes(); ++i) {
 		AnmNormalizer::normalizeByLargestValue(vectors[i]);
 	}

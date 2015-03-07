@@ -42,6 +42,13 @@
 #include "Movement/SimpleMover/ANMICSimpleMover.h"
 #include "Movement/SimpleSDMIN/ANMICSideMinMover.h"
 #include "../../../System/SystemVars.h"
+#include <stdlib.h>
+#include <cmath>
+#include "../../../Tools/stringTools.h"
+#include "../../../System/Logs/OutputWriter.h"
+#include "../../Tools/AnmNormalizer.h"
+#include "../../../Tools/Utils.h"
+#include <algorithm>
 
 using namespace std;
 
@@ -132,7 +139,7 @@ void AnmInternals::performMovement(EnergyCalculator * enerCalc,
 
 	// Create a ANM Mover (TODO: This can be moved to a factory when it gets more logic)
 	ANMICMover* mover = NULL;
-	cout<<"DBG Mover type: "<<anmParameters->getICMoverType()<<endl;
+	cout<<"DBG: Anm IC Mover type: "<<anmParameters->getICMoverType()<<endl;
 	switch(anmParameters->getICMoverType()){
 		case SIMPLE:
 			mover = new ANMICSimpleMover(enerCalc, anmParameters);
@@ -143,8 +150,6 @@ void AnmInternals::performMovement(EnergyCalculator * enerCalc,
 		case SIMPLE_PLUS_SIDECHAIN_MD:
 			break;
 	}
-
-	cout <<"DBG: Mover "<<mover<<endl;
 
 	//Perform the movement
 	mover->perform_one_movement_cycle(units, targetCoords);
@@ -178,19 +183,152 @@ std::string AnmInternals::generateReport(AnmParameters * anmParameters) const
 
 void AnmInternals::calculateModes(AnmParameters * anmParameters, const AnmNodeList & nodeList, AnmEigen * eigen)
 {
-
+	// Calculates frequencies and sets frequency counters to a random offset;
 	modesCalculator->calculateEigenValuesAndVectors(anmParameters, nodeList, eigen);
+
+	if(anmParameters->getOverridePickingAndMixing() != DO_NOT_OVERRIDE)
+		resetFrequencies(anmParameters, eigen);
+
+	// Logging
 	SystemVars::getModesWriterHandler()->getWriter("original_modes_cc")->
 			writeInternalModes(eigen, &nodeList, true);
 	SystemVars::getModesWriterHandler()->getWriter("original_modes_ic")->
 				writeInternalModes(eigen, &nodeList, false);
 
+	// Normalization
 	normalizeEigenVectors(eigen);
+
+	// Logging
 	SystemVars::getModesWriterHandler()->getWriter("normalized_modes_cc")->
 					writeInternalModes(eigen, &nodeList, true);
 	SystemVars::getModesWriterHandler()->getWriter("normalized_modes_ic")->
 						writeInternalModes(eigen, &nodeList, false);
 
+}
+
+void AnmInternals::resetFrequencies(AnmParameters * anmParameters, AnmEigen * eigen){
+
+	cout<<"DBG: Resetting mode counters "<<endl;
+	unsigned int max_cycle = anmParameters->getMajorModePeriod()*2;
+
+	// Prepare cycle frequencies
+	mode_frequency.clear();
+
+	// Calculate real frequencies
+	vector<double> real_mode_frequencies;
+	for (unsigned int i =0; i < eigen->values.size(); ++i){
+		if(anmParameters->getMainModeWeightForMixModes() < 1){
+			real_mode_frequencies.push_back(1./eigen->values[i]); // TODO: Use real formula
+		}
+		else{
+			real_mode_frequencies.push_back(eigen->values[i]);
+		}
+		//cout<<"KK "<<eigen->values[i]<<endl;
+	}
+	// Divide by the maximum value, as eigenvalues are ordered, the maximum is the first one :)
+	double max_real_cycle =  real_mode_frequencies[0];
+	for (unsigned int i =0; i < eigen->values.size(); ++i){
+		//cout<<"LL "<<real_mode_frequencies[i]<<endl;
+		real_mode_frequencies[i] = real_mode_frequencies[i] /max_real_cycle;
+	}
+	// Assign the cycle frequencies
+	for (unsigned int i =0; i < eigen->values.size(); ++i){
+		mode_frequency.push_back(max((int)(floor(max_cycle*real_mode_frequencies[i])),1)); //Half of the cycle in one direction, half in the other
+		//cout<<"XX "<<max_cycle<<" "<<max((int)(floor(max_cycle*real_mode_frequencies[i])),2)<<endl;
+	}
+
+	// Randomize initial counters
+	mode_frequency_counter.clear();
+	srand((unsigned)time(NULL));
+	for (unsigned int i =0; i < mode_frequency.size(); ++i){
+		mode_frequency_counter.push_back(((double)rand()/RAND_MAX)*mode_frequency[i]);
+	}
+}
+
+void AnmInternals::calculateTargetCoords(AnmParameters * anmParameters, AnmEigen * eigen,
+						const AnmNodeList & nodeList, std::vector<double> & targetCoords,
+						unsigned int chosenMode){
+
+	// If the mixing case is the eigenvalues one, we intercept the whole calculation protocol
+	if(anmParameters->getOverridePickingAndMixing() == DO_NOT_OVERRIDE){
+		cout<<"DBG: Calculating target coords using Regular Control File Parameters"<<endl;
+		AnmAlgorithm::calculateTargetCoords(anmParameters, eigen, nodeList, targetCoords, chosenMode);
+	}
+	else{
+		if(anmParameters->getOverridePickingAndMixing() == EIGEN_MIXING_EIGEN_WEIGHT){
+			cout<<"DBG: Calculating target coords using EIGEN_MIXING_EIGEN_WEIGHT"<<endl;
+			unsigned int eigensize = eigen->vectors[0].size();
+
+			// Initialize target coordinates
+			targetCoords.resize(eigensize,0);
+			for (unsigned int j = 0; j < eigensize; ++j){
+				targetCoords[j] = 0;
+			}
+
+			// Ensure modes are normalized (norm of the mode must be one)
+			for(unsigned int i = 0; i < eigen->vectors.size(); ++i){
+				vector<double> & eigenvector = eigen->vectors[i];
+				Math::normalizeVector(Utils::vectorToPointer(eigenvector), eigensize);
+			}
+
+			// Calculate target angle increments
+			for (unsigned int i = 0; i < mode_frequency.size(); ++i){
+				double sense = mode_frequency_counter[i] > mode_frequency[i]/2? 1:-1;
+				double atenuation = eigen->values[i] / eigen->values[0];
+				for (unsigned int j = 0; j < eigensize; ++j){
+					targetCoords[j] += sense*atenuation*eigen->vectors[i][j];
+				}
+			}
+
+			// Put all angles in the correct range
+			for (unsigned int i = 0; i < targetCoords.size(); ++i){
+				targetCoords[i] = HarmonicDihedralConstraintFunctions::put_in_pi_minus_pi_range(targetCoords[i]);
+			}
+
+			// And normalize the result!
+			AnmNormalizer::normalizeByLargestValue(targetCoords);
+
+			// Then multiply the maximum displacement
+			Math::multiplyVectorByScalar(targetCoords, anmParameters->getDisplacementMagnitude());
+
+			// Log frequency counters
+			ostringstream os;
+			os<<"Counters:";
+			for (unsigned int i =0; i < mode_frequency.size(); ++i){
+				os<<mode_frequency_counter[i]<<" ";
+			}
+			os<<endl<<"Periods: ";
+			for (unsigned int i =0; i < eigen->values.size(); ++i){
+				os<<mode_frequency[i]<<" ";
+			}
+			SystemVars::getLog("mode_counters")->write(os.str());
+
+			ostringstream mode_sense;
+			for (unsigned int i =0; i < mode_frequency.size(); ++i){
+				mode_sense<<(mode_frequency_counter[i] > mode_frequency[i]/2? 1:-1)<<" ";
+			}
+			SystemVars::getLog("mode_sense")->write(mode_sense.str());
+
+			SystemVars::flushLogs();
+			// Update frequency counters
+			for (unsigned int i =0; i < mode_frequency.size(); ++i){
+				mode_frequency_counter[i] = (mode_frequency_counter[i]+1)%mode_frequency[i];
+			}
+		}
+		else{
+
+		}
+	}
+
+
+}
+
+void AnmInternals::logVectorAsMode(std::string name, vector<double>& vector_mode, const AnmNodeList* nodeList){
+	// Log current torsions + increments (proposal)
+	AnmEigen* vector_as_eigen =  ModesWriter::getEigenFromArray(vector_mode);
+	SystemVars::getModesWriterHandler()->getWriter(name+"_ic")->writeInternalModes(vector_as_eigen, nodeList, false);
+
+	// Log the actual cc structure you would get after applying this proposal
 }
 
 void AnmInternals::normalizeEigenVectors(AnmEigen * eigen)

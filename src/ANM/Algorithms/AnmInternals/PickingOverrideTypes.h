@@ -1,0 +1,17 @@
+/////////////////////////////////////////////////////////////////////////////
+/// \author vgil
+/// \date 06/03/2015
+/////////////////////////////////////////////////////////////////////////////
+
+#pragma once
+
+#ifndef PICKINGOVERRIDETYPES_H_
+#define PICKINGOVERRIDETYPES_H_
+
+enum PickingOverrideType{
+	DO_NOT_OVERRIDE,
+	EIGEN_MIXING_EIGEN_WEIGHT
+};
+
+
+#endif /* PICKINGOVERRIDETYPES_H_ */

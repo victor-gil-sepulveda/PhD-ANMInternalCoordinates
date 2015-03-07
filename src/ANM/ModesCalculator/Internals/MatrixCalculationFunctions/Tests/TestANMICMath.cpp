@@ -63,6 +63,8 @@ void TestANMICMath::run() {
 	TEST_FUNCTION(testGetABMatrix);
 	TEST_FUNCTION(testAddMatrixToU);
 	TEST_FUNCTION(testConvertMatrixToArray);
+	TEST_FUNCTION(testArbitrarySizeMatrixMult);
+	TEST_FUNCTION(testTranspose)
 
 	finish();
 }
@@ -655,7 +657,7 @@ bool TestANMICMath::testInvertMatrix() {
 		{0, 0, 1},
 	};
 
-	ANMICMath::invertMatrix(matrix, result);
+	ANMICMath::invertIMatrix(matrix, result);
 
 	ANMICMath::multiplyMatrixByMatrix(matrix, result, ident);
 
@@ -797,5 +799,49 @@ bool TestANMICMath::testConvertMatrixToArray() {
 	delete [] in;
 	delete [] expected;
 
+	return ok;
+}
+
+bool TestANMICMath::testArbitrarySizeMatrixMult(){
+	vector<vector<double> > matrix1,matrix2, out1,out2, expected_out1, expected_out2;
+
+	TestTools::load_vector_of_vectors(matrix1, "src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/math/math_mult_1.txt");
+	TestTools::load_vector_of_vectors(matrix2, "src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/math/math_mult_2.txt");
+	TestTools::load_vector_of_vectors(expected_out1, "src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/math/math_mult_result.txt");
+	TestTools::load_vector_of_vectors(expected_out2, "src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/math/math_mult_result2.txt");
+
+	ANMICMath::multiplyMatrixByMatrix(matrix1,matrix2,out1);
+	ANMICMath::multiplyMatrixByMatrix(matrix2,matrix1,out2);
+
+	bool ok = true;
+	for (unsigned int i =0; i<expected_out1.size();++i){
+		ok = ok && Assertion::expectedVectorEqualsCalculatedWithinPrecision(
+				expected_out1[i],
+				out1[i],
+				1e-16);
+	}
+
+	for (unsigned int i =0; i<expected_out2.size();++i){
+		ok = ok && Assertion::expectedVectorEqualsCalculatedWithinPrecision(
+				expected_out2[i],
+				out2[i],
+				1e-16);
+	}
+
+	return ok;
+}
+
+bool TestANMICMath::testTranspose(){
+	vector<vector<double> > matrix, transposed, expected_transposed;
+	TestTools::load_vector_of_vectors(matrix, "src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/math/math_mult_1.txt");
+	TestTools::load_vector_of_vectors(expected_transposed, "src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/math/transposed.txt");
+	ANMICMath::transpose(matrix, transposed);
+	bool ok = true;
+	for (unsigned int i =0; i<expected_transposed.size();++i){
+		ok = ok && Assertion::expectedVectorEqualsCalculatedWithinPrecision(
+				expected_transposed[i],
+				transposed[i],
+				1e-16);
+	}
 	return ok;
 }

@@ -55,11 +55,15 @@ namespace ANMICMath {
 
 	void multiplyMatrixByMatrix(double *first, double *second, double *result, unsigned int size);
 
+	void multiplyMatrixByMatrix(std::vector<std::vector<double> >& first,
+			std::vector<std::vector<double> >& second,
+			std::vector<std::vector<double> >& out);
+
 	Point multiplyIMatrixByEVector(double const I[3][3], double e[3]);
 
 	Point multiplyIMatrixByEVector(double const I[3][3], Point& e);
 
-	void invertMatrix(double matrix[3][3], double result[3][3]);
+	void invertIMatrix(double matrix[3][3], double result[3][3]);
 
 	void invertMatrix(double *matrix, double *result, unsigned int size);
 
@@ -90,6 +94,9 @@ namespace ANMICMath {
 	void convertMatrixToArray(double **matrix, double *array, int rows, int columns);
 
 	Unit* getDummyUnit(double x, double y, double z);
+
+	void transpose(std::vector<std::vector<double> >& in,
+			std::vector<std::vector<double> >& out);
 };
 
 #endif /* ANMICMATH_H_ */

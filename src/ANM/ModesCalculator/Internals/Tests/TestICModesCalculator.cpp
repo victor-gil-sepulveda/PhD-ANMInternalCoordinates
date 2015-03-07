@@ -159,7 +159,7 @@ bool TestICModesCalculator::testCompleteEigencalculation(const char* pdb_path,
 	//	anmParameters.getNumberOfModes()
 	AnmEigen eigen;
 	AnmUnitNodeList* node_list = new AnmUnitNodeList;
-	node_list->setNodeList(units);
+	node_list->setNodeList(complex);
 	InternalModesCalculator calctor;
 	calctor.calculateEigenValuesAndVectors(&anmParameters,
 											*((AnmNodeList*)node_list),
@@ -282,7 +282,6 @@ bool TestICModesCalculator::testCartesianToInternal(const char* prot_path,
 	cout << "Loading model"<<endl;
 	TestANMICTools::createUnitsFromFile(prot_path, units, complex, false);
 
-
 	// Load input and golden
 	vector<vector<double> > input_cartesian, output_internal, expected_internal;
 	TestTools::load_vector_of_vectors(input_cartesian, initial_cc_path);
@@ -299,5 +298,6 @@ bool TestICModesCalculator::testCartesianToInternal(const char* prot_path,
 	for (unsigned int i = 0; i < output_eigen->vectors.size();++i){
 		ANMICMath::printVector(Utils::vectorToPointer(output_eigen->vectors[i]), output_eigen->vectors[i].size());
 	}
+
 	delete output_eigen;
 }

@@ -68,17 +68,19 @@ void InternalModesCalculator::calculateEigenValuesAndVectors(AnmParameters * anm
 																const AnmNodeList & node_list,
 																AnmEigen * eigen)
 {
-	// const std::vector<Atom*> & node_list viene de  NodeListGenerator::selectNodes
+	// We need to first update the model
+	AnmUnitNodeList &unitNodeList = dynamic_cast<AnmUnitNodeList &>(const_cast<AnmNodeList &>(node_list));
+	unitNodeList.updateUnitList();
+
 	// Build coarse grain model
-	const AnmUnitNodeList &unitNodeList = dynamic_cast<const AnmUnitNodeList &>(node_list);
 	std::vector<Unit*> units = unitNodeList.getNodeList(); // TODO: RELLENAR modelo
 	cout<<"DBG: Calculating Eig. for "<< units.size() <<" units."<<endl;
 
 	// Calculate K and H
 	double cutoff = anmParameters->getCutoff();
 	double k = anmParameters->getConstantForHessian();
-	cout<<"DBG: InternalModesCalculator::calculateEigenValuesAndVectors K "<<k<<" cutoff "<<cutoff<<endl;
-	//ElasticConstantCalculator ecc(k);
+	cout<<"DBG: InternalModesCalculator::calculateEigenValuesAndVectors - k: "<<k<<", cutoff: "<<cutoff<<endl;
+
 	InverseExponentialElasticConstant ecc(k, 3.8, 6);
 	std::vector< std::vector<double> > U = ANMICHessianCalculator::calculateU(cutoff*cutoff,
 			&ecc,
@@ -86,13 +88,19 @@ void InternalModesCalculator::calculateEigenValuesAndVectors(AnmParameters * anm
 			false); // Skip OXT
 
 	TriangularMatrix* H = ANMICHessianCalculator::calculateH(units,  U);
-	//ANM TODO: This must be an option !!
-	//ANMICHessianCalculator::modifyHessianWithExtraTorsion(H);
+
+	if(anmParameters->getTipEffectLowering()){
+		cout<<"DBG: Trying to lower tip effect."<<endl;
+		ANMICHessianCalculator::modifyHessianWithExtraTorsion(H);
+	}
 
 	TriangularMatrix* K = ANMICKineticMatrixCalculator::calculateK(units, INMA);
 
 	// And then the modes
 	calculate_modes(anmParameters, H, K, eigen);
+
+	delete H;
+	delete K;
 }
 
 ///////////////////////////////////////////////////////////////
@@ -159,6 +167,10 @@ void InternalModesCalculator::calculate_modes(AnmParameters * anmParameters,
 	delete [] IWORK;
 	delete [] IFAIL;
 
+	for (unsigned int i = 0; i < number_of_eigen; i++){
+		cout<<"DBG: eigen val: "<<W[i]<<endl;
+	}
+
 	eigen->initialize(W, Z, number_of_eigen, H->size1(), false);
 
 	delete [] W;
@@ -202,10 +214,10 @@ AnmEigen* InternalModesCalculator::internalToCartesian(vector<Unit*>& units, Anm
 	vector<Point> term1, term2, term1b, term2b;
 	double I[3][3], I_inv[3][3];
 	ANMICKineticMatrixCalculator::calculateI(I, units, pair<int,int>(0, units.size()-1), INMA); // calculate I for all units i in [0,number_of_units-1]
-	ANMICMath::invertMatrix(I,I_inv);
+	ANMICMath::invertIMatrix(I,I_inv);
 	for(unsigned int dihedral = 0; dihedral < number_of_dihedrals; ++dihedral){
-		ANMICKineticMatrixCalculator::dri_dq( units, dihedral, I_inv, term1, term2);
-		ANMICKineticMatrixCalculator::dri_dq_2( units, dihedral, I_inv, term1b, term2b);
+		ANMICKineticMatrixCalculator::dr1dq( units, dihedral, I_inv, term1, term2);
+		ANMICKineticMatrixCalculator::dr2dq( units, dihedral, I_inv, term1b, term2b);
 	}
 
 	// Calculate per-atom contributions of each dihedral turn
@@ -277,82 +289,103 @@ AnmEigen* InternalModesCalculator::internalToCartesian(vector<Unit*>& units, Anm
 AnmEigen* InternalModesCalculator::cartesianToInternal(vector<Unit*>& units, AnmEigen* in){
 	AnmEigen* out = new AnmEigen;
 	unsigned int number_of_modes = in->getNumberOfModes();
-	// K (n_di, n_di)   J (n_coords, n_di) M() r (n_coords) KJMr
-	// J r -> (n_di, 1) KJr -> (n_di, 1)
 
 	// Calculate Jacobi
 	cout<<"Jacobi calculation..."<<endl;
-	vector<vector<double> > J;
+	vector<vector<double> > J, Jt;
 	ANMICKineticMatrixCalculator::Jacobi(units, J);
+	ANMICMath::transpose(J,Jt);
 
 	// Calculate K
 	cout<<"K calculation..."<<endl;
 	TriangularMatrix* K = ANMICKineticMatrixCalculator::calculateK(units, INMA);
 
-	cout<<"K inversion..."<<endl;
-	// Invert K
-	char uplo = 'U';
-	int info = 0;
-	int N = K->size1();
-	dpptri_(&uplo, &N, K->data().begin(), &info);
-	cout<< "INFO: "<<info<<endl;
+	vector<vector<double> > Kv(K->size1(), vector<double>(K->size1(),0)), KvKi;
+	cout<<"DBG: K inv"<<endl;
+	for (unsigned int i = 0; i < K->size1(); ++i){
+		TriangularMatrixRow K_r (*K,i);
+		for (unsigned int j = i; j < K->size2(); ++j){
+			Kv[i][j] = K_r(j);
+			Kv[j][i] = K_r(j);
+		}
+	}
 
-	cout<<"M calculation..."<<endl;
-	// Get all masses
+
+//	cout<<"K inversion..."<<endl;
+//	// Invert K
+//	char uplo = 'U';
+//	int info = 0;
+//	int N = K->size1();
+//	dpptri_(&uplo, &N, K->data().begin(), &info);
+//	cout<< "INFO: "<<info<<endl;
+
+//	vector<vector<double> > Ki(K->size1(), vector<double>(K->size1(),0));
+//	cout<<"DBG: K inv"<<endl;
+//	for (unsigned int i = 0; i < K->size1(); ++i){
+//		TriangularMatrixRow K_r (*K,i);
+//		for (unsigned int j = i; j < K->size2(); ++j){
+//			Ki[i][j] = K_r(j);
+//			Ki[j][i] = K_r(j);
+//		}
+//	}
+
+	vector<vector<double> > Ki;
+	TestTools::load_vector_of_vectors(Ki, "src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala3/Kinv.txt");
+	ANMICMath::multiplyMatrixByMatrix(Ki,Kv,KvKi);
+
+	cout<<"K ------"<<endl;
+	for (unsigned int i = 0; i < Kv.size();++i){
+		ANMICMath::printVector(Utils::vectorToPointer(Kv[i]), Kv[i].size());
+	}
+
+	cout<<"Ki ------"<<endl;
+	for (unsigned int i = 0; i < Ki.size();++i){
+		ANMICMath::printVector(Utils::vectorToPointer(Ki[i]), Ki[i].size());
+	}
+
+	cout<<"KvKi ------"<<endl;
+	for (unsigned int i = 0; i < KvKi.size();++i){
+		ANMICMath::printVector(Utils::vectorToPointer(KvKi[i]), KvKi[i].size());
+	}
+
+	// M matrix
 	bool onlyHeavyAtoms = true;
 	vector<Atom*> all_atoms;
 	UnitTools::getAllAtomsFromUnits(units, all_atoms, onlyHeavyAtoms);
-	vector<double> M;
+	vector<vector<double> > M(all_atoms.size()*3, vector<double>(all_atoms.size()*3,0));
 	for (unsigned int i = 0; i < all_atoms.size(); ++i){
-		M.push_back(all_atoms[i]->getMass());
-		M.push_back(all_atoms[i]->getMass());
-		M.push_back(all_atoms[i]->getMass());
+		unsigned int offset = i*3;
+		double mass = all_atoms[i]->getMass();
+		M[offset][offset] = mass;
+		M[offset+1][offset+1] = mass;
+		M[offset+2][offset+2] = mass;
 	}
-
 
 	cout<<"Conversion..."<<endl;
 	// We do this for every of the modes we have in cartesian coordinates
 	vector< vector<double> > new_evectors;
 
 	for (unsigned int i = 0; i < number_of_modes; ++i){
-		vector<double> torsion_rotations;
 		vector<double>& original_mode = in->vectors[i];
+		cout<<"Original: ";
+		ANMICMath::printVector(Utils::vectorToPointer(original_mode), original_mode.size());
 
-		// Multiply M by r
-		cout<<"DBG: M  "<< M.size()<<"original_mode "<< original_mode.size()<<endl;
-		vector<double> Mr;
-		for (unsigned j = 0; j < original_mode.size(); ++j){
-			Mr.push_back(M[j]*original_mode[j]);
-		}
+		vector<vector<double> > rt, r, Mr, JtMr, KiJtMr, Jr;
+		rt.push_back(original_mode);
+		ANMICMath::transpose(rt,r);
+		ANMICMath::multiplyMatrixByMatrix(M, r, Mr);
+		ANMICMath::multiplyMatrixByMatrix(Jt, Mr , JtMr);
+		ANMICMath::multiplyMatrixByMatrix(Ki, JtMr , KiJtMr);
+		ANMICMath::multiplyMatrixByMatrix(Jt,r,Jr);
 
-		// JMr (matrix multiplication) (JMr (n_dihedrals x1) )
-		vector<double> JMr;
-		for (unsigned int j_row = 0; j_row < J.size(); ++j_row){
-			double dot = 0;
-			for (unsigned int m_index = 0; m_index < M.size(); ++m_index){
-				dot += J[j_row][m_index]*Mr[m_index];
-			}
-			JMr.push_back(dot);
-		}
+		vector< vector<double> > evec;
+		ANMICMath::transpose(KiJtMr,evec);
+//		ANMICMath::transpose(JtMr, evec);
+//		ANMICMath::transpose(Jr,evec);
+		new_evectors.push_back(evec[0]);
 
-		// K^-1JMr (n_dihedrals x 1)
-		vector<double> KinvJMr;
-		for (unsigned int k_row = 0; k_row < K->size1()/*n_dihedrals*/; ++k_row){
-			double dot = 0;
-			for (unsigned int jmr_index = 0; jmr_index < JMr.size(); ++jmr_index){
-				double Kab;
-				if (k_row >= jmr_index ){
-					Kab = (*K)( jmr_index, k_row);
-				}
-				else{
-					Kab = (*K)( k_row, jmr_index);
-				}
-				dot += Kab * JMr[jmr_index];
-			}
-			KinvJMr.push_back(dot);
-		}
-
-		new_evectors.push_back(KinvJMr);
+		cout<<"Calcted: ";
+		ANMICMath::printVector(Utils::vectorToPointer(evec[0]), evec[0].size());
 	}
 
 	delete K;
@@ -360,8 +393,6 @@ AnmEigen* InternalModesCalculator::cartesianToInternal(vector<Unit*>& units, Anm
 	cout<<"Creating anmeigen object..."<<endl;
 	bool notUsingCartesian = false;
 	out->initialize(in->values, new_evectors, notUsingCartesian);
-
-
 
 	return out;
 }

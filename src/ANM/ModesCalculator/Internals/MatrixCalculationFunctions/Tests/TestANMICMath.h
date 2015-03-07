@@ -46,6 +46,8 @@ class TestANMICMath : public Test
         bool testGetABMatrix();
         bool testAddMatrixToU();
         bool testConvertMatrixToArray();
+        bool testArbitrarySizeMatrixMult();
+        bool testTranspose();
 };
 
 #endif /* TESTANMICMATH_H_ */
