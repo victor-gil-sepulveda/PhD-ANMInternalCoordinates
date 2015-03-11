@@ -876,18 +876,26 @@ bool TestANMICMath::testInversion(const char* original_matrix, const char* expec
 	}
 
 	// Coherence check (m m^-1 == I)
+	bool coherence_check = true;
 	ANMICMath::multiplyMatrixByMatrix(original,calculated, mult);
 	for (unsigned int i =0; i < mult.size(); ++i){
 		for (unsigned int j = 0; i < mult[i].size(); ++j){
 			if (i == j){
-				ok = ok && Assertion::expectedEqualsCalculatedWithinPrecision(1, mult[i][j], 1e-8);
+				coherence_check = coherence_check && Assertion::expectedEqualsCalculatedWithinPrecision(1, mult[i][j], 1e-8);
 			}
 			else{
-				ok = ok && Assertion::expectedEqualsCalculatedWithinPrecision(0, mult[i][j], 1e-8);
+				coherence_check = coherence_check && Assertion::expectedEqualsCalculatedWithinPrecision(0, mult[i][j], 1e-8);
 			}
 		}
 	}
 
+	if (coherence_check){
+		cout<<"Coherence check OK."<<endl;
+	}
+	else{
+		cout<<"Coherence check FAILED."<<endl;
+	}
+
 	delete t;
-	return ok;
+	return ok && coherence_check;
 }
