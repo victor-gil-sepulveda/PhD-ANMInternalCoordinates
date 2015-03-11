@@ -242,3 +242,13 @@ std::string AnmCalculator::showNodeList() const {
 AnmAlgorithm * AnmCalculator::getAlgorithm(){
 	return this->algorithm;
 }
+
+
+void AnmCalculator::logAfterANMCoords(){
+	this->algorithm->logAfterANMCoords(this->nodeList);
+}
+
+
+void AnmCalculator::logAfterMinimizationCoords(){
+	this->algorithm->logAfterMinimizationCoords(this->nodeList);
+}

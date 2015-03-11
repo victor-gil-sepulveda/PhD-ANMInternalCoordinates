@@ -44,12 +44,12 @@ void TestANMKineticMatrixFunctions::run()
     bool SKIP_OXT = true;
     bool DO_NOT_SKIP_OXT = false;
 
-//    TEST_REGRESSION_FUNCTION(testCalculateI,
-//    	"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala3/ala3.pdb",
-//		"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala3/I_INMA.txt",
-//		INMA,
-//		DO_NOT_SKIP_OXT,
-//		1e-6);
+    TEST_REGRESSION_FUNCTION(testCalculateI,
+    	"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala3/ala3.pdb",
+		"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala3/I_INMA.txt",
+		INMA,
+		DO_NOT_SKIP_OXT,
+		1e-6);
 //
 //    TEST_FUNCTION(testCalculateI,
 //    	"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala5/ala5.fixed.pdb",

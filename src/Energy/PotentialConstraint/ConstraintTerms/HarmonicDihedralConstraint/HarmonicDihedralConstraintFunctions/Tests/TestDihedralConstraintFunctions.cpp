@@ -42,6 +42,7 @@ void TestDihedralConstraintFunctions::run()
 	TEST_REGRESSION_FUNCTION(testDerivatives, 1.0e-4) // precission lowered (golden data precission was also lowered)
 	TEST_REGRESSION_FUNCTION(testHessian, 1.0e-3) // Idem
 
+
 	TEST_FUNCTION(testPIto2PIRange, Math::degToRad(30), Math::degToRad(30))
 	TEST_FUNCTION(testPIto2PIRange, Math::degToRad(150), Math::degToRad(150))
 	TEST_FUNCTION(testPIto2PIRange, Math::degToRad(200), Math::degToRad(200))
@@ -61,6 +62,7 @@ void TestDihedralConstraintFunctions::run()
 	TEST_FUNCTION(testAngleFixing, Math::degToRad(-150), Math::degToRad(-150))
 	TEST_FUNCTION(testAngleFixing, Math::degToRad(-200), Math::degToRad(160))
 	TEST_FUNCTION(testAngleFixing, Math::degToRad(-330), Math::degToRad(30))
+    TEST_FUNCTION(testAngleFixing, 11.09, -1.476370614359173)
 
 	TEST_FUNCTION(testRadSubtraction, Math::degToRad(40), Math::degToRad(30), Math::degToRad(10))
 	TEST_FUNCTION(testRadSubtraction, Math::degToRad(30), Math::degToRad(40), Math::degToRad(-10))
@@ -94,6 +96,7 @@ bool TestDihedralConstraintFunctions::testRadSubtraction(double a, double b, dou
 				HarmonicDihedralConstraintFunctions::rad_subtraction(a,b),
 				1e-12);
 }
+
 
 bool TestDihedralConstraintFunctions::testPIto2PIRange(double angle, double expected){
 	return Assertion::expectedEqualsCalculatedWithinPrecision(expected,

@@ -32,14 +32,19 @@ using namespace std;
 double HarmonicDihedralConstraintFunctions::put_in_pi_minus_pi_range(double angle){
 
 	if (angle > M_PI){
-		return angle - (2*M_PI);
+		while(angle > M_PI)
+			angle -=  (2*M_PI);
+		return angle;
 	}
 
 	if (angle < -M_PI){
-		return (2*M_PI) + angle;
+		while(angle < -M_PI)
+			angle +=  (2*M_PI);
+		return angle;
 	}
 
 	return angle;
+
 }
 
 ///////////////////////////////////////////////////////////////

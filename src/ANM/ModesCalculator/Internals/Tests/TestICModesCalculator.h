@@ -49,10 +49,12 @@ class TestICModesCalculator : public Test
         		double tolerance);
 
         bool testCartesianToInternal(const char* prot_path,
-        		const char* initial_cc_path,
-        		const char* final_ic_path,
         		double tolerance);
 
+        bool testGeometricCartesianToInternal(const char* prot_path,
+                		const char* initial_cc_path,
+                		const char* final_ic_path,
+                		double tolerance);
 };
 
 #endif /* TESTICMODESCALCULATOR_H_ */

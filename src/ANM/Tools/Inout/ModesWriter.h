@@ -22,10 +22,12 @@ class AnmNodeList;
 
 class ModesWriter {
 	public:
+		ModesWriter();
 		ModesWriter(std::string writer_name, std::string full_path);
 		virtual ~ModesWriter();
 
 		void setPath(std::string full_path);
+		void setName(std::string name);
 
 static AnmEigen* 	getEigenFromArray( std::vector<double> &  one_eigen_v);
 		void 		writeCartesianModes( AnmEigen * eigen, std::vector<double>& coordinates);
@@ -35,6 +37,8 @@ static AnmEigen* 	getEigenFromArray( std::vector<double> &  one_eigen_v);
 		void 		writeCoordinatesDifference(	std::vector<double>& initial_coords,
 													std::vector<double>& final_coords,
 													std::vector<double>& conformation_coords);
+
+		void 		writeCoordinates(std::vector<double>& conformation_coords);
 
 		void writeHeader(std::ofstream& file_handler);
 		void writeResnames(std::ofstream& file_handler, std::vector<Atom*>& atoms);

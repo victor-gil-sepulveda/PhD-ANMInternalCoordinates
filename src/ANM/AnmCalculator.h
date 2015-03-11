@@ -63,6 +63,9 @@ class AnmCalculator
 
 		AnmAlgorithm * getAlgorithm();
 
+		void logAfterANMCoords();
+		void logAfterMinimizationCoords();
+
 	private:
 		// Attributes
 		AnmAlgorithm * algorithm;

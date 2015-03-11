@@ -19,6 +19,8 @@ class AnmUnitNodeList : public AnmNodeList {
 		AnmUnitNodeList();
 		std::vector<Unit*> getNodeList() const;
 		void setNodeList(AtomSet* atomSet);
+		void setNodeList(std::vector<Unit*>& units);
+
 		std::string showNodeList();
 		unsigned int size();
 
@@ -26,9 +28,9 @@ class AnmUnitNodeList : public AnmNodeList {
 
 		// TODO: must handle Unit deletion when destructed?
 
+		AtomSet* sourceAtomSet;
 	private:
 		std::vector<Unit*> nodeList;
-		AtomSet* sourceAtomSet;
 		bool updated;
 };
 

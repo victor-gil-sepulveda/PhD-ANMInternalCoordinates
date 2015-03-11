@@ -10,11 +10,16 @@
 
 #include "ANMICMath.h"
 #include <vector>
-#include <iosfwd>
 #include <iostream>
 #include <iomanip>
 #include "../../../../Tools/Utils.h"
+
 using namespace std;
+
+extern "C" {
+	double dpptri_(char* uplo, int* n, double* ap, int* info);
+}
+
 
 ///////////////////////////////////////////////////////////////
 /// \remarks
@@ -792,4 +797,17 @@ void ANMICMath::transpose(std::vector<std::vector<double> >& in,
 		}
 		out.push_back(new_row);
 	}
+}
+
+void ANMICMath::invertMatrix(std::vector<std::vector<double> >& in){
+
+}
+
+
+// Inplace inversion
+void ANMICMath::invertMatrix(TriangularMatrix* in_out){
+	char uplo = 'U';
+	int info = 0;
+	int N = in_out->size1();
+	dpptri_(&uplo,  &N,  in_out->data().begin(),  &info);
 }

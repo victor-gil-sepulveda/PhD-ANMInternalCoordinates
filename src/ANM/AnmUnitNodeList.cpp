@@ -24,6 +24,9 @@ std::vector<Unit*> AnmUnitNodeList::getNodeList() const {
 void AnmUnitNodeList::setNodeList(AtomSet* atomSet) {
 	this->sourceAtomSet = atomSet;
 }
+void AnmUnitNodeList::setNodeList(vector<Unit*>& units) {
+	this->nodeList = units;
+}
 
 void AnmUnitNodeList::updateUnitList(){
 	Utils::clearVector<Unit>(nodeList);

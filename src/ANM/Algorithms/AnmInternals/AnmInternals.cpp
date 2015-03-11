@@ -49,6 +49,7 @@
 #include "../../Tools/AnmNormalizer.h"
 #include "../../../Tools/Utils.h"
 #include <algorithm>
+#include "../../../Molecules/AtomSet/AtomSet.h"
 
 using namespace std;
 
@@ -66,12 +67,25 @@ using namespace std;
 ///////////////////////////////////////////////////////////////
 AnmInternals::AnmInternals(RandomGenerator * randomGenerator, ModesCalculator * modesCalculator,
 								AnmInternalsTargetUpdater * anmTargetUpdater, Picker * picker)
- : AnmAlgorithm(randomGenerator, modesCalculator, anmTargetUpdater, picker)
-{
+ : AnmAlgorithm(randomGenerator, modesCalculator, anmTargetUpdater, picker){
 }
 
-AnmInternals::~AnmInternals()
-{
+AnmInternals::~AnmInternals(){
+}
+
+void AnmInternals::calculate_current_angles(vector<double>& current_angles, vector<Unit*>& units){
+
+	for(unsigned int i=0; i < units.size()-1; ++i){
+		Dihedral* right = units[i]->getRightDihedral();
+		std::vector<Atom*> the_atoms_of_the_dihedral = right->getAtoms();
+		double current_angle = HarmonicDihedralConstraintFunctions::calculateDihedralAngleWithArcTanFunction(
+				the_atoms_of_the_dihedral[0]->getX(), the_atoms_of_the_dihedral[0]->getY(), the_atoms_of_the_dihedral[0]->getZ(),
+				the_atoms_of_the_dihedral[1]->getX(), the_atoms_of_the_dihedral[1]->getY(), the_atoms_of_the_dihedral[1]->getZ(),
+				the_atoms_of_the_dihedral[2]->getX(), the_atoms_of_the_dihedral[2]->getY(), the_atoms_of_the_dihedral[2]->getZ(),
+				the_atoms_of_the_dihedral[3]->getX(), the_atoms_of_the_dihedral[3]->getY(), the_atoms_of_the_dihedral[3]->getZ());
+		current_angle = HarmonicDihedralConstraintFunctions::put_in_pi_minus_pi_range(Math::degToRad(current_angle));
+		current_angles.push_back(current_angle);
+	}
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -96,20 +110,16 @@ void AnmInternals::constrainCurrentAnmNodes(EnergyCalculator * enerCalc,
 	const AnmUnitNodeList& unitNodeList = dynamic_cast<const AnmUnitNodeList&>(nodeList);
 	std::vector<Unit*> units = unitNodeList.getNodeList();
 
+	vector<double> current_angles;
+	calculate_current_angles(current_angles, units);
+
 	for(unsigned int i=0; i < units.size()-1; ++i){
 		Dihedral* right = units[i]->getRightDihedral();
 		std::vector<Atom*> the_atoms_of_the_dihedral = right->getAtoms();
-		double current_angle = HarmonicDihedralConstraintFunctions::calculateDihedralAngleWithArcTanFunction(
-				the_atoms_of_the_dihedral[0]->getX(), the_atoms_of_the_dihedral[0]->getY(), the_atoms_of_the_dihedral[0]->getZ(),
-				the_atoms_of_the_dihedral[1]->getX(), the_atoms_of_the_dihedral[1]->getY(), the_atoms_of_the_dihedral[1]->getZ(),
-				the_atoms_of_the_dihedral[2]->getX(), the_atoms_of_the_dihedral[2]->getY(), the_atoms_of_the_dihedral[2]->getZ(),
-				the_atoms_of_the_dihedral[3]->getX(), the_atoms_of_the_dihedral[3]->getY(), the_atoms_of_the_dihedral[3]->getZ());
-
 		// Adding a constraint for each dihedral (torsion)
-		current_angle = HarmonicDihedralConstraintFunctions::put_in_pi_minus_pi_range(Math::degToRad(current_angle));
 		ConstraintTerm * term = new HarmonicDihedralConstraintTerm(
 				springConstant,
-				current_angle,  // Current angle is the eq. angle, as we want to 'fix' it but let it oscillate
+				current_angles[i],  // Current angle is the eq. angle, as we want to 'fix' it but let it oscillate
 								// a bit if needed
 				the_atoms_of_the_dihedral);
 
@@ -151,7 +161,7 @@ void AnmInternals::performMovement(EnergyCalculator * enerCalc,
 			break;
 	}
 
-	//Perform the movement
+	// Perform the movement
 	mover->perform_one_movement_cycle(units, targetCoords);
 	cout <<"DBG: Movement cycle performed"<<endl;
 
@@ -243,16 +253,27 @@ void AnmInternals::resetFrequencies(AnmParameters * anmParameters, AnmEigen * ei
 	for (unsigned int i =0; i < mode_frequency.size(); ++i){
 		mode_frequency_counter.push_back(((double)rand()/RAND_MAX)*mode_frequency[i]);
 	}
+
+	// Log the periods
+	SystemVars::getModesWriterHandler()->logStepAndVector("mode_counters", mode_frequency);
 }
 
 void AnmInternals::calculateTargetCoords(AnmParameters * anmParameters, AnmEigen * eigen,
 						const AnmNodeList & nodeList, std::vector<double> & targetCoords,
 						unsigned int chosenMode){
 
+	vector<Unit*> units = dynamic_cast<AnmUnitNodeList&>(const_cast<AnmNodeList&>(nodeList)).getNodeList();
+
+	// Log current coordinates and proposal
+	cout<<"DBG: Logging initial coordinates and conformation proposal. "<<endl;
+	SystemVars::getModesWriterHandler()->logStepAndCurrentCACoordinates("initial_cc");
+	SystemVars::getModesWriterHandler()->logStepAndCurrentDihedralAngles("initial_ic", units);
+
 	// If the mixing case is the eigenvalues one, we intercept the whole calculation protocol
 	if(anmParameters->getOverridePickingAndMixing() == DO_NOT_OVERRIDE){
 		cout<<"DBG: Calculating target coords using Regular Control File Parameters"<<endl;
-		AnmAlgorithm::calculateTargetCoords(anmParameters, eigen, nodeList, targetCoords, chosenMode);
+		anmTargetUpdater->updateTargetCoordinates(targetCoords, anmParameters, eigen, nodeList,
+				chosenMode);
 	}
 	else{
 		if(anmParameters->getOverridePickingAndMixing() == EIGEN_MIXING_EIGEN_WEIGHT){
@@ -260,6 +281,7 @@ void AnmInternals::calculateTargetCoords(AnmParameters * anmParameters, AnmEigen
 			unsigned int eigensize = eigen->vectors[0].size();
 
 			// Initialize target coordinates
+			targetCoords.clear();
 			targetCoords.resize(eigensize,0);
 			for (unsigned int j = 0; j < eigensize; ++j){
 				targetCoords[j] = 0;
@@ -272,7 +294,7 @@ void AnmInternals::calculateTargetCoords(AnmParameters * anmParameters, AnmEigen
 			}
 
 			// Calculate target angle increments
-			for (unsigned int i = 0; i < mode_frequency.size(); ++i){
+			for (unsigned int i = 0; i < eigen->vectors.size(); ++i){
 				double sense = mode_frequency_counter[i] > mode_frequency[i]/2? 1:-1;
 				double atenuation = eigen->values[i] / eigen->values[0];
 				for (unsigned int j = 0; j < eigensize; ++j){
@@ -289,49 +311,47 @@ void AnmInternals::calculateTargetCoords(AnmParameters * anmParameters, AnmEigen
 			AnmNormalizer::normalizeByLargestValue(targetCoords);
 
 			// Then multiply the maximum displacement
-			Math::multiplyVectorByScalar(targetCoords, anmParameters->getDisplacementMagnitude());
+			Math::multiplyVectorByScalar(targetCoords, anmParameters->getDisplacement());
 
-			// Log frequency counters
-			ostringstream os;
-			os<<"Counters:";
+			// Log frequency signs
+			vector<double> signs;
 			for (unsigned int i =0; i < mode_frequency.size(); ++i){
-				os<<mode_frequency_counter[i]<<" ";
+				signs.push_back((mode_frequency_counter[i] > mode_frequency[i]/2? 1:-1));
 			}
-			os<<endl<<"Periods: ";
-			for (unsigned int i =0; i < eigen->values.size(); ++i){
-				os<<mode_frequency[i]<<" ";
-			}
-			SystemVars::getLog("mode_counters")->write(os.str());
+			SystemVars::getModesWriterHandler()->logStepAndVector("mode_counters", mode_frequency_counter);
+			SystemVars::getModesWriterHandler()->logStepAndVector("mode_signs", signs);
 
-			ostringstream mode_sense;
-			for (unsigned int i =0; i < mode_frequency.size(); ++i){
-				mode_sense<<(mode_frequency_counter[i] > mode_frequency[i]/2? 1:-1)<<" ";
-			}
-			SystemVars::getLog("mode_sense")->write(mode_sense.str());
-
-			SystemVars::flushLogs();
 			// Update frequency counters
 			for (unsigned int i =0; i < mode_frequency.size(); ++i){
 				mode_frequency_counter[i] = (mode_frequency_counter[i]+1)%mode_frequency[i];
 			}
+
 		}
 		else{
-
+			cout<<"DBG:  ERROR, Picking and mixing override type has not been defined."<<endl;
+			exit(-1);
 		}
 	}
 
-
+	SystemVars::getModesWriterHandler()->logStepAndVector("proposal_inc_ic",targetCoords);
+	SystemVars::getModesWriterHandler()->logStepAndDihedralAnglesProposal("proposal_ic",targetCoords,units);
+	SystemVars::getModesWriterHandler()->logStepAndDihedralToCartesianProposal("proposal_cc", targetCoords, units);
 }
 
-void AnmInternals::logVectorAsMode(std::string name, vector<double>& vector_mode, const AnmNodeList* nodeList){
-	// Log current torsions + increments (proposal)
-	AnmEigen* vector_as_eigen =  ModesWriter::getEigenFromArray(vector_mode);
-	SystemVars::getModesWriterHandler()->getWriter(name+"_ic")->writeInternalModes(vector_as_eigen, nodeList, false);
-
-	// Log the actual cc structure you would get after applying this proposal
-}
-
-void AnmInternals::normalizeEigenVectors(AnmEigen * eigen)
-{
+void AnmInternals::normalizeEigenVectors(AnmEigen * eigen){
 	eigen->normalizeByLargestValue();
+}
+
+void AnmInternals::logAfterANMCoords(AnmNodeList* nodeList){
+	vector<Unit*> units = dynamic_cast<AnmUnitNodeList*>(const_cast<AnmNodeList*>(nodeList))->getNodeList();
+	cout << "DBG: Logging coordinates after anm."<<endl;
+	SystemVars::getModesWriterHandler()->logStepAndCurrentCACoordinates("after_anm_cc");
+	SystemVars::getModesWriterHandler()->logStepAndCurrentDihedralAngles("after_anm_ic",units);
+}
+
+void AnmInternals::logAfterMinimizationCoords(AnmNodeList* nodeList){
+	vector<Unit*> units = dynamic_cast<AnmUnitNodeList*>(const_cast<AnmNodeList*>(nodeList))->getNodeList();
+	cout << "DBG: Logging final step coordinates."<<endl;
+	SystemVars::getModesWriterHandler()->logStepAndCurrentCACoordinates("after_minimization_cc");
+	SystemVars::getModesWriterHandler()->logStepAndCurrentDihedralAngles("after_minimization_ic",units);
 }

@@ -34,6 +34,8 @@ class AnmInternalsTargetUpdater;
 /// \author vgil
 /// \date 31/07/2013
 /////////////////////////////////////////////////////////////////////////////
+class Unit;
+
 class AnmInternals : public AnmAlgorithm
 {
 	public:
@@ -63,7 +65,11 @@ class AnmInternals : public AnmAlgorithm
 								const AnmNodeList & nodeList, std::vector<double> & targetCoords,
 								unsigned int chosenMode);
 
-		void logVectorAsMode(std::string name, std::vector<double>& vector_mode,const AnmNodeList* nodeList);
+		static void calculate_current_angles(std::vector<double>& current_angles, std::vector<Unit*>& units);
+
+		void logAfterANMCoords(AnmNodeList *);
+
+		void logAfterMinimizationCoords(AnmNodeList *);
 
 	private:
 		// Atributes

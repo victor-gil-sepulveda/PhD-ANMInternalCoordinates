@@ -40,7 +40,6 @@ extern "C" {
 	void dspgvx_(int* itype, char* jobz, char* range, char* uplo, int* N, double* A, double* B, double* vl, double* vu,
 			int* il, int* iu, double* abstol, int* M, double*W, double* Z, int* ldz, double* work,	int* iwork, int* ifail,
 			int* info);
-	double dlamch_(char* cmach);
 	double dpptri_(char* uplo, int* n, double* ap, int* info);
 }
 //--------------------------------
@@ -70,7 +69,7 @@ void InternalModesCalculator::calculateEigenValuesAndVectors(AnmParameters * anm
 {
 	// We need to first update the model
 	AnmUnitNodeList &unitNodeList = dynamic_cast<AnmUnitNodeList &>(const_cast<AnmNodeList &>(node_list));
-	unitNodeList.updateUnitList();
+	//unitNodeList.updateUnitList();
 
 	// Build coarse grain model
 	std::vector<Unit*> units = unitNodeList.getNodeList(); // TODO: RELLENAR modelo
@@ -120,8 +119,8 @@ void InternalModesCalculator::calculate_modes(AnmParameters * anmParameters,
 													TriangularMatrix* K,
 													AnmEigen* eigen){
 
-	TestTools::save_vector( H->data().begin(), "H.txt", 0, H->data().size()-1, 4);
-	TestTools::save_vector( K->data().begin(), "K.txt", 0, K->data().size()-1, 4);
+//	TestTools::save_vector( H->data().begin(), "H.txt", 0, H->data().size()-1, 4);
+//	TestTools::save_vector( K->data().begin(), "K.txt", 0, K->data().size()-1, 4);
 
 	int number_of_eigen = anmParameters->getNumberOfModes();
 	int itype = 1;
@@ -131,10 +130,9 @@ void InternalModesCalculator::calculate_modes(AnmParameters * anmParameters,
 	int N = K->size1();
 	int il = 1;
 	int iu = number_of_eigen;
-	char cmach = 'S';
-	double abstol = 2*dlamch_(&cmach);
+
 	//override
-	abstol = 0.0001;
+	double abstol = 0.0001;
 	int M;
 	double* W = new double[number_of_eigen];
 	double* Z = new double[N*number_of_eigen];
@@ -167,9 +165,9 @@ void InternalModesCalculator::calculate_modes(AnmParameters * anmParameters,
 	delete [] IWORK;
 	delete [] IFAIL;
 
-	for (unsigned int i = 0; i < number_of_eigen; i++){
-		cout<<"DBG: eigen val: "<<W[i]<<endl;
-	}
+//	for (unsigned int i = 0; i < number_of_eigen; i++){
+//		cout<<"DBG: eigen val: "<<W[i]<<endl;
+//	}
 
 	eigen->initialize(W, Z, number_of_eigen, H->size1(), false);
 
@@ -300,24 +298,26 @@ AnmEigen* InternalModesCalculator::cartesianToInternal(vector<Unit*>& units, Anm
 	cout<<"K calculation..."<<endl;
 	TriangularMatrix* K = ANMICKineticMatrixCalculator::calculateK(units, INMA);
 
-	vector<vector<double> > Kv(K->size1(), vector<double>(K->size1(),0)), KvKi;
-	cout<<"DBG: K inv"<<endl;
-	for (unsigned int i = 0; i < K->size1(); ++i){
-		TriangularMatrixRow K_r (*K,i);
-		for (unsigned int j = i; j < K->size2(); ++j){
-			Kv[i][j] = K_r(j);
-			Kv[j][i] = K_r(j);
-		}
-	}
+//	vector<vector<double> > Kv(K->size1(), vector<double>(K->size1(),0)), KvKi;
+//	cout<<"DBG: K inv"<<endl;
+//	for (unsigned int i = 0; i < K->size1(); ++i){
+//		TriangularMatrixRow K_r (*K,i);
+//		for (unsigned int j = i; j < K->size2(); ++j){
+//			Kv[i][j] = K_r(j);
+//			Kv[j][i] = K_r(j);
+//		}
+//	}
 
+	vector<vector<double> > Kv, KvKi;
+	TriangularMatrixTools::triangularMatrixToVectorMatrix(K,Kv);
 
-//	cout<<"K inversion..."<<endl;
-//	// Invert K
-//	char uplo = 'U';
-//	int info = 0;
-//	int N = K->size1();
-//	dpptri_(&uplo, &N, K->data().begin(), &info);
-//	cout<< "INFO: "<<info<<endl;
+	cout<<"K inversion..."<<endl;
+	// Invert K
+	char uplo = 'U';
+	int info = 0;
+	int N = K->size1();
+	dpptri_(&uplo, &N, K->data().begin(), &info);
+	cout<< "INFO: "<<info<<endl;
 
 //	vector<vector<double> > Ki(K->size1(), vector<double>(K->size1(),0));
 //	cout<<"DBG: K inv"<<endl;
@@ -331,6 +331,7 @@ AnmEigen* InternalModesCalculator::cartesianToInternal(vector<Unit*>& units, Anm
 
 	vector<vector<double> > Ki;
 	TestTools::load_vector_of_vectors(Ki, "src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala3/Kinv.txt");
+
 	ANMICMath::multiplyMatrixByMatrix(Ki,Kv,KvKi);
 
 	cout<<"K ------"<<endl;

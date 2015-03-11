@@ -59,7 +59,7 @@ class AnmAlgorithm
 
 		virtual void calculateTargetCoords(AnmParameters * anmParameters, AnmEigen * eigen,
 											const AnmNodeList & nodeList, std::vector<double> & targetCoords,
-											unsigned int chosenMode);
+											unsigned int chosenMode) = 0;
 
 		virtual unsigned int pickNewMode(AnmEigen * eigen, AnmParameters * anmParameters);
 
@@ -75,8 +75,9 @@ class AnmAlgorithm
 
 		virtual std::string generateReport(AnmParameters * anmParameters) const;
 
-		// Mode logging
-		virtual void logVectorAsMode(std::string name, std::vector<double>& vector_mode,const AnmNodeList* nodeList) = 0;
+		virtual void logAfterANMCoords(AnmNodeList *) = 0;
+
+		virtual void logAfterMinimizationCoords(AnmNodeList *) = 0;
 
 	protected:
 		// Atributes

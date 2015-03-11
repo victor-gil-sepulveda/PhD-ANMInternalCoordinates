@@ -123,29 +123,3 @@ void AnmAlgorithm::normalizeEigenVectors(AnmEigen * eigen,
 	}
 }
 
-/////////////////////////////////////////////////////////////////////////////////////
-/// \remarks
-/// It calculates the target coordinates
-///
-/// \param eigen [In] Eigen values and eigen vectors
-/// \param nodesList [In] List of nodes
-/// \param anmParameters [In] ANM parameters
-/// \param chosenModeIndex [In] Index of chosen mode
-///
-/// \param targetCoords [Out] Target coordinates
-///
-/// \author atarraco
-/// \author mrivero
-/// \date 06/07/2012
-///////////////////////////////////////////////////////////////////////////////////
-void AnmAlgorithm::calculateTargetCoords(AnmParameters * anmParameters, AnmEigen * eigen,
-										const AnmNodeList & nodesList, vector<double> & targetCoords,
-										unsigned int chosenModeIndex)
-{
-	anmTargetUpdater->updateTargetCoordinates(targetCoords, anmParameters, eigen, nodesList,
-											  	  chosenModeIndex);
-
-	cout<<"DBG: Logging targetCoords vector "<<endl;
-	logVectorAsMode("translation_proposal", targetCoords, &nodesList);
-
-}

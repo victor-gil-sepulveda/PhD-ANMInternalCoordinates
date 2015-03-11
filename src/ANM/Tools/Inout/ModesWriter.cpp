@@ -21,6 +21,11 @@
 #include "../../AnmUnitNodeList.h"
 using namespace std;
 
+ModesWriter::ModesWriter() {
+	this->full_path = "";
+	this-> writer_name = "";
+}
+
 ModesWriter::ModesWriter(string writer_name, string full_path) {
 	this->full_path = full_path;
 	this-> writer_name = writer_name;
@@ -31,6 +36,10 @@ ModesWriter::~ModesWriter() {
 
 void ModesWriter::setPath(std::string full_path){
 	this->full_path = full_path;
+}
+
+void ModesWriter::setName(std::string name){
+	this->writer_name = name;
 }
 
 AnmEigen* ModesWriter::getEigenFromArray(vector<double>&  one_eigen_v){
@@ -283,3 +292,9 @@ void ModesWriter::writeCoordinatesDifference(
 		delete eigen;
 }
 
+void ModesWriter::writeCoordinates(std::vector<double>& conformation_coords){
+	ofstream file_handler;
+	file_handler.open(this->full_path.c_str());
+
+	writeCoordinates(file_handler, conformation_coords);
+}
