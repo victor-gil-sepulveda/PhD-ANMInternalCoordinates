@@ -67,14 +67,15 @@ bool TestUnitsBuilder::testUnitaryBondVectors(const char* complex_path, const ch
 	TestTools::load_vector_of_vectors(unitary_bond_vectors, vectors_file_path);
 
 	bool all_vectors_are_equal = true;
-	for (unsigned int i = 0; i < units.size(); ++i){
-//		all_vectors_are_equal &= Assertion::expectedVectorEqualsCalculatedWithinPrecision(Utils::vectorToPointer(unitary_bond_vectors[2*i]),
-//				&(units[i]->e_left->getCoordinates()[0]), 3, 1e-7);
-		all_vectors_are_equal &= Assertion::expectedVectorEqualsCalculatedWithinPrecision(Utils::vectorToPointer(unitary_bond_vectors[2*i+1]),
+	unsigned int number_of_torsions = units.size()-1;
+	for (unsigned int i = 0; i < number_of_torsions; ++i){
+		all_vectors_are_equal &= Assertion::expectedVectorEqualsCalculatedWithinPrecision(
+				Utils::vectorToPointer(unitary_bond_vectors[2*i+1]),
 				&(units[i]->e_right->getCoordinates()[0]), 3, 1e-7);
 	}
 
 	delete complex;
+	delete com;
 	Utils::clearVector<Unit>(units);
 
 	return all_vectors_are_equal;

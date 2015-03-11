@@ -359,7 +359,6 @@ Dihedral* UnitsBuilder::get_psi_dihedral( Atom*& CA, Atom*& C, Link* link, bool 
 	return dihedral;
 }
 
-
 Dihedral* UnitsBuilder::get_phi_dihedral( Atom*& N_next, Atom*& CA_next, Link* link){
 	Atom* C = link->getAtomsWithName(AtomNames::C)[0];
 	N_next = link->getNextLink()->getAtomsWithName(AtomNames::N)[0];

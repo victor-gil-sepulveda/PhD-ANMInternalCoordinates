@@ -16,7 +16,7 @@ using namespace std;
 ///////////////////////////////////////////////////////////////
 /// \remarks
 /// Creates a unit with all its parameters.
-///     [Unit i -1] <---e_left----r_left[atom 2, atom 3.... ] r_rigth ------e_right----> [Unit i+1]
+///     [Unit i -1] <---e_left----r_left[atom 2, atom 3.... ] r_right ------e_right----> [Unit i+1]
 ///                              [            Unit i                 ]
 
 /// \param atoms [In] A list with all the heavy atoms the unit is composed of.
@@ -78,7 +78,6 @@ void Unit::update(){
 		e_right = (new Point(Point::subtract(right_torsion_bond_atom->toPoint(),left_torsion_bond_atom->toPoint())))->normalize();
 	}
 }
-
 
 std::vector<Atom*> Unit::getAllAtoms(){
 	// TODO: improve this with bookkeeping! Units must be inmutable but its atoms are not

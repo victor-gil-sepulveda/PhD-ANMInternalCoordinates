@@ -14,24 +14,24 @@
 using namespace std;
 
 AnmUnitNodeList::AnmUnitNodeList(){
-	sourceAtomSet = NULL;
+}
+
+AnmUnitNodeList::~AnmUnitNodeList(){
+	Utils::clearVector(this->nodeList);
 }
 
 std::vector<Unit*> AnmUnitNodeList::getNodeList() const {
 	return this->nodeList;
 }
 
-void AnmUnitNodeList::setNodeList(AtomSet* atomSet) {
-	this->sourceAtomSet = atomSet;
-}
 void AnmUnitNodeList::setNodeList(vector<Unit*>& units) {
 	this->nodeList = units;
 }
 
 void AnmUnitNodeList::updateUnitList(){
-	Utils::clearVector<Unit>(nodeList);
-	UnitsBuilder unitsBuilder((Chain*) sourceAtomSet);
-	unitsBuilder.build(nodeList);
+	for(unsigned int i = 0; i< nodeList.size();++i){
+		nodeList[i]->update();
+	}
 }
 
 

@@ -68,7 +68,7 @@ void InternalModesCalculator::calculateEigenValuesAndVectors(AnmParameters * anm
 {
 	// We need to first update the model
 	AnmUnitNodeList &unitNodeList = dynamic_cast<AnmUnitNodeList &>(const_cast<AnmNodeList &>(node_list));
-	//unitNodeList.updateUnitList();
+	unitNodeList.updateUnitList();
 
 	// Build coarse grain model
 	std::vector<Unit*> units = unitNodeList.getNodeList(); // TODO: RELLENAR modelo

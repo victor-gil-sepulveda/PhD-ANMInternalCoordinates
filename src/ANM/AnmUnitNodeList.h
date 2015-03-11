@@ -17,8 +17,9 @@ class AtomSet;
 class AnmUnitNodeList : public AnmNodeList {
 	public:
 		AnmUnitNodeList();
+		~AnmUnitNodeList();
+
 		std::vector<Unit*> getNodeList() const;
-		void setNodeList(AtomSet* atomSet);
 		void setNodeList(std::vector<Unit*>& units);
 
 		std::string showNodeList();
@@ -26,9 +27,6 @@ class AnmUnitNodeList : public AnmNodeList {
 
 		void updateUnitList();
 
-		// TODO: must handle Unit deletion when destructed?
-
-		AtomSet* sourceAtomSet;
 	private:
 		std::vector<Unit*> nodeList;
 		bool updated;

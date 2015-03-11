@@ -42,86 +42,86 @@ void TestANMKineticMatrixFunctions::run()
     Test::run();
 
     bool SKIP_OXT = true;
-    bool DO_NOT_SKIP_OXT = false;
 
     TEST_REGRESSION_FUNCTION(testCalculateI,
     	"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala3/ala3.pdb",
 		"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala3/I_INMA.txt",
 		INMA,
-		DO_NOT_SKIP_OXT,
+		not SKIP_OXT,
 		1e-6);
-//
-//    TEST_FUNCTION(testCalculateI,
-//    	"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala5/ala5.fixed.pdb",
-//    	"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala5/I_INMA.txt",
-//    	INMA_NO_OXT,
-//    	SKIP_OXT,
-//    	1e-6);
-//
-//    TEST_FUNCTION(testCalculateI,
-//		"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala_pro_ala/ala_pro_ala.pdb",
-//		"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala_pro_ala/I.txt",
-//		INMA,
-//		DO_NOT_SKIP_OXT,
-//		1e-6);
-//
-//    TEST_REGRESSION_FUNCTION(testCalculateI,
-//       	"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala5/ala5.fixed.pdb",
-//       	"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala5/I_BRAUN.txt",
-//       	BRAUN,
-//    	SKIP_OXT,
-//    	1e-6);
-//
-//    TEST_FUNCTION(testCalculateI,
-//		"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/1AKE/1AKE.pdb",
-//		"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/1AKE/I.txt",
-//		INMA,
-//		DO_NOT_SKIP_OXT,
-//		1e-7);
-//
-//    // Uses OXT
-//    TEST_FUNCTION(testCalculateI,
-//		"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/9WVG/9WVG.pdb",
-//		"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/9WVG/I.txt",
-//		INMA,
-//		DO_NOT_SKIP_OXT,
-//		1e-7);
-//
-//    // K  wo skipping OXT
-//    TEST_FUNCTION(testCalculateK,
-//    	"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala3/ala3.pdb",
-//		"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala3/K.txt",
-//		INMA,
-//		1e-4);
-//
-//    // K skipping OXT
-//    TEST_FUNCTION(testCalculateK,
-//    	"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala5/ala5.fixed.pdb",
-//    	"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala5/K.txt",
-//    	INMA_NO_OXT,
-//		1e-3);
-//
-//    // K  wo skipping OXT
-//    TEST_FUNCTION(testCalculateK,
-//		"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala_pro_ala/ala_pro_ala.pdb",
-//		"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala_pro_ala/K.txt",
-//		INMA,
-//		1e-4);
-//
-//    //This test fails because of unknown reasons
-//    // Relative errors > 0.1: 1.3 (+/- scenario),  0.169, 0.1046, 0.178, 0.111, 0.907
-//    // K  wo skipping OXT
-//	TEST_FUNCTION(testCalculateK,
-//		"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/1AKE/1AKE.pdb",
-//		"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/1AKE/K.txt",
-//		INMA,
-//		0.1);
 
-//	TEST_FUNCTION(testCalculateK,
-//		"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/9WVG/9WVG.pdb",
-//		"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/9WVG/K.txt",
-//		INMA,
-//		0.1);
+    TEST_FUNCTION(testCalculateI,
+    	"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala5/ala5.fixed.pdb",
+    	"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala5/I_INMA.txt",
+    	INMA_NO_OXT,
+    	SKIP_OXT,
+    	1e-6);
+
+    TEST_FUNCTION(testCalculateI,
+		"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala_pro_ala/ala_pro_ala.pdb",
+		"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala_pro_ala/I.txt",
+		INMA,
+		not SKIP_OXT,
+		1e-6);
+
+    TEST_REGRESSION_FUNCTION(testCalculateI,
+       	"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala5/ala5.fixed.pdb",
+       	"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala5/I_BRAUN.txt",
+       	BRAUN,
+    	SKIP_OXT,
+    	1e-6);
+
+    TEST_FUNCTION(testCalculateI,
+		"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/1AKE/1AKE.pdb",
+		"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/1AKE/I.txt",
+		INMA,
+		not SKIP_OXT,
+		1e-7);
+
+    // Uses OXT
+    TEST_FUNCTION(testCalculateI,
+		"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/9WVG/9WVG.pdb",
+		"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/9WVG/I.txt",
+		INMA,
+		not SKIP_OXT,
+		1e-7);
+
+    // K  wo skipping OXT
+    TEST_FUNCTION(testCalculateK,
+    	"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala3/ala3.pdb",
+		"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala3/K.txt",
+		INMA,
+		1e-4);
+
+    // K skipping OXT
+    TEST_FUNCTION(testCalculateK,
+    	"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala5/ala5.fixed.pdb",
+    	"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala5/K.txt",
+    	INMA_NO_OXT,
+		1e-3);
+
+    // K  wo skipping OXT
+    TEST_FUNCTION(testCalculateK,
+		"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala_pro_ala/ala_pro_ala.pdb",
+		"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala_pro_ala/K.txt",
+		INMA,
+		1e-4);
+
+    //This test fails because of unknown reasons
+    // Relative errors > 0.1: 1.3 (+/- scenario),  0.169, 0.1046, 0.178, 0.111, 0.907
+    // K  wo skipping OXT
+	TEST_FUNCTION(testCalculateK,
+		"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/1AKE/1AKE.pdb",
+		"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/1AKE/K.txt",
+		INMA,
+		0.1);
+
+	TEST_FUNCTION(testCalculateK,
+		"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/9WVG/9WVG.pdb",
+		"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/9WVG/K.txt",
+		INMA,
+		0.1);
+
     TEST_FUNCTION(testJacobi,
     		"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala3/ala3.pdb",
     		1e-12)
@@ -193,15 +193,6 @@ bool TestANMKineticMatrixFunctions::testCalculateK(const char* complex_pdb,
 	// Calculate K
 	TriangularMatrix* K = ANMICKineticMatrixCalculator::calculateK(units, tensor_calc_type);
 
-//	cout<<"DBG: K size ("<<K->size1()<<", "<<K->size2()<<")"<<endl;
-//	for (unsigned int i = 0; i < K->size1(); ++i){
-//		TriangularMatrixRow K_r (*K,i);
-//		for (unsigned int j = i; j < K->size2(); ++j){
-//			cout<<K_r(j)<<", ";
-//		}
-//		cout<<endl;
-//	}
-
 	bool ok = true;
 	for (unsigned int i = 0; i < expected_K.size(); ++i){
 		TriangularMatrixRow K_ith_row (*K,i);
@@ -255,30 +246,12 @@ bool TestANMKineticMatrixFunctions::testJacobi(const char* prot_path, double tol
 	ANMICMath::multiplyMatrixByMatrix(Jt,M,JtM);
 	ANMICMath::multiplyMatrixByMatrix(JtM,J,JtMJ);
 
-	cout<<"DBG: K size ("<<K->size1()<<", "<<K->size2()<<")"<<endl;
-	for (unsigned int i = 0; i < K->size1(); ++i){
-		TriangularMatrixRow K_r (*K,i);
-		for (unsigned int j = i; j < K->size2(); ++j){
-			cout<<K_r(j)<<", ";
-		}
-		cout<<endl;
-	}
-
-	cout <<"--------"<<endl;
-	for (unsigned int i = 0; i< JtMJ.size(); ++i){
-		for (unsigned int j = 0; j< JtMJ[0].size(); ++j){
-			cout<<JtMJ[i][j]<<", ";
-		}
-		cout<<endl;
-	}
-
 	// Also, sum(MiJia) = 0
 	for (unsigned int alpha = 0; alpha < Jt.size(); ++alpha){
 		double total = 0;
 		for  (unsigned int i = 0; i< Jt[alpha].size(); ++i){
 			total += M[i][i]*Jt[alpha][i];
 		}
-		cout<<"** "<<total<<endl;
 	}
 
 	// And sum(mi rixJia) = 0
@@ -292,6 +265,7 @@ bool TestANMKineticMatrixFunctions::testJacobi(const char* prot_path, double tol
 			total += M[i][i]* rixJia.getY();
 			total += M[i][i]* rixJia.getZ();
 		}
-		cout<<"xx "<<total<<endl;
 	}
+
+	return false;
 }

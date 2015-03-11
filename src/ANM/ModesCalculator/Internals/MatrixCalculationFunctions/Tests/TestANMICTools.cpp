@@ -69,6 +69,7 @@ Complex* TestANMICTools::createUnitsFromFilePickingCOM(const char* file_path,
 
 	builder.build(units);
 	delete selector;
+
 	return complex;
 }
 

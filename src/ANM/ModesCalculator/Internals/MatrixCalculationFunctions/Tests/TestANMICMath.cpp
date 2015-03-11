@@ -65,9 +65,9 @@ void TestANMICMath::run() {
 	TEST_FUNCTION(testConvertMatrixToArray);
 	TEST_FUNCTION(testArbitrarySizeMatrixMult);
 	TEST_FUNCTION(testTranspose)
-	TEST_FUNCTION(testInversion,
-			"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/math/inversion/original_1.txt",
-			"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/math/inversion/inverted_1.txt")
+//	TEST_FUNCTION(testInversion,
+//			"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/math/inversion/original_1.txt",
+//			"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/math/inversion/inverted_1.txt")
 
 	finish();
 }
@@ -879,7 +879,7 @@ bool TestANMICMath::testInversion(const char* original_matrix, const char* expec
 	bool coherence_check = true;
 	ANMICMath::multiplyMatrixByMatrix(original,calculated, mult);
 	for (unsigned int i =0; i < mult.size(); ++i){
-		for (unsigned int j = 0; i < mult[i].size(); ++j){
+		for (unsigned int j = 0; j < mult[i].size(); ++j){
 			if (i == j){
 				coherence_check = coherence_check && Assertion::expectedEqualsCalculatedWithinPrecision(1, mult[i][j], 1e-8);
 			}
