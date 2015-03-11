@@ -780,7 +780,7 @@ Unit * ANMICMath::getDummyUnit(double x, double y, double z) {
 
 	vector<Atom*> dummy_atoms;
 	dummy_atoms.push_back(atom);
-	Unit* u = new Unit(dummy_atoms, dummy_atoms, NULL, NULL, NULL, NULL, NULL, NULL, NULL,""); //e_left, e_right, r_left, r_right
+	Unit* u = new Unit(dummy_atoms, dummy_atoms, NULL, NULL, NULL, NULL,"");
 
 	return u;
 }

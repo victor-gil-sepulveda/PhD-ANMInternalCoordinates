@@ -76,7 +76,7 @@ AnmInternals::~AnmInternals(){
 void AnmInternals::calculate_current_angles(vector<double>& current_angles, vector<Unit*>& units){
 
 	for(unsigned int i=0; i < units.size()-1; ++i){
-		Dihedral* right = units[i]->getRightDihedral();
+		Dihedral* right = units[i]->right_dihedral;
 		std::vector<Atom*> the_atoms_of_the_dihedral = right->getAtoms();
 		double current_angle = HarmonicDihedralConstraintFunctions::calculateDihedralAngleWithArcTanFunction(
 				the_atoms_of_the_dihedral[0]->getX(), the_atoms_of_the_dihedral[0]->getY(), the_atoms_of_the_dihedral[0]->getZ(),
@@ -114,7 +114,7 @@ void AnmInternals::constrainCurrentAnmNodes(EnergyCalculator * enerCalc,
 	calculate_current_angles(current_angles, units);
 
 	for(unsigned int i=0; i < units.size()-1; ++i){
-		Dihedral* right = units[i]->getRightDihedral();
+		Dihedral* right = units[i]->right_dihedral;
 		std::vector<Atom*> the_atoms_of_the_dihedral = right->getAtoms();
 		// Adding a constraint for each dihedral (torsion)
 		ConstraintTerm * term = new HarmonicDihedralConstraintTerm(

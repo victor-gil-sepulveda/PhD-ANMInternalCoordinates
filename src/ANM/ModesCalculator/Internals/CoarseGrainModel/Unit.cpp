@@ -6,6 +6,8 @@
 #include "../../../../Tools/vectorTools.h"
 #include "../../../../Molecules/ForceFieldTerms/Dihedral.h"
 #include "../../../../PELE/PeleTasks/Sensors/Metrics/Tools/CenterOfMass.h"
+#include "../../../../Tools/Utils.h"
+#include "../../../../Molecules/Atom.h"
 
 using namespace std;
 
@@ -27,48 +29,58 @@ using namespace std;
 /// \author vgil
 /// \date 1/07/2015
 ///////////////////////////////////////////////////////////////
-Unit::Unit(vector<Atom*>& atoms,
-			vector<Atom*>& hydrogens,
-			Dihedral* left, Dihedral* right,
-			Point* e_left, Point* e_right,
-			Point* r_left, Point* r_right,
+Unit::Unit(std::vector<Atom*>& atoms,
+			std::vector<Atom*>& hydrogens,
+			Dihedral* right,
+			Atom* left_torsion_bond_atom,
+			Atom* right_torsion_bond_atom,
 			Atom* main_atom,
-			string resname,
-			string description ){
+			std::string resname,
+			std::string description ){
 
 	VectorTools::copy<Atom*>(this->atoms, atoms);
 	VectorTools::copy<Atom*>(this->hydrogens, hydrogens);
 
-	this->left_dihedral = left;
 	this->right_dihedral = right;
 
-	com = new CenterOfMass(CenterOfMass::compute(atoms));
-
-	this->e_left = e_left;
-	this->e_right = e_right;
-	this->r_left = r_left;
-	this->r_right = r_right;
+	this->left_torsion_bond_atom = left_torsion_bond_atom;
+	this->right_torsion_bond_atom = right_torsion_bond_atom;
 
 	this->resname = resname;
-
 	this->description = description;
-
 	this->main_atom = main_atom;
+
+	com = NULL;
+	e_right = r_right = NULL;
+
+	update();
 }
 
 Unit::~Unit() {
 	delete com;
-	delete e_left;
 	delete e_right;
-	delete r_left;
 	delete r_right;
 }
 
-Point Unit::getCenterOfMass() const{
-	return Point(com->getX(),com->getY(), com->getZ());
+void Unit::update(){
+	// compute center of mass
+	Utils::deleteAndSetPointerToNull(com);
+	com = new CenterOfMass(CenterOfMass::compute(atoms));
+
+	// Calculate the axis only if the bond exists
+	if (left_torsion_bond_atom!=NULL && right_torsion_bond_atom!=NULL){
+		// compute ra
+		Utils::deleteAndSetPointerToNull(r_right);
+		r_right = new Point(left_torsion_bond_atom->toPoint());
+
+		// compute ea
+		Utils::deleteAndSetPointerToNull(e_right);
+		e_right = (new Point(Point::subtract(right_torsion_bond_atom->toPoint(),left_torsion_bond_atom->toPoint())))->normalize();
+	}
 }
 
-std::vector<Atom*> Unit::get_all_atoms(){
+
+std::vector<Atom*> Unit::getAllAtoms(){
 	// TODO: improve this with bookkeeping! Units must be inmutable but its atoms are not
 	vector<Atom*> all;
 
@@ -80,14 +92,6 @@ std::vector<Atom*> Unit::get_all_atoms(){
 
 double Unit::getMass() const{
 	return com->getMass();
-}
-
-Dihedral* Unit::getRightDihedral() {
-	return right_dihedral;
-}
-
-Dihedral* Unit::getLeftDihedral() {
-	return left_dihedral;
 }
 
 string Unit::toString(){

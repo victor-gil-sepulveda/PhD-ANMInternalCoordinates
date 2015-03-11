@@ -15,6 +15,7 @@
 #include <iostream>
 #include <iomanip>
 #include "../../../../Tools/Math/Point.h"
+#include "../../../../PELE/PeleTasks/Sensors/Metrics/Tools/CenterOfMass.h"
 
 using namespace std;
 
@@ -53,18 +54,18 @@ int UnitTools::getNumberOfAtomsOfUnitRange(vector<Unit*>& units, int start, int 
 void UnitTools::printUnits(std::vector<Unit*>& units){
 	for (unsigned int i = 0; i < units.size(); ++i){
 		Unit* unit = units[i];
-		Point com = unit->getCenterOfMass();
-		Point e_left = *(unit->e_left);
+		Point* com = dynamic_cast<Point*>(unit->com);
+		//Point e_left = *(unit->e_left);
 		Point e_right = *(unit->e_right);
-		Point r_left = *(unit->r_left);
+		//Point r_left = *(unit->r_left);
 		Point r_right = *(unit->r_right);
 		cout << setprecision(16)
 				<< "Unit resname:"<<unit->resname
 				<<" description:"<<unit->description
-				<<" com: "<< com.toString()
-				<< "e_left:"<<e_left.toString()
+				<<" com: "<< com->toString()
+				//<< "e_left:"<<e_left.toString()
 				<< "e_right"<<e_right.toString()
-				<< "r_left"<< r_left.toString()
+				//<< "r_left"<< r_left.toString()
 				<< "r_right"<<r_right.toString()
 				<< "mass: "<<unit->getMass()
 				<< endl;

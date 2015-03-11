@@ -187,11 +187,8 @@ void UnitsBuilder::get_all_hydrogens_from_Ca_Sidechain_Unit(Link* link, vector<A
 	get_all_hydrogens_from_N_Ca_Sidechain_Unit(link, atoms );
 }
 
-void UnitsBuilder::get_all_hydrogens_from_C_O_O_Unit(Link* link, vector<Atom*>& atoms ){
 
-}
-
-void UnitsBuilder::get_all_hydrogens_from_N_C_O_Unit(Link* link, Link* next_link, vector<Atom*>& atoms ){
+void UnitsBuilder::get_all_hydrogens_from_N_C_O_Unit(Link* next_link, vector<Atom*>& atoms ){
 	vector<string> link1_hydrogen; link1_hydrogen.push_back(AtomNames::H);
 	getAtomsFromLink(atoms, link1_hydrogen, next_link);
 }
@@ -210,18 +207,14 @@ Unit* UnitsBuilder::build_N_Ca_Sidechain_Unit(Link* link){
 	// Get the other needed parameters to build the Unit
 	// First unit only has one dihedral (psi)
 	Atom *CA, *C;
-	Dihedral* phi = NULL;
 	Dihedral* psi = get_psi_dihedral(CA, C, link, link->isLastInChain());
 
 	// Build it
 	return new Unit(atoms,
 			hydrogens,
-			phi,// Left dihedral
 			psi, // Right dihedral
-			new Point(0,0,0),
-			(new Point(Point::subtract(C->toPoint(),CA->toPoint())))->normalize(),
-			new Point(CA->toPoint()),//Point(0,0,0),
-			new Point(CA->toPoint()),
+			CA,  // left torsion bond atom
+			C,   // right torsion bond atom
 			CA,
 			link->name,
 			"N-CA-SIDE");
@@ -238,18 +231,14 @@ Unit* UnitsBuilder::build_Ca_Sidechain_Unit(Link* link){
 	get_all_hydrogens_from_Ca_Sidechain_Unit(link, hydrogens);
 
 	// Get the other needed parameters to build the Unit
-	// Middle CA SD units have two dihedrals (phi, psi)
-	Atom *CA, *C, *N;
-	Dihedral* phi = get_left_phi_dihedral(N,CA, link);
+	Atom *CA, *C;
 	Dihedral* psi = get_psi_dihedral( CA, C, link, link->isLastInChain());
+
 	return new Unit(atoms,
 			hydrogens,
-			phi,// Left dihedral
 			psi, // Right dihedral
-			(new Point(Point::subtract(N->toPoint(),CA->toPoint())))->normalize(),
-			(new Point(Point::subtract(C->toPoint(),CA->toPoint())))->normalize(),
-			new Point(CA->toPoint()),
-			new Point(CA->toPoint()),
+			CA,  // left torsion bond atom
+			C,   // right torsion bond atom
 			CA,
 			link->name,
 			"CA-SIDE");
@@ -263,23 +252,20 @@ Unit* UnitsBuilder::build_C_O_O_Unit(Link* link){
 	names.push_back(StringTools::replaceSpacesByUnderscores(AtomNames::O));
 	names.push_back(StringTools::replaceSpacesByUnderscores(AtomNames::OXT));
 	getAtomsFromLink(atoms,names,link);
-	// Hydrogens
+	// This unit has no hydrogens
 	vector<Atom*> hydrogens;
-	get_all_hydrogens_from_C_O_O_Unit(link, hydrogens);
 
 	// Get the other needed parameters to build the Unit
-	// Middle COO units have 1 dihedral (psi)
-	Atom *CA, *C;
-	Dihedral* psi = get_psi_dihedral( CA, C, link, link->isLastInChain());
-	Dihedral* phi = NULL;
+	Atom* C = link->getAtomsWithName(AtomNames::C)[0];
+
+	// No dihedral for this unit
+	// No bond with other units is defined
+
 	return new Unit(atoms,
 			hydrogens,
-			psi,// Left dihedral
-			phi, // Right dihedral
-			(new Point(Point::subtract(CA->toPoint(),C->toPoint())))->normalize(),
-			new Point(0,0,0),
-			new Point(C->toPoint()),
-			new Point(0,0,0),
+			NULL,  	// Right dihedral
+			NULL,  	// left torsion bond atom
+			NULL, 	// right torsion bond atom
 			C,
 			link->name,
 			"C-O=O");
@@ -299,22 +285,20 @@ Unit* UnitsBuilder::build_N_C_O_Unit(Link* link, Link* next_link){
 	getAtomsFromLink(atoms, names_next, next_link);
 	// Hydrogens
 	vector<Atom*> hydrogens;
-	get_all_hydrogens_from_N_C_O_Unit(link, next_link, hydrogens);
+	get_all_hydrogens_from_N_C_O_Unit(next_link, hydrogens);
 
+	// Get dihedral
+	Atom *N_next, *CA_next;
+	Dihedral* phi = get_phi_dihedral(N_next, CA_next, link);
 
 	// Get the other needed parameters to build the Unit
-	// Middle N C O units have two dihedrals (psi, phi)
-	Atom *CA, *C, *N_next, *CA_next;
-	Dihedral* psi = get_psi_dihedral(CA, C, link, link->isLastInChain());
-	Dihedral* phi = get_right_phi_dihedral(N_next, CA_next, link);
+	Atom* C = link->getAtomsWithName(AtomNames::C)[0];
+
 	return new Unit(atoms,
 			hydrogens,
-			psi,// Left dihedral
-			phi, // Right dihedral
-			(new Point(Point::subtract(CA->toPoint(),C->toPoint())))->normalize(),
-			(new Point(Point::subtract(CA_next->toPoint(),N_next->toPoint())))->normalize(),
-			new Point(C->toPoint()),
-			new Point(N_next->toPoint()),
+			phi,      // Right dihedral
+			N_next,   // left torsion bond atom
+			CA_next,  // right torsion bond atom
 			C,
 			link->name,
 			"C=O-N");
@@ -375,24 +359,8 @@ Dihedral* UnitsBuilder::get_psi_dihedral( Atom*& CA, Atom*& C, Link* link, bool 
 	return dihedral;
 }
 
-Dihedral* UnitsBuilder::get_left_phi_dihedral( Atom*& N, Atom*& CA, Link* link){
-	Atom* C_before = link->getPreviousLink()->getAtomsWithName(AtomNames::C)[0];
-	N = link->getAtomsWithName(AtomNames::N)[0];
-	CA = link->getAtomsWithName(AtomNames::CA)[0];
-	Atom* C = link->getAtomsWithName(AtomNames::C)[0];
 
-	Dihedral* dihedral = chain_topology->locateDihedral(C_before,(Atom*) N,(Atom*) CA, C);
-	if (dihedral == 0) {
-		cout << "DBG: (get_left_phi) Null dihedral for atoms"
-				<< *C_before
-				<< *N
-				<< *CA
-				<< *C << endl;
-	}
-	return dihedral;
-}
-
-Dihedral* UnitsBuilder::get_right_phi_dihedral( Atom*& N_next, Atom*& CA_next, Link* link){
+Dihedral* UnitsBuilder::get_phi_dihedral( Atom*& N_next, Atom*& CA_next, Link* link){
 	Atom* C = link->getAtomsWithName(AtomNames::C)[0];
 	N_next = link->getNextLink()->getAtomsWithName(AtomNames::N)[0];
 	CA_next = link->getNextLink()->getAtomsWithName(AtomNames::CA)[0];
@@ -471,12 +439,9 @@ Unit* UnitsBuilder::merge_units(Unit* first_unit, Unit* second_unit){
 
 		Unit* merged_unit = new Unit(heavy_atoms,
 				hydrogens,
-				first_unit->getLeftDihedral(),
-				second_unit->getRightDihedral(),
-				new Point(*(first_unit->e_left)),
-				new Point(*(second_unit->e_right)),
-				new Point(*(first_unit->r_left)),
-				new Point(*(second_unit->r_right)),
+				second_unit->right_dihedral,
+				second_unit->left_torsion_bond_atom,
+				second_unit->right_torsion_bond_atom,
 				second_unit->main_atom,
 				second_unit->resname,
 				first_unit->toString()+" + "+second_unit->toString());
