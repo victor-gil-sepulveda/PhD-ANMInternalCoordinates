@@ -40,6 +40,8 @@ extern "C" {
 	void dspgvx_(int* itype, char* jobz, char* range, char* uplo, int* N, double* A, double* B, double* vl, double* vu,
 			int* il, int* iu, double* abstol, int* M, double*W, double* Z, int* ldz, double* work,	int* iwork, int* ifail,
 			int* info);
+	double dlamch_(char* cmach);
+	double dpptri_(char* uplo, int* n, double* ap, int* info);
 }
 //--------------------------------
 
@@ -80,11 +82,10 @@ void InternalModesCalculator::calculateEigenValuesAndVectors(AnmParameters * anm
 	cout<<"DBG: InternalModesCalculator::calculateEigenValuesAndVectors - k: "<<k<<", cutoff: "<<cutoff<<endl;
 
 	InverseExponentialElasticConstant ecc(k, 3.8, 6);
-	bool skipOXT = true;
 	std::vector< std::vector<double> > U = ANMICHessianCalculator::calculateU(cutoff*cutoff,
 			&ecc,
 			units,
-			not skipOXT);
+			false); // Skip OXT
 
 	TriangularMatrix* H = ANMICHessianCalculator::calculateH(units,  U);
 
@@ -130,9 +131,10 @@ void InternalModesCalculator::calculate_modes(AnmParameters * anmParameters,
 	int N = K->size1();
 	int il = 1;
 	int iu = number_of_eigen;
-
+	char cmach = 'S';
+	double abstol = 2*dlamch_(&cmach);
 	//override
-	double abstol = 0.0001;
+	abstol = 0.0001;
 	int M;
 	double* W = new double[number_of_eigen];
 	double* Z = new double[N*number_of_eigen];
@@ -164,6 +166,10 @@ void InternalModesCalculator::calculate_modes(AnmParameters * anmParameters,
 	delete [] WORK;
 	delete [] IWORK;
 	delete [] IFAIL;
+
+	for (unsigned int i = 0; i < number_of_eigen; i++){
+		cout<<"DBG: eigen val: "<<W[i]<<endl;
+	}
 
 	eigen->initialize(W, Z, number_of_eigen, H->size1(), false);
 
@@ -271,7 +277,6 @@ AnmEigen* InternalModesCalculator::internalToCartesian(vector<Unit*>& units, Anm
 /// \remarks
 /// Converts a collection of modes expressed in cartesian coordinates in torsional rotations (can be
 /// seen as their conversion to IC.
-///  Based in ... article
 ///
 /// \param units [In] Coarse grain representation of the structure in Unit objects.
 /// \param in [In / Out] AnmEigen object containing modes (or forces or whatever) in cartesian coordinates.
@@ -291,18 +296,63 @@ AnmEigen* InternalModesCalculator::cartesianToInternal(vector<Unit*>& units, Anm
 	ANMICKineticMatrixCalculator::Jacobi2(units, J);
 	ANMICMath::transpose(J,Jt);
 
-	// Calculate K
-	cout<<"K calculation..."<<endl;
-	TriangularMatrix* K = ANMICKineticMatrixCalculator::calculateK(units, INMA);
+//	// Calculate K
+//	cout<<"K calculation..."<<endl;
+//	TriangularMatrix* K = ANMICKineticMatrixCalculator::calculateK(units, INMA);
+//
+//	vector<vector<double> > Kv(K->size1(), vector<double>(K->size1(),0)), KvKi;
+//	cout<<"DBG: K inv"<<endl;
+//	for (unsigned int i = 0; i < K->size1(); ++i){
+//		TriangularMatrixRow K_r (*K,i);
+//		for (unsigned int j = i; j < K->size2(); ++j){
+//			Kv[i][j] = K_r(j);
+//			Kv[j][i] = K_r(j);
+//		}
+//	}
 
-	vector<vector<double> > Kv, Ki;
-	TriangularMatrixTools::triangularMatrixToVectorMatrix(K,Kv);
 
 //	cout<<"K inversion..."<<endl;
-//	ANMICMath::invertMatrix(K);
-//	TriangularMatrixTools::triangularMatrixToVectorMatrix(K,Ki);
+//	// Invert K
+//	char uplo = 'U';
+//	int info = 0;
+//	int N = K->size1();
+//	dpptri_(&uplo, &N, K->data().begin(), &info);
+//	cout<< "INFO: "<<info<<endl;
 
-	TestTools::load_vector_of_vectors(Ki, "src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala3/Kinv.txt");
+//	vector<vector<double> > Ki(K->size1(), vector<double>(K->size1(),0));
+//	cout<<"DBG: K inv"<<endl;
+//	for (unsigned int i = 0; i < K->size1(); ++i){
+//		TriangularMatrixRow K_r (*K,i);
+//		for (unsigned int j = i; j < K->size2(); ++j){
+//			Ki[i][j] = K_r(j);
+//			Ki[j][i] = K_r(j);
+//		}
+//	}
+
+	vector<vector<double> > Ki;
+	// FOR ALA3
+	// cout<< "Loading Kinv for ala3"<<endl;
+	//TestTools::load_vector_of_vectors(Ki, "src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala3/Kinv.txt");
+	// FOR 9WVG
+	cout<< "Loading Kinv for 9WVG"<<endl;
+	TestTools::load_vector_of_vectors(Ki, "/home/user/Desktop/ANM_analysis/IC/ClusterExperiments/cc_pca/K_full_inv.txt");
+
+//	ANMICMath::multiplyMatrixByMatrix(Ki,Kv,KvKi);
+//
+//	cout<<"K ------"<<endl;
+//	for (unsigned int i = 0; i < Kv.size();++i){
+//		ANMICMath::printVector(Utils::vectorToPointer(Kv[i]), Kv[i].size());
+//	}
+//
+//	cout<<"Ki ------"<<endl;
+//	for (unsigned int i = 0; i < Ki.size();++i){
+//		ANMICMath::printVector(Utils::vectorToPointer(Ki[i]), Ki[i].size());
+//	}
+//
+//	cout<<"KvKi ------"<<endl;
+//	for (unsigned int i = 0; i < KvKi.size();++i){
+//		ANMICMath::printVector(Utils::vectorToPointer(KvKi[i]), KvKi[i].size());
+//	}
 
 	// M matrix
 	bool onlyHeavyAtoms = true;
@@ -317,11 +367,14 @@ AnmEigen* InternalModesCalculator::cartesianToInternal(vector<Unit*>& units, Anm
 		M[offset+2][offset+2] = mass;
 	}
 
+	cout<<"Conversion..."<<endl;
 	// We do this for every of the modes we have in cartesian coordinates
 	vector< vector<double> > new_evectors;
 
 	for (unsigned int i = 0; i < number_of_modes; ++i){
 		vector<double>& original_mode = in->vectors[i];
+		cout<<"Original: ";
+		ANMICMath::printVector(Utils::vectorToPointer(original_mode), original_mode.size());
 
 		vector<vector<double> > rt, r, Mr, JtMr, KiJtMr, Jr;
 		rt.push_back(original_mode);
@@ -331,63 +384,22 @@ AnmEigen* InternalModesCalculator::cartesianToInternal(vector<Unit*>& units, Anm
 		ANMICMath::multiplyMatrixByMatrix(Ki, JtMr , KiJtMr);
 		ANMICMath::multiplyMatrixByMatrix(Jt,r,Jr);
 
-		// We need to transpose the column vector we have at the end
 		vector< vector<double> > evec;
 		ANMICMath::transpose(KiJtMr,evec);
+//		ANMICMath::transpose(JtMr, evec);
+//		ANMICMath::transpose(Jr,evec);
 		new_evectors.push_back(evec[0]);
+
+		cout<<"Calcted: ";
+		ANMICMath::printVector(Utils::vectorToPointer(evec[0]), evec[0].size());
 	}
 
-	delete K;
+	//delete K;
 
 	cout<<"Creating anmeigen object..."<<endl;
-	bool usingCartesian = true;
-	out->initialize(in->values, new_evectors, !usingCartesian);
+	bool notUsingCartesian = false;
+	out->initialize(in->values, new_evectors, notUsingCartesian);
 
-	return out;
-}
-
-///////////////////////////////////////////////////////////////
-/// \remarks
-/// A gradient conversion algorithm that can be found in TINKER. It is not clear that it works correctly.
-///  Based in ... article
-///
-/// \param units [In] Coarse grain representation of the structure in Unit objects.
-/// \param in [In / Out] AnmEigen object containing modes (or forces or whatever) in cartesian coordinates.
-///
-/// \return The AnmEigen object holding the converted modes.
-///
-/// \author vgil
-/// \date 11/03/2015
-///////////////////////////////////////////////////////////////
-AnmEigen* InternalModesCalculator::cartesianToInternalGeometrical(std::vector<Unit*>& units, AnmEigen* in){
-
-	AnmEigen* out = new AnmEigen;
-	unsigned int number_of_modes = in->getNumberOfModes();
-	vector< vector<double> > new_evectors;
-
-	for (unsigned int m =0; m < number_of_modes; ++m){
-		vector<double>& orig_mode = in->vectors[m];
-		unsigned int number_of_torsions = units.size()-1;
-		vector<double> conversion(number_of_torsions, 0);
-		for (unsigned int alpha=0; alpha < number_of_torsions; ++alpha){
-			vector<Atom*> right_atoms;
-			UnitTools::getAllAtomsFromUnitRange(units, right_atoms, 0, alpha,true);
-			Point* ea = units[alpha]->e_right;
-			Point* ra = units[alpha]->r_right;
-			for(unsigned int i = 0; i < right_atoms.size(); ++i){
-				unsigned int offset = i*3;
-				Point grad(orig_mode[offset], orig_mode[offset+1], orig_mode[offset+2]);
-				Point r = right_atoms[i]->toPoint();
-				Point r_ra = Point::subtract(r,*ra);
-				Point eaxr_ra = ANMICMath::crossProduct(*ea, r_ra);
-				conversion[alpha] += Point::dotProduct(grad, eaxr_ra);
-			}
-		}
-		new_evectors.push_back(conversion);
-	}
-
-	bool usingCartesian = true;
-	out->initialize(in->values, new_evectors, !usingCartesian);
 	return out;
 }
 

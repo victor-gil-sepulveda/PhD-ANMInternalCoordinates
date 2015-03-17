@@ -65,9 +65,6 @@ void TestANMICMath::run() {
 	TEST_FUNCTION(testConvertMatrixToArray);
 	TEST_FUNCTION(testArbitrarySizeMatrixMult);
 	TEST_FUNCTION(testTranspose)
-	TEST_FUNCTION(testInversion,
-			"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/math/inversion/original_1.txt",
-			"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/math/inversion/inverted_1.txt")
 
 	finish();
 }
@@ -847,55 +844,4 @@ bool TestANMICMath::testTranspose(){
 				1e-16);
 	}
 	return ok;
-}
-
-bool TestANMICMath::testInversion(const char* original_matrix, const char* expected_inversion){
-	vector<vector<double> > original, expected, calculated, mult;
-	TestTools::load_vector_of_vectors(original, original_matrix);
-	TestTools::load_vector_of_vectors(expected, expected_inversion);
-
-	TriangularMatrix* t = TriangularMatrixTools::vectorMatrixToTriangularMatrix(original);
-	ANMICMath::invertMatrix(t);
-
-	TriangularMatrixTools::triangularMatrixToVectorMatrix(t, calculated);
-
-	// result check
-	bool ok = true;
-	for (unsigned int i =0; i < expected.size();++i){
-		ok = ok && Assertion::expectedVectorEqualsCalculatedWithinPrecision(
-				expected[i],
-				calculated[i],
-				1e-12);
-	}
-
-	if (ok){
-		cout<<"Results are as expected."<<endl;
-	}
-	else{
-		cout<<"Calculation failed. Results are NOT the expected ones."<<endl;
-	}
-
-	// Coherence check (m m^-1 == I)
-	bool coherence_check = true;
-	ANMICMath::multiplyMatrixByMatrix(original,calculated, mult);
-	for (unsigned int i =0; i < mult.size(); ++i){
-		for (unsigned int j = 0; i < mult[i].size(); ++j){
-			if (i == j){
-				coherence_check = coherence_check && Assertion::expectedEqualsCalculatedWithinPrecision(1, mult[i][j], 1e-8);
-			}
-			else{
-				coherence_check = coherence_check && Assertion::expectedEqualsCalculatedWithinPrecision(0, mult[i][j], 1e-8);
-			}
-		}
-	}
-
-	if (coherence_check){
-		cout<<"Coherence check OK."<<endl;
-	}
-	else{
-		cout<<"Coherence check FAILED."<<endl;
-	}
-
-	delete t;
-	return ok && coherence_check;
 }

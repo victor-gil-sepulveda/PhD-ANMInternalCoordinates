@@ -48,7 +48,6 @@ class TestANMICMath : public Test
         bool testConvertMatrixToArray();
         bool testArbitrarySizeMatrixMult();
         bool testTranspose();
-        bool testInversion(const char*, const char*);
 };
 
 #endif /* TESTANMICMATH_H_ */

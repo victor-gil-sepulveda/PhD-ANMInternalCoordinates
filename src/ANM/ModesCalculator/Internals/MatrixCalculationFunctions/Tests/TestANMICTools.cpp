@@ -150,4 +150,3 @@ void TestANMICTools::changeAtomMasses(std::vector<Atom*>& atoms){
 	}
 }
 
-

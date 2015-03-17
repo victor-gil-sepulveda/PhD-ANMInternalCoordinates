@@ -23,22 +23,22 @@
 /////////////////////////////////////////////////////////////////////////////
 /// \brief It computes modes in internal coordinates
 ///
-/// \author vgil
+/// \author mrivero
 /// \date 05/09/2012
 /////////////////////////////////////////////////////////////////////////////
 class InternalModesCalculator : public ModesCalculator
 {
 	public:
 		InternalModesCalculator();
-		~InternalModesCalculator();
+		virtual ~InternalModesCalculator();
 
-		void calculateEigenValuesAndVectors(AnmParameters*, const AnmNodeList& , AnmEigen*);
+		void calculateEigenValuesAndVectors(AnmParameters * anmParameters,
+											const AnmNodeList & node_list, AnmEigen * eigen);
+		
+		std::string generateReport() const;
 		
 		static AnmEigen* internalToCartesian(std::vector<Unit*>& units, AnmEigen* in, bool onlyHeavy);
 		static AnmEigen* cartesianToInternal(std::vector<Unit*>& units, AnmEigen* in);
-		static AnmEigen* cartesianToInternalGeometrical(std::vector<Unit*>& units, AnmEigen* in);
-
-		std::string generateReport() const;
 
 	private:
 		static void calculate_modes(AnmParameters * anmParameters, TriangularMatrix* H,

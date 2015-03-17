@@ -53,9 +53,9 @@ void AnmInternalsTargetUpdater::updateTargetCoordinates(std::vector<double> & ta
 
 	const AnmUnitNodeList& unitNodeList = dynamic_cast<const AnmUnitNodeList &>(nodes);
 
-	// TODO: See what to do with this guy. It overwrites the "displacementFactor" attribute
-	// to create the displacementMagnitude ANMParams attribute.
-	// In our case is better to have
+	cout<<"DBG: Calculating target coordinates. Maximum displacement: "<<anmParameters->getDisplacement()<<
+			" Chosen mode: "<<chosenModeIndex<<endl;
+
 	anmParameters->setDisplacementMagnitude(anmParameters->getDisplacement());
 
 	vector<double> moveVector;

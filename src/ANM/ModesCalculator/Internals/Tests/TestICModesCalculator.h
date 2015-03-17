@@ -55,6 +55,8 @@ class TestICModesCalculator : public Test
                 		const char* initial_cc_path,
                 		const char* final_ic_path,
                 		double tolerance);
+
+        bool testConvert9WVGStuff();
 };
 
 #endif /* TESTICMODESCALCULATOR_H_ */

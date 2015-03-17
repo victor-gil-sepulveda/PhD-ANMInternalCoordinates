@@ -78,28 +78,32 @@ void TestANMInternalHessianFunctions::run() {
 		DO_NOT_SKIP_OXT,
 		1e-4);
 
+	// These tests use an error check which is relative to the maximum absolute magnitude
+	// of the array/ matrix. This is done because H matrix (as well as K) is very sensitive
+	// to small changes in masses and compilation flags.
+	//-----------------
 	// Note that changing coordinates by those at ala3/plop_ala.coords using
 	// createUnitsFromFileChangingCoordinates can increase precision to 10-12
 	TEST_FUNCTION(testCalculateH,
 		"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala3/ala3.pdb",
 		"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala3/H.txt",
 		DO_NOT_SKIP_OXT,
-		1e-5);
+		1e-5); // allowed relative error (with respect to the maximum absolute value)
 
 	TEST_FUNCTION(testCalculateH,
 		"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala_pro_ala/ala_pro_ala.pdb",
 		"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala_pro_ala/H.txt",
 		DO_NOT_SKIP_OXT,
-		1e-5);
+		2e-5);
 
-	// Will work even using OXT, WHY??
 	TEST_FUNCTION(testCalculateH,
 		"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala5/ala5.fixed.pdb",
 		"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala5/H.txt",
 		DO_NOT_SKIP_OXT,
 		1e-5);
 
-	TEST_FUNCTION(testCalculateH,
+	// With prior test checks this one was passing, but i will not, as INMA was using OXT in this case
+	FAILING_TEST_FUNCTION(testCalculateH,
 		"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala5/ala5.fixed.pdb",
 		"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala5/H.txt",
 		SKIP_OXT,
@@ -109,13 +113,13 @@ void TestANMInternalHessianFunctions::run() {
 		"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/1AKE/1AKE.pdb",
 		"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/1AKE/H.txt",
 		DO_NOT_SKIP_OXT,
-		0.05);
+		1e-5);
 
 	TEST_FUNCTION(testCalculateH,
 		"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/9WVG/9WVG.pdb",
 		"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/9WVG/H.txt",
 		DO_NOT_SKIP_OXT,
-		0.05);
+		2e-5);
 
 	finish();
 }
@@ -327,7 +331,6 @@ bool TestANMInternalHessianFunctions::testCalculateH(
 	vector<vector<double> > expected;
 	TestTools::load_vector_of_vectors(expected, goldenH);
 
-	//ElasticCalculatorMock ecc(1);
 	InverseExponentialElasticConstant ecc(1, 3.8, 6);
 	std::vector<std::vector<double> > U = ANMICHessianCalculator::calculateU(100, &ecc, units, skip_OXT);
 
@@ -335,16 +338,19 @@ bool TestANMInternalHessianFunctions::testCalculateH(
 
 	bool ok = true;
 	for (unsigned int i = 0; i < expected.size(); ++i){
-		for(unsigned int j = i; j < expected.size();++j){
-//			ok &= Assertion::expectedEqualsCalculatedWithinPrecision(
-//					expected[i][j],
-//					(*H)(i,j),
-//					test_precision);
-			ok &= Assertion::expectedEqualsCalculatedWithTolerance(
-								expected[i][j],
-								(*H)(i,j),
-								test_tolerance);
+		vector<double> h_row;
+		for(unsigned int j = 0; j < expected.size();++j){
+			if(j>=i){
+				h_row.push_back((*H)(i,j));
+			}
+			else{
+				h_row.push_back(0.0);
+			}
 		}
+		ok &= Assertion::expectedVectorHasRelativeErrorNotBiggerThan(
+							expected[i],
+							h_row,
+							test_tolerance);
 	}
 
 	Utils::clearVector<Unit>(units);
