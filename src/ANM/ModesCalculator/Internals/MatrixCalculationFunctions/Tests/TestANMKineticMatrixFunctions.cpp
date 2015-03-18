@@ -42,13 +42,12 @@ void TestANMKineticMatrixFunctions::run()
     Test::run();
 
     bool SKIP_OXT = true;
-    bool DO_NOT_SKIP_OXT = false;
 
     TEST_REGRESSION_FUNCTION(testCalculateI,
     	"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala3/ala3.pdb",
 		"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala3/I_INMA.txt",
 		INMA,
-		DO_NOT_SKIP_OXT,
+		not SKIP_OXT,
 		1e-6);
 
     TEST_FUNCTION(testCalculateI,
@@ -62,7 +61,7 @@ void TestANMKineticMatrixFunctions::run()
 		"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala_pro_ala/ala_pro_ala.pdb",
 		"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala_pro_ala/I.txt",
 		INMA,
-		DO_NOT_SKIP_OXT,
+		not SKIP_OXT,
 		1e-6);
 
     TEST_REGRESSION_FUNCTION(testCalculateI,
@@ -76,7 +75,7 @@ void TestANMKineticMatrixFunctions::run()
 		"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/1AKE/1AKE.pdb",
 		"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/1AKE/I.txt",
 		INMA,
-		DO_NOT_SKIP_OXT,
+		not SKIP_OXT,
 		1e-7);
 
     // Uses OXT
@@ -84,7 +83,7 @@ void TestANMKineticMatrixFunctions::run()
 		"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/9WVG/9WVG.pdb",
 		"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/9WVG/I.txt",
 		INMA,
-		DO_NOT_SKIP_OXT,
+		not SKIP_OXT,
 		1e-7);
 
     // K  wo skipping OXT
@@ -109,7 +108,6 @@ void TestANMKineticMatrixFunctions::run()
 		1e-6);
 
     // K matrices are very sensitive to small changes
-    // K  wo skipping OXT
 	TEST_FUNCTION(testCalculateK,
 		"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/1AKE/1AKE.pdb",
 		"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/1AKE/K.txt",
@@ -257,30 +255,12 @@ bool TestANMKineticMatrixFunctions::testJacobi(const char* prot_path, double tol
 	ANMICMath::multiplyMatrixByMatrix(Jt,M,JtM);
 	ANMICMath::multiplyMatrixByMatrix(JtM,J,JtMJ);
 
-	cout<<"DBG: K size ("<<K->size1()<<", "<<K->size2()<<")"<<endl;
-	for (unsigned int i = 0; i < K->size1(); ++i){
-		TriangularMatrixRow K_r (*K,i);
-		for (unsigned int j = i; j < K->size2(); ++j){
-			cout<<K_r(j)<<", ";
-		}
-		cout<<endl;
-	}
-
-	cout <<"--------"<<endl;
-	for (unsigned int i = 0; i< JtMJ.size(); ++i){
-		for (unsigned int j = 0; j< JtMJ[0].size(); ++j){
-			cout<<JtMJ[i][j]<<", ";
-		}
-		cout<<endl;
-	}
-
 	// Also, sum(MiJia) = 0
 	for (unsigned int alpha = 0; alpha < Jt.size(); ++alpha){
 		double total = 0;
 		for  (unsigned int i = 0; i< Jt[alpha].size(); ++i){
 			total += M[i][i]*Jt[alpha][i];
 		}
-		cout<<"** "<<total<<endl;
 	}
 
 	// And sum(mi rixJia) = 0
@@ -294,6 +274,7 @@ bool TestANMKineticMatrixFunctions::testJacobi(const char* prot_path, double tol
 			total += M[i][i]* rixJia.getY();
 			total += M[i][i]* rixJia.getZ();
 		}
-		cout<<"xx "<<total<<endl;
 	}
+
+	return false;
 }

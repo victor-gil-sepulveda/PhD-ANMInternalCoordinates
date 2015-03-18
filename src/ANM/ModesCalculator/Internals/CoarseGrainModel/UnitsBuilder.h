@@ -47,8 +47,7 @@ class UnitsBuilder {
 
 		void get_all_hydrogens_from_N_Ca_Sidechain_Unit(Link* link, std::vector<Atom*>& atoms );
 		void get_all_hydrogens_from_Ca_Sidechain_Unit(Link* link, std::vector<Atom*>& atoms );
-		void get_all_hydrogens_from_C_O_O_Unit(Link* link, std::vector<Atom*>& atoms );
-		void get_all_hydrogens_from_N_C_O_Unit(Link* link, Link* next_link, std::vector<Atom*>& atoms );
+		void get_all_hydrogens_from_N_C_O_Unit(Link* next_link, std::vector<Atom*>& atoms );
 		CenterOfMass* centerChainCoordsAtCOM(bool skip_OXT);
 		Unit* merge_units(Unit* first_unit, Unit* second_unit);
 
@@ -60,8 +59,7 @@ class UnitsBuilder {
 		CenterOfMass* global_com;
 
 		Dihedral* get_psi_dihedral( Atom*& CA, Atom*& C, Link* link, bool is_last);
-		Dihedral* get_left_phi_dihedral(  Atom*& N, Atom*& CA, Link* link);
-		Dihedral* get_right_phi_dihedral( Atom*& N, Atom*& CA_after, Link* link);
+		Dihedral* get_phi_dihedral( Atom*& N, Atom*& CA_after, Link* link);
 
 		static void getAtomsFromLink(std::vector<Atom* >& atoms, std::vector<std::string>& atom_names, Link* link);
 		static void getAtomsAndSidechainFromLink(std::vector<Atom* >& atoms, std::vector<std::string>& atom_names, Link* link);

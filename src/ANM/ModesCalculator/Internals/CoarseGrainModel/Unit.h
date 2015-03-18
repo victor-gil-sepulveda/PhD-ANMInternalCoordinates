@@ -29,43 +29,38 @@ class Unit {
 	public:
 		Unit(	std::vector<Atom*>& atoms,
 				std::vector<Atom*>& hydrogens,
-				Dihedral* left, Dihedral* right,
-				Point* e_left, Point* e_right,
-				Point* r_left, Point* r_right,
+				Dihedral* right,
+				Atom* bond_atom_left,
+				Atom* bond_atom_right,
 				Atom* main_atom,
 				std::string resname,
 				std::string description = "");
 
 		virtual ~Unit();
 
-		Point getCenterOfMass() const;
+		void update();
 
-		std::vector<Atom*> get_all_atoms();
+		std::vector<Atom*> getAllAtoms();
 
 		double getMass() const;
 
-		Dihedral* getRightDihedral();
-		Dihedral* getLeftDihedral();
-
 		std::string toString();
 
-		Point* e_left;
-		Point* e_right;
-		Point* r_left;
-		Point* r_right;
+		// Singular atoms to define the torsion around the valence bond
+		Atom *right_torsion_bond_atom, *left_torsion_bond_atom;
+		Point *e_right, *r_right;
 
-		std::vector<Atom*> atoms;
-		std::vector<Atom*> hydrogens;
+		// Contents of this unit
+		std::vector<Atom*> atoms, hydrogens;
+
+		// Other useful data
+		Dihedral* right_dihedral;
+		CenterOfMass* com;
+
+		// Characterization of the unit
+		Atom* main_atom;
 		std::string resname;
 		std::string description;
-
-		Atom* main_atom;
-
-	private:
-		CenterOfMass* com;
-		Dihedral* left_dihedral;
-		Dihedral* right_dihedral;
-
 };
 
 #endif /* UNIT_H_ */

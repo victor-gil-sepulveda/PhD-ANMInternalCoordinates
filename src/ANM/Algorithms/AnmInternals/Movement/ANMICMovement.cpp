@@ -34,7 +34,7 @@ Quat_cu ANMICMovement::calculate_quaternion_for_unit(double torsional_disp,
 		int unit_number){
 
 	Point pivot(*(units[unit_number]->r_right));
-	Point Q(*(units[unit_number+1]->r_left));
+	Point Q(units[unit_number]->right_torsion_bond_atom->toPoint());
 
 	Point axis = Point::subtract(Q, pivot);
 	return Quat_cu(cos(torsional_disp/2.),
@@ -71,7 +71,7 @@ void ANMICMovement::apply_rotations_to_molecule_units(vector<Unit*>& units,
 		double torsion_increment = angular_increments[i] * increment_divider;
 		q_i = ANMICMovement::calculate_quaternion_for_unit(torsion_increment, units, i);
 
-		Point Q_p(*(units[i+1]->r_left));
+		Point Q_p(units[i]->right_torsion_bond_atom->toPoint());
 		Point3 Q_i(Q_p.getX(), Q_p.getY(), Q_p.getZ());
 
 		if (i == 0){
@@ -94,7 +94,7 @@ void ANMICMovement::apply_rotations_to_molecule_units(vector<Unit*>& units,
 
 		// Rotate unit i+1
 		Dual_quat_cu M(s_im1, T);
-		vector<Atom*> atoms = units[i+1]->get_all_atoms();
+		vector<Atom*> atoms = units[i+1]->getAllAtoms();
 		for (unsigned int j = 0; j < atoms.size(); ++j){
 			Atom* atom = atoms[j];
 			Point3 atom_v3(	atom->getX(), atom->getY(), atom->getZ());

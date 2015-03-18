@@ -169,8 +169,7 @@ bool TestICModesCalculator::testCompleteEigencalculation(const char* pdb_path,
 	//	anmParameters.getNumberOfModes()
 	AnmEigen eigen;
 	AnmUnitNodeList* node_list = new AnmUnitNodeList;
-	node_list->setNodeList(complex);
-	node_list->setNodeList(units); // OJOOOOOOOOOOOOOO
+	node_list->setNodeList(units);
 	InternalModesCalculator calctor;
 	calctor.calculateEigenValuesAndVectors(&anmParameters,
 											*((AnmNodeList*)node_list),
@@ -301,7 +300,6 @@ bool TestICModesCalculator::testCartesianToInternal(const char* prot_path,
 	cout << "IC modes calculation."<<endl;
 	AnmEigen eigen;
 	AnmUnitNodeList* node_list = new AnmUnitNodeList;
-	node_list->setNodeList(complex);
 	node_list->setNodeList(units);
 	InternalModesCalculator calctor;
 	calctor.calculateEigenValuesAndVectors(&anmParameters,
@@ -468,7 +466,6 @@ bool TestICModesCalculator::testConvert9WVGStuff(){
 	ModesWriter writer;
 
 	AnmUnitNodeList nodeList;
-	nodeList.setNodeList(complex);
 	nodeList.setNodeList(units);
 
 	writer.setPath("/home/user/Desktop/ANM_analysis/IC/ClusterExperiments/cc_pca/BB_nozeros/9WVG_PCA_CCtoIC.nmd");

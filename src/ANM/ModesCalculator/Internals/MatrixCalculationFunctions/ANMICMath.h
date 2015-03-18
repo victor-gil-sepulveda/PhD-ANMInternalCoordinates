@@ -18,6 +18,7 @@
 #include "../../../../Tools/Math/Point.h"
 #include "../../../../Molecules/Atom.h"
 #include "../CoarseGrainModel/Unit.h"
+#include "TriangularMatrices.h"
 
 namespace ANMICMath {
 
@@ -67,9 +68,16 @@ namespace ANMICMath {
 
 	void invertMatrix(double *matrix, double *result, unsigned int size);
 
+	void invertMatrix(std::vector<std::vector<double> >& inout);
+
+	void invertMatrix(TriangularMatrix* inout);
+
 	void transposeMatrix(double matrix[3][3], double result[3][3]);
 
 	void transposeMatrix(double *matrix, double *result, unsigned int size);
+
+	void transpose(std::vector<std::vector<double> >& in,
+			std::vector<std::vector<double> >& out);
 
 	void getABMatrix(std::vector< std::vector<double> > &UMatrix, double *result, int a, int b);
 
@@ -95,8 +103,6 @@ namespace ANMICMath {
 
 	Unit* getDummyUnit(double x, double y, double z);
 
-	void transpose(std::vector<std::vector<double> >& in,
-			std::vector<std::vector<double> >& out);
 };
 
 #endif /* ANMICMATH_H_ */

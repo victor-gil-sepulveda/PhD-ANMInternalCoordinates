@@ -19,6 +19,7 @@
 
 #include <vector>
 #include <iosfwd>
+#include "PreCalculated/ModeTypes.h"
 
 /////////////////////////////////////////////////////////////////////////////
 /// \brief This class holds the eigenvalues and eigenvectors
@@ -35,8 +36,11 @@ class AnmEigen
 		virtual ~AnmEigen();
 
 		void computeAverageEigenVector(const std::vector<double> & weights, std::vector<double> & directions);
+
+		// TODO : CHANGE usingCartesian by a function of its ModeTypes::ModeType type
 		void initialize(const double * const eigenValues, const double * const eigenVectors,
 				unsigned int numberOfModes, unsigned int numberOfNodes, bool usingCartesian=true);
+
 		void initialize(std::vector<double>& eigenValues,
 						std::vector<std::vector<double> >& eigenVectors,
 						bool usingCartesian);
@@ -59,6 +63,8 @@ class AnmEigen
 		unsigned int numberOfModes;
 		std::vector<double> values;
 		std::vector<std::vector<double> > vectors;
+
+		ModeTypes::ModeType type;
 };
 
 #endif /* ANMEIGEN_H_ */

@@ -22,4 +22,9 @@ typedef ublas::triangular_matrix<double, ublas::upper, ublas::column_major> Tria
 // Shortcut to access to rows.
 typedef ublas::matrix_row<TriangularMatrix> TriangularMatrixRow;
 
+namespace TriangularMatrixTools{
+	TriangularMatrix* vectorMatrixToTriangularMatrix(std::vector<std::vector<double> >&);
+	void triangularMatrixToVectorMatrix(TriangularMatrix* , std::vector<std::vector<double> >&);
+}
+
 #endif /* TRIANGULARMATRICES_H_ */

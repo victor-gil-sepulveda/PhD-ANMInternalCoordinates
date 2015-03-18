@@ -49,7 +49,6 @@ void TestANMInternalHessianFunctions::run() {
 	Test::run();
 
 	bool SKIP_OXT = true;
-	bool DO_NOT_SKIP_OXT = false;
 
 	TEST_FUNCTION(testCalculateD,
 		"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala3/D.txt");
@@ -57,7 +56,7 @@ void TestANMInternalHessianFunctions::run() {
 	TEST_FUNCTION(testCalculateT,
 		"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala3/ala3.pdb",
 		"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala3/T_iexp.txt",
-		DO_NOT_SKIP_OXT,
+		not SKIP_OXT,
 		1e-5);
 
 	TEST_FUNCTION(testCalculateT,
@@ -69,13 +68,13 @@ void TestANMInternalHessianFunctions::run() {
 	TEST_FUNCTION(testCalculateT,
 		"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala_pro_ala/ala_pro_ala.pdb",
 		"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala_pro_ala/T_iexp.txt",
-		DO_NOT_SKIP_OXT,
+		not SKIP_OXT,
 		1e-5);
 
 	TEST_FUNCTION(testCalculateU,
 		"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala3/ala3.pdb",
 		"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala3/U.txt",
-		DO_NOT_SKIP_OXT,
+		not SKIP_OXT,
 		1e-4);
 
 	// These tests use an error check which is relative to the maximum absolute magnitude
@@ -87,19 +86,19 @@ void TestANMInternalHessianFunctions::run() {
 	TEST_FUNCTION(testCalculateH,
 		"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala3/ala3.pdb",
 		"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala3/H.txt",
-		DO_NOT_SKIP_OXT,
-		1e-5); // allowed relative error (with respect to the maximum absolute value)
+		not SKIP_OXT,
+		1e-5);// allowed relative error (with respect to the maximum absolute value)
 
 	TEST_FUNCTION(testCalculateH,
 		"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala_pro_ala/ala_pro_ala.pdb",
 		"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala_pro_ala/H.txt",
-		DO_NOT_SKIP_OXT,
+		not SKIP_OXT,
 		2e-5);
 
 	TEST_FUNCTION(testCalculateH,
 		"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala5/ala5.fixed.pdb",
 		"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala5/H.txt",
-		DO_NOT_SKIP_OXT,
+		not SKIP_OXT,
 		1e-5);
 
 	// With prior test checks this one was passing, but i will not, as INMA was using OXT in this case
@@ -112,13 +111,13 @@ void TestANMInternalHessianFunctions::run() {
 	TEST_FUNCTION(testCalculateH,
 		"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/1AKE/1AKE.pdb",
 		"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/1AKE/H.txt",
-		DO_NOT_SKIP_OXT,
+		not SKIP_OXT,
 		1e-5);
 
 	TEST_FUNCTION(testCalculateH,
 		"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/9WVG/9WVG.pdb",
 		"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/9WVG/H.txt",
-		DO_NOT_SKIP_OXT,
+		not SKIP_OXT,
 		2e-5);
 
 	finish();

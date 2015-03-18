@@ -539,6 +539,25 @@ void ANMICMath::invertMatrix(double *a, double *result, unsigned int size) {
 
 ///////////////////////////////////////////////////////////////
 /// \remarks
+/// This function calculates the inverse of a matrix with arbitrary size
+///
+/// \param a [In] matrix
+///
+/// \param result [Out]
+///
+/// \author vgil
+/// \date 17/03/2015
+///////////////////////////////////////////////////////////////
+void ANMICMath::invertMatrix(std::vector<std::vector<double> >& out){
+
+}
+
+void ANMICMath::invertMatrix(TriangularMatrix* inout){
+
+}
+
+///////////////////////////////////////////////////////////////
+/// \remarks
 /// This function calculates the transpose of a 3x3 matrix
 ///
 /// \param matrix [In]
@@ -775,7 +794,7 @@ Unit * ANMICMath::getDummyUnit(double x, double y, double z) {
 
 	vector<Atom*> dummy_atoms;
 	dummy_atoms.push_back(atom);
-	Unit* u = new Unit(dummy_atoms, dummy_atoms, NULL, NULL, NULL, NULL, NULL, NULL, NULL,""); //e_left, e_right, r_left, r_right
+	Unit* u = new Unit(dummy_atoms, dummy_atoms, NULL, NULL, NULL, NULL,"");
 
 	return u;
 }
