@@ -14,6 +14,7 @@
 #include <string>
 #include <vector>
 #include <iosfwd>
+#include "../../ModesCalculator/PreCalculated/ModeTypes.h"
 
 class AnmEigen;
 class Unit;
@@ -40,7 +41,7 @@ static AnmEigen* 	getEigenFromArray( std::vector<double> &  one_eigen_v);
 
 		void 		writeCoordinates(std::vector<double>& conformation_coords);
 
-		void writeHeader(std::ofstream& file_handler);
+		void writeHeader(std::ofstream& file_handler, ModeTypes::ModeType type);
 		void writeResnames(std::ofstream& file_handler, std::vector<Atom*>& atoms);
 		void writeAtomnames(std::ofstream& file_handler, std::vector<Atom*>& atoms);
 		void writeCoordinates(std::ofstream& file_handler, std::vector<Atom*>& atoms);

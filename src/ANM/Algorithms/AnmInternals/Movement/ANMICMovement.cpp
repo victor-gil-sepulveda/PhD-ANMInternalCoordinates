@@ -11,6 +11,7 @@
 #include "../DualQuaternion/dual_quat_cu.hpp"
 #include "../DualQuaternion/point3.hpp"
 #include "../DualQuaternion/quat_cu.hpp"
+#include "../../../ModesCalculator/Internals/CoarseGrainModel/UnitTools.h"
 
 using namespace std;
 
@@ -33,15 +34,18 @@ Quat_cu ANMICMovement::calculate_quaternion_for_unit(double torsional_disp,
 		vector<Unit*>& units,
 		int unit_number){
 
-	Point pivot(*(units[unit_number]->r_right));
+	Point P(units[unit_number]->left_torsion_bond_atom->toPoint());
 	Point Q(units[unit_number]->right_torsion_bond_atom->toPoint());
 
-	Point axis = Point::subtract(Q, pivot);
-	return Quat_cu(cos(torsional_disp/2.),
-					axis.getX()*sin(torsional_disp/2.),
-					axis.getY()*sin(torsional_disp/2.),
-					axis.getZ()*sin(torsional_disp/2.)
-	);
+	Point axis = Point::subtract(Q, P);
+	axis.normalize();
+
+	Quat_cu q(cos(torsional_disp/2.),
+				axis.getX()*sin(torsional_disp/2.),
+				axis.getY()*sin(torsional_disp/2.),
+				axis.getZ()*sin(torsional_disp/2.));
+	q.normalize();
+	return q;
 }
 
 ///////////////////////////////////////////////////////////////
@@ -61,6 +65,7 @@ Quat_cu ANMICMovement::calculate_quaternion_for_unit(double torsional_disp,
 void ANMICMovement::apply_rotations_to_molecule_units(vector<Unit*>& units,
 		vector<double>& angular_increments,
 		double increment_divider){
+
 	Quat_cu q_i;
 	Quat_cu s_im1;
 	Point3 T;
@@ -69,6 +74,7 @@ void ANMICMovement::apply_rotations_to_molecule_units(vector<Unit*>& units,
 	for(unsigned int i = 0; i < units.size()-1; ++i){
 		// Accumulate rotations and translations
 		double torsion_increment = angular_increments[i] * increment_divider;
+		cout<<"DBG: applying increment "<<torsion_increment<<endl;
 		q_i = ANMICMovement::calculate_quaternion_for_unit(torsion_increment, units, i);
 
 		Point Q_p(units[i]->right_torsion_bond_atom->toPoint());
@@ -90,10 +96,12 @@ void ANMICMovement::apply_rotations_to_molecule_units(vector<Unit*>& units,
 			// Result accumulation for next iter
 			T_im1 = T;
 			s_im1 = q_i*s_im1;
+			s_im1.normalize();
 		}
 
 		// Rotate unit i+1
 		Dual_quat_cu M(s_im1, T);
+		M.normalize();
 		vector<Atom*> atoms = units[i+1]->getAllAtoms();
 		for (unsigned int j = 0; j < atoms.size(); ++j){
 			Atom* atom = atoms[j];

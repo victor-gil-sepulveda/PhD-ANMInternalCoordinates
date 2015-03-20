@@ -125,6 +125,9 @@ void ModesWriterHandler::logStepAndDihedralToCartesianProposal(std::string logge
 	vector<double> coords, icoords;
 	atomset->saveCoordinates(coords,icoords);
 	ANMICMovement::apply_rotations_to_molecule_units(units, target_angle_increments, 1.);
+	Math::superpose(coords.size()/3,
+			Utils::vectorToPointer(coords),
+			Utils::vectorToPointer(atomset->getAllCartesianCoordinates()));
 	logStepAndCurrentCACoordinates(logger_name);
 	atomset->restoreCoordinates(coords, icoords);
 }

@@ -47,6 +47,7 @@ UnitsBuilder::UnitsBuilder(Chain* from_this_chain, bool center_coordinates_at_co
 
 	this->global_com = NULL;
 	if(center_coordinates_at_com){
+		Utils::deleteAndSetPointerToNull(this->global_com);
 		this->global_com = centerChainCoordsAtCOM(skip_OXT);
 	}
 
@@ -395,7 +396,7 @@ CenterOfMass* UnitsBuilder::centerChainCoordsAtCOM(bool skip_OXT){
 	if (skip_OXT){
 		filterOXT(non_hydrogens, non_hydrogens_no_oxt);
 		used_atoms = &non_hydrogens_no_oxt;
-		cout<<"DBG: COM IS NOT USING OXT ATOM !!"<<endl;
+		cout<<"DBG: COM IS NOT USING OXT ATOM !! "<<endl;
 	}
 	else{
 		used_atoms = &non_hydrogens;

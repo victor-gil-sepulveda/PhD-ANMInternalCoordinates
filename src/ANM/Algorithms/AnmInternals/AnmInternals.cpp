@@ -50,6 +50,7 @@
 #include "../../../Tools/Utils.h"
 #include <algorithm>
 #include "../../../Molecules/AtomSet/AtomSet.h"
+#include "../../ModesCalculator/PreCalculated/ModeTypes.h"
 
 using namespace std;
 
@@ -74,7 +75,7 @@ AnmInternals::~AnmInternals(){
 }
 
 void AnmInternals::calculate_current_angles(vector<double>& current_angles, vector<Unit*>& units){
-
+	current_angles.clear();
 	for(unsigned int i=0; i < units.size()-1; ++i){
 		Dihedral* right = units[i]->right_dihedral;
 		std::vector<Atom*> the_atoms_of_the_dihedral = right->getAtoms();
@@ -120,7 +121,7 @@ void AnmInternals::constrainCurrentAnmNodes(EnergyCalculator * enerCalc,
 		ConstraintTerm * term = new HarmonicDihedralConstraintTerm(
 				springConstant,
 				current_angles[i],  // Current angle is the eq. angle, as we want to 'fix' it but let it oscillate
-								// a bit if needed
+									// a bit if needed
 				the_atoms_of_the_dihedral);
 
 		enerCalc->addAnmConstraintTerm(term);
@@ -227,13 +228,14 @@ void AnmInternals::resetFrequencies(AnmParameters * anmParameters, AnmEigen * ei
 	// Calculate real frequencies
 	vector<double> real_mode_frequencies;
 	for (unsigned int i =0; i < eigen->values.size(); ++i){
-		if(anmParameters->getMainModeWeightForMixModes() < 1){
+		if(ModeTypes::isANM(eigen->type)){
+			cout<<"DBG: calculating frequencies as ANM eigenvalues."<<endl;
 			real_mode_frequencies.push_back(1./eigen->values[i]); // TODO: Use real formula
 		}
 		else{
+			cout<<"DBG: calculating frequencies as PCA eigenvalues."<<endl;
 			real_mode_frequencies.push_back(eigen->values[i]);
 		}
-		//cout<<"KK "<<eigen->values[i]<<endl;
 	}
 	// Divide by the maximum value, as eigenvalues are ordered, the maximum is the first one :)
 	double max_real_cycle =  real_mode_frequencies[0];
@@ -251,7 +253,8 @@ void AnmInternals::resetFrequencies(AnmParameters * anmParameters, AnmEigen * ei
 	mode_frequency_counter.clear();
 	srand((unsigned)time(NULL));
 	for (unsigned int i =0; i < mode_frequency.size(); ++i){
-		mode_frequency_counter.push_back(((double)rand()/RAND_MAX)*mode_frequency[i]);
+		//mode_frequency_counter.push_back(((double)rand()/RAND_MAX)*mode_frequency[i]);
+		mode_frequency_counter.push_back(0.0);
 	}
 
 	// Log the periods
@@ -283,24 +286,33 @@ void AnmInternals::calculateTargetCoords(AnmParameters * anmParameters, AnmEigen
 			// Initialize target coordinates
 			targetCoords.clear();
 			targetCoords.resize(eigensize,0);
-			for (unsigned int j = 0; j < eigensize; ++j){
-				targetCoords[j] = 0;
+			for (unsigned int i = 0; i < eigensize; ++i){
+				targetCoords[i] = 0;
 			}
 
+			/*
 			// Ensure modes are normalized (norm of the mode must be one)
 			for(unsigned int i = 0; i < eigen->vectors.size(); ++i){
 				vector<double> & eigenvector = eigen->vectors[i];
 				Math::normalizeVector(Utils::vectorToPointer(eigenvector), eigensize);
-			}
+			}*/
 
 			// Calculate target angle increments
+			vector<double> signs;
+			cout<<"DBG: Atenuations ";
 			for (unsigned int i = 0; i < eigen->vectors.size(); ++i){
-				double sense = mode_frequency_counter[i] > mode_frequency[i]/2? 1:-1;
-				double atenuation = eigen->values[i] / eigen->values[0];
+				double sense = mode_frequency_counter[i] > mode_frequency[i]/2? -1:1;
+				signs.push_back(sense);
+				double 	atenuation = eigen->values[i] / eigen->values[0];
+				if(ModeTypes::isPCA(eigen->type)){
+					atenuation = 1/(eigen->values[i] / eigen->values[0]);
+				}
+				cout<<" "<<i<<":"<<atenuation<<" ";
 				for (unsigned int j = 0; j < eigensize; ++j){
 					targetCoords[j] += sense*atenuation*eigen->vectors[i][j];
 				}
 			}
+			cout<<endl;
 
 			// Put all angles in the correct range
 			for (unsigned int i = 0; i < targetCoords.size(); ++i){
@@ -313,11 +325,7 @@ void AnmInternals::calculateTargetCoords(AnmParameters * anmParameters, AnmEigen
 			// Then multiply the maximum displacement
 			Math::multiplyVectorByScalar(targetCoords, anmParameters->getDisplacement());
 
-			// Log frequency signs
-			vector<double> signs;
-			for (unsigned int i =0; i < mode_frequency.size(); ++i){
-				signs.push_back((mode_frequency_counter[i] > mode_frequency[i]/2? 1:-1));
-			}
+			// Log counters and signs
 			SystemVars::getModesWriterHandler()->logStepAndVector("mode_counters", mode_frequency_counter);
 			SystemVars::getModesWriterHandler()->logStepAndVector("mode_signs", signs);
 

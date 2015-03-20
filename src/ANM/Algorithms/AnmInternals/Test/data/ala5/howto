@@ -1,0 +1,12 @@
+calculated with prody:
+
+get_dihedral resi 2 and name  N  , resi 1 and name  C  , resi 1 and name  CA , resi 1 and name  N  , 
+get_dihedral resi 1 and name  C  , resi 2 and name  N  , resi 2 and name  CA , resi 2 and name  C  , 
+get_dihedral resi 3 and name  N  , resi 2 and name  C  , resi 2 and name  CA , resi 2 and name  N  , 
+get_dihedral resi 2 and name  C  , resi 3 and name  N  , resi 3 and name  CA , resi 3 and name  C  , 
+get_dihedral resi 4 and name  N  , resi 3 and name  C  , resi 3 and name  CA , resi 3 and name  N  , 
+get_dihedral resi 3 and name  C  , resi 4 and name  N  , resi 4 and name  CA , resi 4 and name  C  , 
+get_dihedral resi 5 and name  N  , resi 4 and name  C  , resi 4 and name  CA , resi 4 and name  N  , 
+get_dihedral resi 4 and name  C  , resi 5 and name  N  , resi 5 and name  CA , resi 5 and name  C  , 
+get_dihedral resi 5 and name  OXT, resi 5 and name  C  , resi 5 and name  CA , resi 5 and name  N  , 
+

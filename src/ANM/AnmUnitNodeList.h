@@ -29,7 +29,6 @@ class AnmUnitNodeList : public AnmNodeList {
 
 	private:
 		std::vector<Unit*> nodeList;
-		bool updated;
 };
 
 

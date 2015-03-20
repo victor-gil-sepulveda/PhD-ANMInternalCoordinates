@@ -335,7 +335,7 @@ AnmEigen* InternalModesCalculator::cartesianToInternal(vector<Unit*>& units, Anm
 	//TestTools::load_vector_of_vectors(Ki, "src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala3/Kinv.txt");
 	// FOR 9WVG
 	cout<< "Loading Kinv for 9WVG"<<endl;
-	TestTools::load_vector_of_vectors(Ki, "/home/user/Desktop/ANM_analysis/IC/ClusterExperiments/cc_pca/K_full_inv.txt");
+	TestTools::load_vector_of_vectors(Ki, "/home/user/Desktop/cc_pca_2/CA/K_full_inv.txt");
 
 //	ANMICMath::multiplyMatrixByMatrix(Ki,Kv,KvKi);
 //

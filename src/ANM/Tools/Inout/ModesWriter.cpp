@@ -57,7 +57,7 @@ void ModesWriter::writeCartesianModes(AnmEigen * eigen, vector<double>& coordina
 	ofstream file_handler;
 	file_handler.open(this->full_path.c_str());
 
-	writeHeader(file_handler);
+	writeHeader(file_handler, eigen->type);
 	writeCoordinates(file_handler, coordinates);
 
 	for (unsigned int i = 0; i < eigen->numberOfModes;++i){
@@ -72,7 +72,7 @@ void ModesWriter::writeCartesianModes(AnmEigen * eigen, std::vector<Atom*>& atom
 
 	file_handler.open(this->full_path.c_str());
 
-	writeHeader(file_handler);
+	writeHeader(file_handler, eigen->type);
 	writeResnames(file_handler, atoms );
 	writeAtomnames(file_handler, atoms);
 	writeCoordinates(file_handler, atoms);
@@ -130,7 +130,7 @@ void ModesWriter::writeInternalModes(AnmEigen * eigen, const  AnmNodeList* nodeL
 		ofstream file_handler;
 		file_handler.open(full_path.c_str());
 
-		writeHeader(file_handler);
+		writeHeader(file_handler, eigen->type);
 
 		vector<Atom*> bb_atoms;
 		getBBAtomsFromUnits(units, bb_atoms);
@@ -147,9 +147,10 @@ void ModesWriter::writeInternalModes(AnmEigen * eigen, const  AnmNodeList* nodeL
 	}
 }
 
-void ModesWriter::writeHeader(std::ofstream& file_handler){
+void ModesWriter::writeHeader(std::ofstream& file_handler, ModeTypes::ModeType type){
 	file_handler << "nmwiz_load " << this->full_path << endl;
 	file_handler << "name " << this->writer_name << endl;
+	file_handler << "type " << ModeTypes::toString(type) << endl;
 }
 
 void ModesWriter::writeResnames(ofstream& file_handler, vector<Atom*>& atoms){
