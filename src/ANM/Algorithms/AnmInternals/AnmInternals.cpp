@@ -156,7 +156,7 @@ void AnmInternals::performMovement(EnergyCalculator * enerCalc,
 			mover = new ANMICSimpleMover(enerCalc, anmParameters);
 			break;
 		case SIMPLE_PLUS_SIDECHAIN_MIN:
-			mover = new ANMICSideMinMover(enerCalc, anmParameters, workingAtomSet);
+			//mover = new ANMICSideMinMover(enerCalc, anmParameters, workingAtomSet);
 			break;
 		case SIMPLE_PLUS_SIDECHAIN_MD:
 			break;

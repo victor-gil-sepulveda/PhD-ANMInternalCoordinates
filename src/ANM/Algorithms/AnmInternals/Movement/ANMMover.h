@@ -25,7 +25,7 @@ class ANMICMover {
 
 		virtual ~ANMICMover(){}
 
-		virtual void perform_one_movement_cycle(std::vector<Unit*> & units, std::vector<double>& targetCoords) = 0;
+		virtual void perform_one_movement_cycle(std::vector<Unit*> & units, std::vector<double>& targetCoords ) = 0;
 
 	protected:
 		EnergyCalculator * enerCalc;

@@ -79,11 +79,9 @@ bool TestMover::testApplyRotations(){
 	for(unsigned int i =0; i< expected_initial_angles_deg.size(); ++i){
 		expected_initial_angles_rad.push_back(Math::degToRad(expected_initial_angles_deg[i]));
 	}
+
 	// Get the ones we calculate
 	AnmInternals::calculate_current_angles(calculated_initial_angles_rad, units);
-//	for(unsigned int i =0; i< expected_initial_angles_deg.size(); ++i){
-//		cout<<calculated_initial_angles_rad[i]<<" "<<expected_initial_angles_rad[i]<<endl;
-//	}
 	bool we_can_calculate_angles = Assertion::expectedVectorEqualsCalculatedWithinPrecision(expected_initial_angles_rad,calculated_initial_angles_rad,1e-4);
 
 	// move once
@@ -94,6 +92,7 @@ bool TestMover::testApplyRotations(){
 		expected_final_angles.push_back(rotation_increments_rad[i]+calculated_initial_angles_rad[i]);
 	}
 	ANMICMovement::apply_rotations_to_molecule_units(units, rotation_increments_rad, 1);
+
 	vector<double> calculated_final_angles_rad;
 	AnmInternals::calculate_current_angles(calculated_final_angles_rad, units);
 	for(unsigned int i =0; i< calculated_initial_angles_rad.size(); ++i){
@@ -103,13 +102,26 @@ bool TestMover::testApplyRotations(){
 		    <<" calculated: "<<calculated_final_angles_rad[i]<<endl;
 	}
 
-	// move twice
-	//	ANMICMovement()
+	bool we_can_move_them = Assertion::expectedVectorEqualsCalculatedWithinPrecision(expected_final_angles,calculated_final_angles_rad,1e-4);
 
-	bool we_can_move_them = false;
+	// Chain two rotations to move them to the original position
+	vector<double> backward_increments;
+	for(unsigned int i =0; i< rotation_increments_rad.size(); ++i){
+		backward_increments.push_back(-rotation_increments_rad[i]);
+	}
+
+	ANMICMovement::apply_rotations_to_molecule_units(units, backward_increments, 0.5);
+	ANMICMovement::apply_rotations_to_molecule_units(units, backward_increments, 0.5);
+	AnmInternals::calculate_current_angles(calculated_final_angles_rad, units);
+	for(unsigned int i =0; i< calculated_initial_angles_rad.size(); ++i){
+		cout<<" calculated: "<<calculated_final_angles_rad[i]<<endl;
+	}
+
+	bool we_can_undo_the_move = Assertion::expectedVectorEqualsCalculatedWithinPrecision(expected_initial_angles_rad,calculated_final_angles_rad,1e-4);
+
 
 	delete complex;
 	Utils::clearVector<Unit>(units);
 
-	return we_can_calculate_angles && we_can_move_them;
+	return we_can_calculate_angles && we_can_move_them && we_can_undo_the_move;
 }

@@ -627,7 +627,7 @@ class Quat_cu{
 
         // The conventionnal way to rotate a vector
 
-/*Quat_cu tmp = *this;
+    	Quat_cu tmp = *this;
         tmp.normalize();
         // Compute the quaternion inverse with
         Quat_cu inv = tmp.conjugate();
@@ -636,10 +636,10 @@ class Quat_cu{
         Quat_cu result = *this * Quat_cu(0, v) * inv;
         return Vec3(result.coeff[1],result.coeff[2],result.coeff[3]);
 
-**/
+
         // An optimized way to compute rotation
-        Vec3 q_vec = get_vec_part();
-        return v + (q_vec*2.f).cross( q_vec.cross(v) + v*coeff[0] );
+//        Vec3 q_vec = get_vec_part();
+//        return v + (q_vec*2.f).cross( q_vec.cross(v) + v*coeff[0] );
     }
 
     /// Do the rotation of point 'p' with the quaternion
