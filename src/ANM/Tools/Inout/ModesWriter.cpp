@@ -42,20 +42,11 @@ void ModesWriter::setName(std::string name){
 	this->writer_name = name;
 }
 
-AnmEigen* ModesWriter::getEigenFromArray(vector<double>&  one_eigen_v){
-	AnmEigen*  eigen_mock = new AnmEigen;
-	vector<vector<double> > eigenvectors;
-	vector<double> eigenvalues(1, 1);
-	cout<<"DBG:: eigensize "<<one_eigen_v.size()<<endl;
-	eigenvectors.push_back(one_eigen_v);
-	bool isCartesian = true;
-	eigen_mock->initialize(eigenvalues, eigenvectors, isCartesian);
-	return eigen_mock;
-}
 
 void ModesWriter::writeCartesianModes(AnmEigen * eigen, vector<double>& coordinates){
 	ofstream file_handler;
 	file_handler.open(this->full_path.c_str());
+	cout<<"DBG: Writing "<<full_path<<" ..."<<endl;
 
 	writeHeader(file_handler, eigen->type);
 	writeCoordinates(file_handler, coordinates);
@@ -69,7 +60,7 @@ void ModesWriter::writeCartesianModes(AnmEigen * eigen, vector<double>& coordina
 
 void ModesWriter::writeCartesianModes(AnmEigen * eigen, std::vector<Atom*>& atoms){
 	ofstream file_handler;
-
+	cout<<"DBG: Writing "<<full_path<<" ..."<<endl;
 	file_handler.open(this->full_path.c_str());
 
 	writeHeader(file_handler, eigen->type);
@@ -85,9 +76,7 @@ void ModesWriter::writeCartesianModes(AnmEigen * eigen, std::vector<Atom*>& atom
 }
 
 void ModesWriter::writeCartesianModes(AnmEigen * eigen, const AnmNodeList* nodeList){
-
 	vector<Atom*> atoms = dynamic_cast<const AnmAtomNodeList*>( nodeList)->getNodeList();
-
 	writeCartesianModes(eigen, atoms);
 }
 
@@ -95,7 +84,6 @@ void ModesWriter::writeCartesianModes(AnmEigen * eigen, const AnmNodeList* nodeL
 /// \remarks
 /// Writes the contents of a AnmEigen object into a file. It tries to be compatible with
 /// Prody and the vmd viewer.
-///
 ///
 /// \param filename [In] The path of the file were we will write the modes.
 /// \param eigen [In] Modes to write.
@@ -110,9 +98,22 @@ void ModesWriter::writeInternalModes(AnmEigen * eigen, const  AnmNodeList* nodeL
 
 	if (toCartesian){
 		bool onlyHeavyAtoms = true;
-
+		cout<<"DBG: converting to cartesian prior to writing"<<endl;
+		cout<<"DBG: first eigenvalue values ("<<eigen->vectors[0].size()<< ") "<<
+				eigen->vectors[0][0]<<" "<<
+				eigen->vectors[0][1]<<" "<<
+				eigen->vectors[0][2]<<" "<<
+				eigen->vectors[0][3]<<" "<<
+				eigen->vectors[0][4]<<" "<<endl;
 		// First convert from internal to cartesian
 		AnmEigen* converted = InternalModesCalculator::internalToCartesian(units, eigen, onlyHeavyAtoms);
+
+		cout<<"DBG: first converted values ("<<converted->vectors[0].size()<< ") "<<
+				converted->vectors[0][0]<<" "<<
+				converted->vectors[0][1]<<" "<<
+				converted->vectors[0][2]<<" "<<
+				converted->vectors[0][3]<<" "<<
+				converted->vectors[0][4]<<" "<<endl;
 
 		vector<int> ca_atom_indices;
 		vector<Atom*> ca_atoms;
@@ -121,14 +122,16 @@ void ModesWriter::writeInternalModes(AnmEigen * eigen, const  AnmNodeList* nodeL
 		// Then filter the modes
 		AnmEigen filtered;
 		filterEigenvectors(converted, &filtered, ca_atom_indices);
-		delete converted;
 
 		// Write them!
 		this->writeCartesianModes( &filtered, ca_atoms);
+
+		delete converted;
 	}
 	else{
 		ofstream file_handler;
 		file_handler.open(full_path.c_str());
+		cout<<"DBG: Writing "<<full_path<<" ..."<<endl;
 
 		writeHeader(file_handler, eigen->type);
 
@@ -272,30 +275,3 @@ void ModesWriter::getCoordinatesFromAtomVector(std::vector<Atom*>& atoms, std::v
 	}
 }
 
-///////////////////////////////////////////////////////////////
-/// \remarks
-/// Calculates the difference of two coordinate sets (initial and final) and writes them to a logger.
-/// \author vgil
-/// \date 17/02/2015
-///////////////////////////////////////////////////////////////
-void ModesWriter::writeCoordinatesDifference(
-		vector<double>& initial_coords,
-		vector<double>& final_coords,
-		vector<double>& conformation_coords){
-
-		vector<double> changes;
-		changes.resize(initial_coords.size());
-		Math::subtractVectors(initial_coords.size(), &(final_coords[0]), &(initial_coords[0]), &(changes[0]));
-
-		AnmEigen* eigen = ModesWriter::getEigenFromArray(changes);
-		writeCartesianModes(eigen, conformation_coords);
-
-		delete eigen;
-}
-
-void ModesWriter::writeCoordinates(std::vector<double>& conformation_coords){
-	ofstream file_handler;
-	file_handler.open(this->full_path.c_str());
-
-	writeCoordinates(file_handler, conformation_coords);
-}

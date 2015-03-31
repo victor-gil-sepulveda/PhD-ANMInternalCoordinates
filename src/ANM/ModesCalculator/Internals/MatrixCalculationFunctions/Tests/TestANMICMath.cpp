@@ -42,32 +42,35 @@ void TestANMICMath::init() {
 void TestANMICMath::run() {
 	Test::run();
 
-	TEST_FUNCTION(testMultiplyColumnByRow);
-	TEST_FUNCTION(testMultiplyMatrixByScalar);
-  	TEST_FUNCTION(testMultiplyMatrixByScalarGeneral);
-  	TEST_FUNCTION(testAddMatrices);
-	TEST_FUNCTION(testAddMatricesGeneral);
-	TEST_FUNCTION(testAddMatricesInPlace);
-	TEST_FUNCTION(testAddMatricesInPlaceGeneral);
-	TEST_FUNCTION(testSubtractMatrices);
-	TEST_FUNCTION(testSubtractMatricesGeneral);
-  	TEST_FUNCTION(testMultitplyRowByMatrix);
-  	TEST_FUNCTION(testMultiplyRowByColumn);
-  	TEST_FUNCTION(testMultiplyMatrixByMatrix);
-  	TEST_FUNCTION(testMultiplyMatrixByMatrixGeneral);
-  	TEST_FUNCTION(testMultiplyIMatrixByEVector);
-  	TEST_FUNCTION(testInvertMatrix);
-	TEST_FUNCTION(testInvertMatrixGeneral);
-	TEST_FUNCTION(testTransposeMatrix);
-	TEST_FUNCTION(testTransposeMatrixGeneral);
-	TEST_FUNCTION(testGetABMatrix);
-	TEST_FUNCTION(testAddMatrixToU);
-	TEST_FUNCTION(testConvertMatrixToArray);
-	TEST_FUNCTION(testArbitrarySizeMatrixMult);
-	TEST_FUNCTION(testTranspose)
-//	TEST_FUNCTION(testInversion,
-//			"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/math/inversion/original_1.txt",
-//			"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/math/inversion/inverted_1.txt")
+//	TEST_FUNCTION(testMultiplyColumnByRow);
+//	TEST_FUNCTION(testMultiplyMatrixByScalar);
+//  	TEST_FUNCTION(testMultiplyMatrixByScalarGeneral);
+//  	TEST_FUNCTION(testAddMatrices);
+//	TEST_FUNCTION(testAddMatricesGeneral);
+//	TEST_FUNCTION(testAddMatricesInPlace);
+//	TEST_FUNCTION(testAddMatricesInPlaceGeneral);
+//	TEST_FUNCTION(testSubtractMatrices);
+//	TEST_FUNCTION(testSubtractMatricesGeneral);
+//  	TEST_FUNCTION(testMultitplyRowByMatrix);
+//  	TEST_FUNCTION(testMultiplyRowByColumn);
+//  	TEST_FUNCTION(testMultiplyMatrixByMatrix);
+//  	TEST_FUNCTION(testMultiplyMatrixByMatrixGeneral);
+//  	TEST_FUNCTION(testMultiplyIMatrixByEVector);
+//  	TEST_FUNCTION(testInvertMatrix);
+//	TEST_FUNCTION(testInvertMatrixGeneral);
+//	TEST_FUNCTION(testTransposeMatrix);
+//	TEST_FUNCTION(testTransposeMatrixGeneral);
+//	TEST_FUNCTION(testGetABMatrix);
+//	TEST_FUNCTION(testAddMatrixToU);
+//	TEST_FUNCTION(testConvertMatrixToArray);
+//	TEST_FUNCTION(testArbitrarySizeMatrixMult);
+//	TEST_FUNCTION(testTranspose)
+	TEST_FUNCTION(testInversion,
+				"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala3/K.txt",
+				"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala3/Kinv.txt")
+	TEST_FUNCTION(testInversion,
+				"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/9WVG/K_full.txt",
+				"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/9WVG/K_full_inv.txt")
 
 	finish();
 }
@@ -849,7 +852,8 @@ bool TestANMICMath::testTranspose(){
 	return ok;
 }
 
-bool TestANMICMath::testInversion(const char* original_matrix, const char* expected_inversion){
+bool TestANMICMath::testInversion(const char* original_matrix,
+		const char* expected_inversion){
 	vector<vector<double> > original, expected, calculated, mult;
 	TestTools::load_vector_of_vectors(original, original_matrix);
 	TestTools::load_vector_of_vectors(expected, expected_inversion);
@@ -866,7 +870,7 @@ bool TestANMICMath::testInversion(const char* original_matrix, const char* expec
 		ok = ok && Assertion::expectedVectorEqualsCalculatedWithinPrecision(
 				expected[i],
 				calculated[i],
-				1e-12);
+				1e-8);
 	}
 
 	if (ok){
@@ -878,7 +882,7 @@ bool TestANMICMath::testInversion(const char* original_matrix, const char* expec
 
 	// Coherence check (m m^-1 == I)
 	bool coherence_check = true;
-	ANMICMath::multiplyMatrixByMatrix(original,calculated, mult);
+	ANMICMath::multiplyMatrixByMatrix(calculated, original, mult);
 	for (unsigned int i =0; i < mult.size(); ++i){
 		for (unsigned int j = 0; j < mult[i].size(); ++j){
 			if (i == j){

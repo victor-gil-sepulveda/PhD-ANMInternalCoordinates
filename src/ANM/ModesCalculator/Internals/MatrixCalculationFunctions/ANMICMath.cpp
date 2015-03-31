@@ -16,6 +16,16 @@
 #include "../../../../Tools/Utils.h"
 using namespace std;
 
+extern "C" {
+	// Symmetric positive definite inversion
+	void dpptrf_(char* uplo, int* n, double* ap, int* info);
+	void dpptri_(char* uplo, int* n, double* ap, int* info);
+
+	// Symmetric indefinite inversion
+	void dsptrf_( char* uplo, int* n, double* ap, int* ipv, int* info);
+	void dsptri_( char* uplo, int* n, double* ap, int* ipv, double* work, int* info);
+}
+
 ///////////////////////////////////////////////////////////////
 /// \remarks
 /// This function calculates the matrix resulting of the
@@ -554,6 +564,30 @@ void ANMICMath::invertMatrix(std::vector<std::vector<double> >& out){
 
 void ANMICMath::invertMatrix(TriangularMatrix* inout){
 
+	char uplo = 'U';
+	int info = 0;
+	int N = inout->size1();
+
+	// Temporary copy
+	TriangularMatrix tmp (*inout);
+
+	dpptrf_(&uplo, &N, inout->data().begin(), &info);
+	cout<< "DBG: INFO dpptrf_: "<<info<<endl;
+
+	if(info == 0){
+		dpptri_(&uplo, &N, inout->data().begin(), &info);
+		cout<< "DBG: INFO dpotri_: "<<info<<endl;
+	}
+	else{
+		info = 0;
+		inout->swap(tmp);
+		int ipv[N];
+		double work[N];
+		dsptrf_( &uplo, &N, inout->data().begin(), ipv, &info);
+		cout<< "DBG: INFO dsptrf_: "<<info<<endl;
+		dsptri_( &uplo, &N, inout->data().begin(), ipv, work, &info);
+		cout<< "DBG: INFO dsptri_: "<<info<<endl;
+	}
 }
 
 ///////////////////////////////////////////////////////////////

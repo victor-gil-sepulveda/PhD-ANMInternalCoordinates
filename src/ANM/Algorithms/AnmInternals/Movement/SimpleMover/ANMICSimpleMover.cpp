@@ -10,6 +10,8 @@
 #include "../../../../../Energy/EnergyCalculator.h"
 #include "../../../../Parameters/AnmParameters.h"
 #include "../ANMICMovement.h"
+#include "../../../../../System/SystemVars.h"
+#include "../../../../../System/Logs/ModesAndCoords/ModeWritersHandler.h"
 using namespace std;
 
 ANMICSimpleMover::ANMICSimpleMover(EnergyCalculator * enerCalc, AnmParameters * anmParameters) :
@@ -19,7 +21,8 @@ ANMICSimpleMover::ANMICSimpleMover(EnergyCalculator * enerCalc, AnmParameters * 
 ANMICSimpleMover::~ANMICSimpleMover(){
 }
 
-void ANMICSimpleMover::perform_one_movement_cycle(std::vector<Unit*>& units, std::vector<double>& targetCoords){
+void ANMICSimpleMover::perform_one_movement_cycle(std::vector<Unit*>& units,
+		std::vector<double>& targetCoords){
 	RandomGenerator random_gen(time(NULL));
 	MetropolisAcceptanceCriterion m_criterion(&random_gen);
 
@@ -43,5 +46,8 @@ void ANMICSimpleMover::perform_one_movement_cycle(std::vector<Unit*>& units, std
 
 		cout<<"DBG: ANM IC Metropolis "<<m_criterion.generateReport()<<endl;
 	}
+
 	cout<<"DBG: "<<m<<" of "<<this->anmParameters->getICMaximumStepsPerCycle() <<" iterations performed."<<endl;
+	vector<double > tmp(1, anmParameters->getDisplacement()*(m/anmParameters->getICMaximumStepsPerCycle()));
+	SystemVars::getModesWriterHandler()->logStepAndVector("max_displacement", tmp);
 }

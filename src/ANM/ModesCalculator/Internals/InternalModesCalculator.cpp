@@ -41,7 +41,6 @@ extern "C" {
 			int* il, int* iu, double* abstol, int* M, double*W, double* Z, int* ldz, double* work,	int* iwork, int* ifail,
 			int* info);
 	double dlamch_(char* cmach);
-	double dpptri_(char* uplo, int* n, double* ap, int* info);
 }
 //--------------------------------
 
@@ -70,6 +69,9 @@ void InternalModesCalculator::calculateEigenValuesAndVectors(AnmParameters * anm
 {
 	// We need to first update the model
 	AnmUnitNodeList &unitNodeList = dynamic_cast<AnmUnitNodeList &>(const_cast<AnmNodeList &>(node_list));
+	// Recenter
+
+	// Update nodes
 	unitNodeList.updateUnitList();
 
 	// Build coarse grain model
@@ -292,67 +294,18 @@ AnmEigen* InternalModesCalculator::cartesianToInternal(vector<Unit*>& units, Anm
 
 	// Calculate Jacobi
 	cout<<"Jacobi calculation..."<<endl;
-	vector<vector<double> > J, Jt;
+	vector<vector<double> > Ki, J, Jt;
 	ANMICKineticMatrixCalculator::Jacobi2(units, J);
 	ANMICMath::transpose(J,Jt);
 
-//	// Calculate K
-//	cout<<"K calculation..."<<endl;
-//	TriangularMatrix* K = ANMICKineticMatrixCalculator::calculateK(units, INMA);
-//
-//	vector<vector<double> > Kv(K->size1(), vector<double>(K->size1(),0)), KvKi;
-//	cout<<"DBG: K inv"<<endl;
-//	for (unsigned int i = 0; i < K->size1(); ++i){
-//		TriangularMatrixRow K_r (*K,i);
-//		for (unsigned int j = i; j < K->size2(); ++j){
-//			Kv[i][j] = K_r(j);
-//			Kv[j][i] = K_r(j);
-//		}
-//	}
+	// Calculate K
+	cout<<"K calculation..."<<endl;
+	TriangularMatrix* K = ANMICKineticMatrixCalculator::calculateK(units, INMA);
 
+	cout<<"K inversion..."<<endl;
+	ANMICMath::invertMatrix(K);
 
-//	cout<<"K inversion..."<<endl;
-//	// Invert K
-//	char uplo = 'U';
-//	int info = 0;
-//	int N = K->size1();
-//	dpptri_(&uplo, &N, K->data().begin(), &info);
-//	cout<< "INFO: "<<info<<endl;
-
-//	vector<vector<double> > Ki(K->size1(), vector<double>(K->size1(),0));
-//	cout<<"DBG: K inv"<<endl;
-//	for (unsigned int i = 0; i < K->size1(); ++i){
-//		TriangularMatrixRow K_r (*K,i);
-//		for (unsigned int j = i; j < K->size2(); ++j){
-//			Ki[i][j] = K_r(j);
-//			Ki[j][i] = K_r(j);
-//		}
-//	}
-
-	vector<vector<double> > Ki;
-	// FOR ALA3
-	// cout<< "Loading Kinv for ala3"<<endl;
-	//TestTools::load_vector_of_vectors(Ki, "src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala3/Kinv.txt");
-	// FOR 9WVG
-	cout<< "Loading Kinv for 9WVG"<<endl;
-	TestTools::load_vector_of_vectors(Ki, "/home/user/Desktop/cc_pca_2/CA/K_full_inv.txt");
-
-//	ANMICMath::multiplyMatrixByMatrix(Ki,Kv,KvKi);
-//
-//	cout<<"K ------"<<endl;
-//	for (unsigned int i = 0; i < Kv.size();++i){
-//		ANMICMath::printVector(Utils::vectorToPointer(Kv[i]), Kv[i].size());
-//	}
-//
-//	cout<<"Ki ------"<<endl;
-//	for (unsigned int i = 0; i < Ki.size();++i){
-//		ANMICMath::printVector(Utils::vectorToPointer(Ki[i]), Ki[i].size());
-//	}
-//
-//	cout<<"KvKi ------"<<endl;
-//	for (unsigned int i = 0; i < KvKi.size();++i){
-//		ANMICMath::printVector(Utils::vectorToPointer(KvKi[i]), KvKi[i].size());
-//	}
+	TriangularMatrixTools::triangularMatrixToVectorMatrix(K, Ki);
 
 	// M matrix
 	bool onlyHeavyAtoms = true;
@@ -373,8 +326,6 @@ AnmEigen* InternalModesCalculator::cartesianToInternal(vector<Unit*>& units, Anm
 
 	for (unsigned int i = 0; i < number_of_modes; ++i){
 		vector<double>& original_mode = in->vectors[i];
-		cout<<"Original: ";
-		ANMICMath::printVector(Utils::vectorToPointer(original_mode), original_mode.size());
 
 		vector<vector<double> > rt, r, Mr, JtMr, KiJtMr, Jr;
 		rt.push_back(original_mode);
@@ -386,17 +337,12 @@ AnmEigen* InternalModesCalculator::cartesianToInternal(vector<Unit*>& units, Anm
 
 		vector< vector<double> > evec;
 		ANMICMath::transpose(KiJtMr,evec);
-//		ANMICMath::transpose(JtMr, evec);
-//		ANMICMath::transpose(Jr,evec);
 		new_evectors.push_back(evec[0]);
-
-		cout<<"Calcted: ";
-		ANMICMath::printVector(Utils::vectorToPointer(evec[0]), evec[0].size());
 	}
 
-	//delete K;
+	delete K;
 
-	cout<<"Creating anmeigen object..."<<endl;
+	cout<<"Creating anm eigen object..."<<endl;
 	bool notUsingCartesian = false;
 	out->initialize(in->values, new_evectors, notUsingCartesian);
 

@@ -70,7 +70,6 @@ void calculate_Qs(vector<Unit*>& units, vector<Point>& Qs){
 	}
 }
 
-
 Quat_cu calculate_quaternion(double torsional_disp, Point axis){
 
 	double sin_w = sin(torsional_disp/2.);
@@ -91,10 +90,10 @@ void ANMICMovement::apply_rotations_to_molecule_units(vector<Unit*>& units,
 	vector<vector<double> > M_prev(4, vector<double>(4, 0.0));
 	for(unsigned int i = 0; i < 4; ++i)
 		M_prev[i][i] = 1.0;
-		vector<Point> axes, Q;
 
-		calculate_Qs(units, Q);
-		calculate_axes(units, axes);
+	vector<Point> axes, Q;
+	calculate_Qs(units, Q);
+	calculate_axes(units, axes);
 
 	// Do transformations
 	for(unsigned int i = 0; i < units.size()-1; ++i){
@@ -161,7 +160,6 @@ void ANMICMovement::apply_rotations_to_molecule_units(vector<Unit*>& units,
 
 			atom->setX(result[0][0]); atom->setY(result[1][0]); atom->setZ(result[2][0]);
 		}
-
 	}
 }
 

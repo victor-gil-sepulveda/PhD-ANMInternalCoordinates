@@ -95,19 +95,18 @@ void TestICModesCalculator::run()
 //			"src/ANM/ModesCalculator/Internals/Tests/data/conversion/1SU4/cc_evec.txt",
 //			0.08);
 //
-//    FAILING_TEST_FUNCTION(testCartesianToInternal,
+//    TEST_FUNCTION(testCartesianToInternal,
 //    			"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala3/ala3.pdb",
 //    			1e-12);
-
-
+//
+//    TEST_FUNCTION(testCartesianToInternal,
+//    			"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/9WVG/9WVG.pdb",
+//    			1e-12);
+//
     TEST_FUNCTION(testConvert9WVGStuff)
 
-
-//    FAILING_TEST_FUNCTION(testGeometricCartesianToInternal,
-//    			"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala3/ala3.pdb",
-//    			"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala3/cc_evec.txt",
-//    			"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala3/ic_evec.txt",
-//    			1e-12);
+//    TEST_FUNCTION(testStrangeCase)
+//
 
     finish();
 }
@@ -281,7 +280,7 @@ bool TestICModesCalculator::testInternalToCartesian(const char* prot_path,
 }
 
 bool TestICModesCalculator::testCartesianToInternal(const char* prot_path,
-       		double tolerance){
+       		double precission){
 
 	// Prepare params : cutoff= 10.0, k= 1.000000, x0= 3.8
 	AnmParameters anmParameters;
@@ -314,10 +313,12 @@ bool TestICModesCalculator::testCartesianToInternal(const char* prot_path,
 	cout << "CC -> IC conversion."<<endl;
 	AnmEigen* output_eigen =  InternalModesCalculator::cartesianToInternal(units, eigen_cc);
 
+	bool ok = true;
 	for(unsigned int i = 0; i < eigen.vectors.size();++i){
-		cout<<"---------------"<<endl;
-		cout<<"Calculated: ";ANMICMath::printVector(Utils::vectorToPointer(output_eigen->vectors[i]), output_eigen->vectors[i].size());
-		cout<<"Expected:   ";ANMICMath::printVector(Utils::vectorToPointer(eigen.vectors[i]), eigen.vectors[i].size());
+		ok = ok && Assertion::expectedVectorEqualsCalculatedWithinPrecision(eigen.vectors[i], output_eigen->vectors[i], precission);
+//		cout<<"---------------"<<endl;
+//		cout<<"Calculated: ";ANMICMath::printVector(Utils::vectorToPointer(output_eigen->vectors[i]), output_eigen->vectors[i].size());
+//		cout<<"Expected:   ";ANMICMath::printVector(Utils::vectorToPointer(eigen.vectors[i]), eigen.vectors[i].size());
 	}
 
 	delete node_list;
@@ -325,94 +326,8 @@ bool TestICModesCalculator::testCartesianToInternal(const char* prot_path,
 	delete output_eigen;
 	delete complex;
 
-	return false;
+	return ok;
 }
-
-bool TestICModesCalculator::testGeometricCartesianToInternal(const char* prot_path,
-       		const char* initial_cc_path,
-       		const char* final_ic_path,
-       		double tolerance){
-
-	// Load structure
-	System sys;
-	vector<Unit*> units;
-	Complex* complex;
-	cout << "Loading model"<<endl;
-	TestANMICTools::createUnitsFromFile(prot_path, units, complex, false);
-
-	// Load input and golden
-	vector<vector<double> > input_cartesian, output_internal, expected_internal;
-	TestTools::load_vector_of_vectors(input_cartesian, initial_cc_path);
-	TestTools::load_vector_of_vectors(expected_internal, final_ic_path);
-
-	// Create a AnmEigen object to hold input data
-	vector<double> eigenvalues(input_cartesian.size(), 1);
-	AnmEigen input_cc;
-	bool usingCC = true;
-	input_cc.initialize(eigenvalues, input_cartesian, usingCC);
-
-//	do i = 1, nomega
-//	         base = iomega(1,i)
-//	         partner = iomega(2,i)
-//	         call rotlist (base,partner)
-//	         xdist = x(base) - x(partner)
-//	         ydist = y(base) - y(partner)
-//	         zdist = z(base) - z(partner)
-//	         norm = sqrt(xdist**2 + ydist**2 + zdist**2)
-//	         xdist = xdist / norm
-//	         ydist = ydist / norm
-//	         zdist = zdist / norm
-	// calculate ea
-
-//	         do j = 1, nrot
-//	            k = rot(j)
-//	            xatom = x(k) - x(base)
-//	            yatom = y(k) - y(base)
-//	            zatom = z(k) - z(base)
-	// calculate r-ra
-//	            xterm = ydist*zatom - zdist*yatom
-//	            yterm = zdist*xatom - xdist*zatom
-//	            zterm = xdist*yatom - ydist*xatom
-	// calculate (r-ra) x ea
-//	            teb(i) = teb(i) + deb(1,k)*xterm + deb(2,k)*yterm
-//	     &                              + deb(3,k)*zterm
-//	         end do
-//	      end do
-//
-//	      do i = 1, nomega
-//	         tesum(i) = teb(i)
-//	         derivs(i) = tesum(i)
-//	      end do
-//
-//	nomega   number of dihedral angles allowed to rotate
-//	iomega   numbers of two atoms defining rotation axis
-//	rotlist     creates a list of all atoms affectd by a rotation
-//	nrot        total number of atoms moving when bond rotates
-//	rot         atom numbers of atoms moving when bond rotates
-
-	vector<double>& orig_mode = input_cartesian[0];
-	unsigned int number_of_torsions = units.size()-1;
-	vector<double> conversion(number_of_torsions, 0);
-	for (unsigned int alpha=0; alpha < number_of_torsions; ++alpha){
-		vector<Atom*> right_atoms;
-		UnitTools::getAllAtomsFromUnitRange(units, right_atoms, 0, alpha,true);
-		Point* ea = units[alpha]->e_right;
-		Point* ra = units[alpha]->r_right;
-		for(unsigned int i = 0; i < right_atoms.size(); ++i){
-			unsigned int offset = i*3;
-			Point grad(orig_mode[offset], orig_mode[offset+1], orig_mode[offset+2]);
-			Point r = right_atoms[i]->toPoint();
-			Point r_ra = Point::subtract(r,*ra);
-			Point eaxr_ra = ANMICMath::crossProduct(*ea, r_ra);
-			conversion[alpha] += Point::dotProduct(grad, eaxr_ra);
-		}
-	}
-
-	ANMICMath::printVector(Utils::vectorToPointer(conversion), conversion.size());
-
-	return false;
-}
-
 
 bool TestICModesCalculator::testConvert9WVGStuff(){
 		//	cout<<"K loading..."<<endl;
@@ -441,7 +356,7 @@ bool TestICModesCalculator::testConvert9WVGStuff(){
 	Complex* complex;
 	cout << "Loading model"<<endl;
 	TestANMICTools::createUnitsFromFile(
-			"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/9WVG/9WVG.pdb",
+			"/home/user/Desktop/cc_pca_2/CA_min/9WVG.minim.pdb",
 			units, complex, false);
 
 //	// Write the atoms
@@ -454,8 +369,8 @@ bool TestICModesCalculator::testConvert9WVGStuff(){
 	// Get pca modes
 	vector<double> values;
 	vector<vector<double> > vectors;
-	TestTools::load_vector(values, "/home/user/Desktop/cc_pca_2/CA/cc_pca_aa.values");
-	TestTools::load_vector_of_vectors(vectors, "/home/user/Desktop/cc_pca_2/CA/cc_pca_aa.vectors");
+	TestTools::load_vector(values, "/home/user/Desktop/cc_pca_2/CA_min/cc_pca_aa.values");
+	TestTools::load_vector_of_vectors(vectors, "/home/user/Desktop/cc_pca_2/CA_min/cc_pca_aa.vectors");
 	AnmEigen pca_modes;
 	pca_modes.initialize(values,vectors,true);
 
@@ -470,16 +385,41 @@ bool TestICModesCalculator::testConvert9WVGStuff(){
 	AnmUnitNodeList nodeList;
 	nodeList.setNodeList(units);
 
-	writer.setPath("/home/user/Desktop/cc_pca_2/CA/9WVG_PCA_CCtoIC.nmd");
+	writer.setPath("/home/user/Desktop/cc_pca_2/CA_min/9WVG_PCA_CCtoIC.nmd");
 	writer.setName("9WVG_PCA_CCtoIC");
 	writer.writeInternalModes( pca_ic_eigen, &nodeList, false);
 
-	writer.setPath("/home/user/Desktop/cc_pca_2/CA/9WVG_PCA_CCtoICtoCC.nmd");
+	writer.setPath("/home/user/Desktop/cc_pca_2/CA_min/9WVG_PCA_CCtoICtoCC.nmd");
 	writer.setName("9WVG_PCA_CCtoICtoCC");
 	writer.writeInternalModes( pca_ic_eigen, &nodeList, true);
 
 	delete complex;
 	delete pca_ic_eigen;
 
+	return false;
+}
+
+bool TestICModesCalculator::testStrangeCase(){
+	// Load structure
+	System sys;
+	vector<Unit*> units;
+	Complex* complex;
+	cout << "Loading model"<<endl;
+	TestANMICTools::createUnitsFromFile(
+			"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/9WVG/9WVG.pdb",
+			units, complex, false);
+
+	const char* original = "/home/user/Desktop/cc_pca_2/test_pca_cc2ic_new/second.nmd";
+	AnmEigen* initial_eigen = SimpleModesLoader::load(original, false);
+
+	ModesWriter writer;
+	AnmUnitNodeList nodeList;
+	nodeList.setNodeList(units);
+	writer.setPath("/home/user/Desktop/cc_pca_2/test_pca_cc2ic_new/to_cc.nmd");
+	writer.setName("to_cc");
+	writer.writeInternalModes( initial_eigen, &nodeList, true);
+
+	delete initial_eigen;
+	delete complex;
 	return false;
 }

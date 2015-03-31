@@ -201,8 +201,11 @@ void AnmInternals::calculateModes(AnmParameters * anmParameters, const AnmNodeLi
 		resetFrequencies(anmParameters, eigen);
 
 	// Logging
+	cout<<"DBG: calculateModes logging cc"<<endl;
 	SystemVars::getModesWriterHandler()->getWriter("original_modes_cc")->
 			writeInternalModes(eigen, &nodeList, true);
+
+	cout<<"DBG: calculateModes logging ic"<<endl;
 	SystemVars::getModesWriterHandler()->getWriter("original_modes_ic")->
 				writeInternalModes(eigen, &nodeList, false);
 
@@ -279,6 +282,8 @@ void AnmInternals::calculateTargetCoords(AnmParameters * anmParameters, AnmEigen
 				chosenMode);
 	}
 	else{
+		SystemVars::getModesWriterHandler()->logStepAndVector("first_mode",eigen->vectors[0]);
+
 		if(anmParameters->getOverridePickingAndMixing() == EIGEN_MIXING_EIGEN_WEIGHT){
 			cout<<"DBG: Calculating target coords using EIGEN_MIXING_EIGEN_WEIGHT"<<endl;
 			unsigned int eigensize = eigen->vectors[0].size();
@@ -286,16 +291,17 @@ void AnmInternals::calculateTargetCoords(AnmParameters * anmParameters, AnmEigen
 			// Initialize target coordinates
 			targetCoords.clear();
 			targetCoords.resize(eigensize,0);
-			for (unsigned int i = 0; i < eigensize; ++i){
+			cout<<"DBG: Eigensize: "<<eigensize<<endl;
+			cout<<"DBG: Target Coords size: "<<targetCoords.size()<<endl;
+			for (unsigned int i = 0; i < targetCoords.size(); ++i){
 				targetCoords[i] = 0;
 			}
 
-			/*
 			// Ensure modes are normalized (norm of the mode must be one)
 			for(unsigned int i = 0; i < eigen->vectors.size(); ++i){
 				vector<double> & eigenvector = eigen->vectors[i];
 				Math::normalizeVector(Utils::vectorToPointer(eigenvector), eigensize);
-			}*/
+			}
 
 			// Calculate target angle increments
 			vector<double> signs;
@@ -307,22 +313,18 @@ void AnmInternals::calculateTargetCoords(AnmParameters * anmParameters, AnmEigen
 				if(ModeTypes::isPCA(eigen->type)){
 					atenuation = 1/(eigen->values[i] / eigen->values[0]);
 				}
-				cout<<" "<<i<<":"<<atenuation<<" ";
+				cout<<" "<<i<<": "<<atenuation<<" ";
 				for (unsigned int j = 0; j < eigensize; ++j){
 					targetCoords[j] += sense*atenuation*eigen->vectors[i][j];
 				}
 			}
 			cout<<endl;
 
-			// Put all angles in the correct range
-			for (unsigned int i = 0; i < targetCoords.size(); ++i){
-				targetCoords[i] = HarmonicDihedralConstraintFunctions::put_in_pi_minus_pi_range(targetCoords[i]);
-			}
-
-			// And normalize the result!
+			// And normalize the result! (it keeps relative amplitudes)
 			AnmNormalizer::normalizeByLargestValue(targetCoords);
 
 			// Then multiply the maximum displacement
+			cout<<"DBG: anmParameters->getDisplacement() "<<anmParameters->getDisplacement()<<endl;
 			Math::multiplyVectorByScalar(targetCoords, anmParameters->getDisplacement());
 
 			// Log counters and signs
@@ -342,7 +344,7 @@ void AnmInternals::calculateTargetCoords(AnmParameters * anmParameters, AnmEigen
 	}
 
 	SystemVars::getModesWriterHandler()->logStepAndVector("proposal_inc_ic",targetCoords);
-	SystemVars::getModesWriterHandler()->logStepAndDihedralAnglesProposal("proposal_ic",targetCoords,units);
+	SystemVars::getModesWriterHandler()->logStepAndDihedralAnglesProposal("proposal_ic",targetCoords, units);
 	SystemVars::getModesWriterHandler()->logStepAndDihedralToCartesianProposal("proposal_cc", targetCoords, units);
 }
 

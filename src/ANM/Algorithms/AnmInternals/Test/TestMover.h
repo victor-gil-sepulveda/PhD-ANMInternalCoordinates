@@ -35,6 +35,9 @@ class TestMover : public Test
     private:
         void finish();
         bool testApplyRotations();
+        bool testIterativeAngleApplication();
+        bool testIterativeAngleApplicationWithConversionUpdate();
+        bool testIterativeAngleApplicationWithConversionUpdateToTarget();
 };
 
 #endif /* TESTICMODESCALCULATOR_H_ */

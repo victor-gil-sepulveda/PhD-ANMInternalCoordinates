@@ -29,11 +29,11 @@ void AnmUnitNodeList::setNodeList(vector<Unit*>& units) {
 }
 
 void AnmUnitNodeList::updateUnitList(){
+	cout<<"DBG: Updating CG Model"<<endl;
 	for(unsigned int i = 0; i< nodeList.size();++i){
 		nodeList[i]->update();
 	}
 }
-
 
 string AnmUnitNodeList::showNodeList(){
 	return LogUtils::showUnitLabels(this->nodeList);
