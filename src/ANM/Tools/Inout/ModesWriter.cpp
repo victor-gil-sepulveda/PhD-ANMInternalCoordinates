@@ -93,9 +93,7 @@ void ModesWriter::writeCartesianModes(AnmEigen * eigen, const AnmNodeList* nodeL
 /// \author vgil
 /// \date 7/01/2015
 ///////////////////////////////////////////////////////////////
-void ModesWriter::writeInternalModes(AnmEigen * eigen, const  AnmNodeList* nodeList, bool toCartesian){
-	vector<Unit*> units = dynamic_cast<const AnmUnitNodeList*>(nodeList)->getNodeList();
-
+void ModesWriter::writeInternalModes( AnmEigen * eigen, std::vector<Unit*>& units, bool toCartesian){
 	if (toCartesian){
 		bool onlyHeavyAtoms = true;
 		cout<<"DBG: converting to cartesian prior to writing"<<endl;
@@ -148,6 +146,12 @@ void ModesWriter::writeInternalModes(AnmEigen * eigen, const  AnmNodeList* nodeL
 
 		file_handler.close();
 	}
+}
+
+void ModesWriter::writeInternalModes(AnmEigen * eigen, const  AnmNodeList* nodeList, bool toCartesian){
+	vector<Unit*> units = dynamic_cast<const AnmUnitNodeList*>(nodeList)->getNodeList();
+
+	writeInternalModes( eigen, units, toCartesian);
 }
 
 void ModesWriter::writeHeader(std::ofstream& file_handler, ModeTypes::ModeType type){

@@ -34,6 +34,7 @@ class ModesWriter {
 		void 	writeCartesianModes(AnmEigen * eigen, const AnmNodeList* nodeList);
 		void 	writeCartesianModes(AnmEigen * eigen, std::vector<Atom*>& atoms);
 		void 	writeInternalModes( AnmEigen * eigen, const AnmNodeList* nodeList, bool toCartesian);
+		void 	writeInternalModes( AnmEigen * eigen, std::vector<Unit*>& units, bool toCartesian);
 
 		void 	writeHeader(std::ofstream& file_handler, ModeTypes::ModeType type);
 		void 	writeResnames(std::ofstream& file_handler, std::vector<Atom*>& atoms);

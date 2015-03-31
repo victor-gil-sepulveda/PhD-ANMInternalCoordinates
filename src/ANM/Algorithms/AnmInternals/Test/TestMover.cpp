@@ -136,7 +136,7 @@ bool TestMover::testApplyRotations(){
 	return we_can_calculate_angles && we_can_move_them && we_can_undo_the_move;
 }
 
-bool apply_rots(PDBWriter& writer,
+bool apply_rotations(PDBWriter& writer,
 		vector<double>& angular_increments,
 		vector<double>& current_angles,
 		vector<Unit*>& units,
@@ -144,18 +144,22 @@ bool apply_rots(PDBWriter& writer,
 		const char* pdb_file,
 		unsigned int iteration){
 
+	// Get current angles
+	cout<<"Calculating current angles."<<endl;
 	vector<double> expected_angles(angular_increments.size(), 0);
-
 	AnmInternals::calculate_current_angles(current_angles, units);
 	cout<<current_angles.size()<<" "<<angular_increments.size()<<endl;
 	for(unsigned int i=0; i< current_angles.size(); ++i){
 		expected_angles[i] = current_angles[i] + angular_increments[i];
 	}
+
+	// Apply angle increments
 	cout<<"Applying rotations ("<<iteration<<")"<<endl;
 	ANMICMovement::apply_rotations_to_molecule_units(units, angular_increments, 1);
 	AnmInternals::calculate_current_angles(current_angles, units);
 	writer.writeTrajectory(pdb_file, complex);
 
+	// Compare expected angles with current
 	return Assertion::expectedVectorEqualsCalculatedWithinPrecision(expected_angles,
 			current_angles,
 			1e-5);
@@ -165,11 +169,7 @@ bool TestMover::testIterativeAngleApplication(){
 	const char* complex_pdb = "src/ANM/Algorithms/AnmInternals/Test/data/it_ang_app/9WVG.minim.pdb";
 	cout << "Testing Iterative Angle application with  "<<complex_pdb<<endl;
 
-	System sys;
-	vector<Unit*> units;
-	Complex* complex;
-
-	bool skipOXT = true;
+	System sys;	vector<Unit*> units; Complex* complex; bool skipOXT = true;
 	TestANMICTools::createUnitsFromFile(complex_pdb,
 					units,
 					complex,
@@ -180,7 +180,7 @@ bool TestMover::testIterativeAngleApplication(){
 
 	PDBWriter writer;
 	for(unsigned int i = 0; i < 20; ++i){
-		apply_rots(writer,	angular_increments,	current_angles,
+		apply_rotations(writer,	angular_increments,	current_angles,
 				units, complex, "test1/test.pdb", i);
 	}
 
@@ -215,11 +215,7 @@ bool TestMover::testIterativeAngleApplicationWithConversionUpdate(){
 	const char* complex_pdb = "src/ANM/Algorithms/AnmInternals/Test/data/it_ang_app/9WVG.minim.pdb";
 	cout << "Testing Iterative Angle application with  "<<complex_pdb<<endl;
 
-	System sys;
-	vector<Unit*> units;
-	Complex* complex;
-
-	bool skipOXT = true;
+	System sys;	vector<Unit*> units; Complex* complex;	bool skipOXT = true;
 	TestANMICTools::createUnitsFromFile(complex_pdb,
 					units,
 					complex,
@@ -238,13 +234,9 @@ bool TestMover::testIterativeAngleApplicationWithConversionUpdate(){
 
 		whandler.logStepAndVector("angular_increments", angular_increments);
 
-		AnmNodeList* node_list = new AnmUnitNodeList;
-		dynamic_cast<AnmUnitNodeList*>(node_list)->setNodeList(units);
-		whandler.getWriter("iteration")->writeInternalModes(pca_ic_eigen,
-				node_list,
-				true);
+		whandler.getWriter("iteration")->writeInternalModes(pca_ic_eigen, units, true);
 
-		apply_rots(writer,	angular_increments,	current_angles,
+		apply_rotations(writer, angular_increments,	current_angles,
 				units, complex, "/home/user/workspace/ANMIC_AZ/test2/test.pdb", i);
 
 		for(unsigned int j = 0; j < units.size(); ++j){
@@ -337,7 +329,7 @@ bool TestMover::testIterativeAngleApplicationWithConversionUpdateToTarget(){
 
 		vector<double> expected_angles(angular_increments.size(), 0);
 
-		apply_rots(writer, angular_increments, current_angles,
+		apply_rotations(writer, angular_increments, current_angles,
 				units, complex, "/home/user/workspace/ANMIC_AZ/test3/test.pdb", i);
 
 		for(unsigned int j = 0; j < units.size(); ++j)
