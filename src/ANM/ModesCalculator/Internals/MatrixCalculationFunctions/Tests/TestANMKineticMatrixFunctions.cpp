@@ -89,7 +89,7 @@ void TestANMKineticMatrixFunctions::run()
     // K  wo skipping OXT
     TEST_FUNCTION(testCalculateK,
     	"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala3/ala3.pdb",
-		"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala3/K.txt",
+		"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/ala3/K_zeros.txt",
 		INMA,
 		1e-6);
 

@@ -465,6 +465,22 @@ Point ANMICMath::multiplyIMatrixByEVector(double const I[3][3], Point& e){
 	return multiplyIMatrixByEVector(I, Utils::vectorToPointer(coordinates));
 }
 
+Point ANMICMath::multiplyIVectorMatrixByEVector(vector<vector<double> >& I, Point& e){
+	vector<double> coordinates = e.getCoordinates();
+	double value = 0;
+	double result[3];
+
+	for(unsigned int i=0; i<3; i++) {
+		for(unsigned int j=0; j<3; j++) {
+			value += I[i][j] * coordinates[j];
+		}
+		result[i] = value;
+		value = 0;
+	}
+
+	return Point(result[0], result[1], result[2]);
+}
+
 
 ///////////////////////////////////////////////////////////////
 /// \remarks

@@ -294,8 +294,7 @@ CenterOfMass ANMICKineticMatrixCalculator::calculateMobileBodyCOM(vector<Unit*>&
 //----------------------------------------------
 ///////////////////////////////////////////////////////////////
 /// \remarks
-/// Calculates the center of mass of a rigid macrounit
-/// (rigid unit formed of other units)
+/// Calculates each of the elements of the K matrix
 ///
 /// \param alpha_dihedral [In]
 /// \param beta_dihedral [In]
@@ -309,83 +308,6 @@ CenterOfMass ANMICKineticMatrixCalculator::calculateMobileBodyCOM(vector<Unit*>&
 /// \author vgil
 /// \date 15/08/2013
 ///////////////////////////////////////////////////////////////
-//double ANMICKineticMatrixCalculator::calculateKab(
-//		int alpha_dihedral, int beta_dihedral,
-//		Point* r_a, Point* r_b,
-//		Point* e_a, Point* e_b,
-//		vector<Unit*>& units,
-//		double M,
-//		double const I[3][3],
-//		double const I_inv[3][3],
-//		ICalcType tensor_calc_type) {
-//
-//	bool skip_OXT = tensor_calc_type == INMA_NO_OXT? true: false;
-//
-//	CenterOfMass com1 = calculateMobileBodyCOM(units, pair<int,int>(0,alpha_dihedral), skip_OXT);
-//	CenterOfMass com3 = calculateMobileBodyCOM(units, pair<int,int>(beta_dihedral+1,units.size()-1), skip_OXT);
-//
-//	double M1 = com1.getMass();
-//	//TODO: M3 = M-M1
-//	double M3 = com3.getMass();
-//	//double M3 = M-M1;
-//
-//	Point r_1_0 = Point(com1);
-//	Point r_3_0 = Point(com3);
-//
-//	// Calculation of first term
-//	Point sub_r_a_r_1_0 = Point::subtract(*r_a, r_1_0); // (ra - r10)
-//	Point sub_r_b_r_3_0 = Point::subtract(*r_b, r_3_0); // (rb - r30)
-//
-//	Point cross_e_a_sub_r_a_r_1_0 = ANMICMath::crossProduct(*e_a, sub_r_a_r_1_0); // ea x (ra - r10)
-//	Point cross_e_b_sub_r_b_r_3_0 = ANMICMath::crossProduct(*e_b, sub_r_b_r_3_0); // eb x (rb - r30)
-//
-//	double dot_product = ANMICMath::dotProduct(cross_e_a_sub_r_a_r_1_0, cross_e_b_sub_r_b_r_3_0);// (ea x (ra - r10)) . (eb x (rb - r30))
-//	double term1 = dot_product;// * M1 * M3 / M; // (M1 M3/ M) * (ea x (ra - r10)) . (eb x (rb - r30))
-//
-//	// Calculation of second term
-//	double I1[3][3], I3[3][3];
-//	calculateI(I1,units, pair<int,int>(0,alpha_dihedral), tensor_calc_type);
-//
-//	//TODO: I3 = I - I1
-//	calculateI(I3,units, pair<int,int>(beta_dihedral+1,units.size()-1), tensor_calc_type);
-//	/*for (unsigned int i = 0; i < 3; ++i)
-//		for (unsigned int j = 0; j < 3; ++j)
-//			I3[i][j] = I[i][j]-I1[i][j];*/
-//
-//
-//	Point M1_r_1_0 = Point::multiplyByScalar(r_1_0,M1); // r10 = M1*r10
-//	Point cross_e_a_r_a = ANMICMath::crossProduct(*e_a, *r_a);
-//	Point crossEM1 = ANMICMath::crossProduct(M1_r_1_0, cross_e_a_r_a);
-//
-//	Point M3_r_3_0 = Point::multiplyByScalar(r_3_0,M3); // r30 = M3*r30
-//	Point cross_e_b_r_b = ANMICMath::crossProduct(*e_b, *r_b);
-//	Point crossEM3 = ANMICMath::crossProduct(M3_r_3_0, cross_e_b_r_b);
-//
-//	vector<double> e_a_coords = e_a->getCoordinates();
-//	vector<double> e_b_coords = e_b->getCoordinates();
-//	Point I1e_a = ANMICMath::multiplyIMatrixByEVector(I1, Utils::vectorToPointer<double>(e_a_coords));
-//	Point I3e_b = ANMICMath::multiplyIMatrixByEVector(I3, Utils::vectorToPointer<double>(e_b_coords));
-//
-//	Point resta1P = Point::subtract(crossEM1, I1e_a);
-//	Point resta3P = Point::subtract(crossEM3, I3e_b);
-//
-//	vector<double> resta1P_coords = resta1P.getCoordinates();
-//	vector<double> resta3P_coords = resta3P.getCoordinates();
-//
-//	// Matrix multiplication is associative
-//	Point ImultResta3P = ANMICMath::multiplyIMatrixByEVector(I_inv, Utils::vectorToPointer<double>(resta3P_coords));
-//
-//	vector<double> ImultResta3P_coords = ImultResta3P.getCoordinates();
-//
-//	double term2 = ANMICMath::multiplyRowByColumn(Utils::vectorToPointer<double>(resta1P_coords),
-//			Utils::vectorToPointer<double>(ImultResta3P_coords), 3);
-//
-//	cout<<"** i= "<<alpha_dihedral<<  "  j= "<<beta_dihedral<<"  M1= "<<M1<<"  M3= "<<M3
-//			<<"  mtot= "<<M<<" temp1= "<<term1<<" term2= "<<term2<<" "<<(M1*M3/M) * term1 + term2<<endl;
-//
-//	return (M1*M3/M) * term1 + term2;
-//}
-
 double ANMICKineticMatrixCalculator::calculateKab(
 		int alpha_dihedral, int beta_dihedral,
 		Point* r_a, Point* r_b,
@@ -492,15 +414,88 @@ TriangularMatrix* ANMICKineticMatrixCalculator::calculateK( vector<Unit*>& units
 
 	TriangularMatrix* K = new TriangularMatrix(number_of_dihedrals, number_of_dihedrals);
 
+//	for(int alpha_dihedral = 0; alpha_dihedral < number_of_dihedrals; ++alpha_dihedral){
+//		for(int beta_dihedral = alpha_dihedral; beta_dihedral < number_of_dihedrals; ++beta_dihedral){
+//			(*K)(alpha_dihedral, beta_dihedral) = calculateKab(
+//					alpha_dihedral, beta_dihedral,
+//					units[alpha_dihedral]->r_right, units[beta_dihedral]->r_right,
+//					units[alpha_dihedral]->e_right, units[beta_dihedral]->e_right,
+//					units, M, I, I_inv,
+//					tensor_calc_type);
+//
+//		}
+//	}
+
+	// Kab = MlMr/M t1l.t1r + (t2l.I-1.t2r)
+	// l vectors contain values to the left of one torsion, r to the right
+	vector<double> Ml, Mr;
+	vector<CenterOfMass> coml, comr;
+	vector<vector<vector<double> > > Il,Ir;
+	double Iltmp[3][3];
+
+	// First we do some precalculations
+	for(unsigned int torsion = 0; torsion < number_of_dihedrals; ++torsion){
+		// Precalculate COMs
+		CenterOfMass comltmp = calculateMobileBodyCOM(units, pair<int,int>(0, torsion), skip_OXT);
+		CenterOfMass comrtmp = calculateMobileBodyCOM(units, pair<int,int>(torsion+1, number_of_dihedrals), skip_OXT);
+		coml.push_back(comltmp);
+		comr.push_back(comrtmp);
+
+		// Precalculate masses
+		Ml.push_back(comltmp.getMass());
+		Mr.push_back(comrtmp.getMass());
+
+		// Precalculate tensors
+		vector<vector<double> > Ilv(3,vector<double>(3,0)),Irv(3,vector<double>(3,0));
+		calculateI(Iltmp, units, pair<int,int>(0,torsion), tensor_calc_type);
+		for(unsigned int i =0; i< 3; ++i) for(unsigned int j =0; j< 3; ++j) Ilv[i][j] = Iltmp[i][j];
+		Il.push_back(Ilv);
+		for(unsigned int i =0; i< 3; ++i) for(unsigned int j =0; j< 3; ++j) Irv[i][j] = I[i][j]-Ilv[i][j];
+		Ir.push_back(Irv);
+	}
+
+	// Now we can precalculate terms
+	vector<Point> t1l, t1r, t2l, t2r;
+	for(unsigned int torsion = 0; torsion < number_of_dihedrals; ++torsion){
+		Point* ea = units[torsion]->e_right;
+		Point* ra = units[torsion]->r_right;
+
+		Point sub_r_a_r_1_0 = Point::subtract(*ra, coml[torsion]);
+		Point cross_e_a_sub_r_a_r_1_0 = ANMICMath::crossProduct(*ea, sub_r_a_r_1_0);
+		t1l.push_back(cross_e_a_sub_r_a_r_1_0);
+
+		sub_r_a_r_1_0 = Point::subtract(*ra, comr[torsion]);
+		cross_e_a_sub_r_a_r_1_0 = ANMICMath::crossProduct(*ea, sub_r_a_r_1_0);
+		t1r.push_back(cross_e_a_sub_r_a_r_1_0);
+
+		Point cross_e_a_r_a = ANMICMath::crossProduct(*ea, *ra);
+
+		Point M_r_0 = Point::multiplyByScalar(coml[torsion], Ml[torsion]);
+		Point Iea = ANMICMath::multiplyIVectorMatrixByEVector(Il[torsion], *ea);
+		Point M_r_0_cross_cross_e_a_r_a = ANMICMath::crossProduct(M_r_0, cross_e_a_r_a);
+		t2l.push_back(Point::subtract(M_r_0_cross_cross_e_a_r_a, Iea));
+
+		M_r_0 = Point::multiplyByScalar(comr[torsion], Mr[torsion]);
+		Iea = ANMICMath::multiplyIVectorMatrixByEVector(Ir[torsion], *ea);
+    	M_r_0_cross_cross_e_a_r_a = ANMICMath::crossProduct(M_r_0, cross_e_a_r_a);
+		t2r.push_back(Point::subtract(M_r_0_cross_cross_e_a_r_a, Iea));
+	}
+
+	// Now calculate each Kab
 	for(int alpha_dihedral = 0; alpha_dihedral < number_of_dihedrals; ++alpha_dihedral){
 		for(int beta_dihedral = alpha_dihedral; beta_dihedral < number_of_dihedrals; ++beta_dihedral){
-			(*K)(alpha_dihedral, beta_dihedral) = calculateKab(
-					alpha_dihedral, beta_dihedral,
-					units[alpha_dihedral]->r_right, units[beta_dihedral]->r_right,
-					units[alpha_dihedral]->e_right, units[beta_dihedral]->e_right,
-					units, M, I, I_inv,
-					tensor_calc_type);
+			double Mfact = Ml[alpha_dihedral]*Mr[beta_dihedral] / M;
 
+			double t1lt1r = Point::dotProduct(t1l[alpha_dihedral], t1r[beta_dihedral]);
+
+			Point t2lIm1(
+				Point::dotProduct(t2l[alpha_dihedral], Point(I_inv[0][0], I_inv[0][1], I_inv[0][2])),
+				Point::dotProduct(t2l[alpha_dihedral], Point(I_inv[1][0], I_inv[1][1], I_inv[1][2])),
+				Point::dotProduct(t2l[alpha_dihedral], Point(I_inv[2][0], I_inv[2][1], I_inv[2][2])));
+
+
+			(*K)(alpha_dihedral, beta_dihedral) = (Mfact*t1lt1r)
+					+ Point::dotProduct(t2lIm1, t2r[beta_dihedral]);
 		}
 	}
 
