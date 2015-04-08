@@ -53,6 +53,8 @@ class TestICModesCalculator : public Test
 
         bool testConvert9WVGStuff();
 
+        bool testConvert9WVGStuff_iterative_v();
+
         bool testStrangeCase();
 };
 

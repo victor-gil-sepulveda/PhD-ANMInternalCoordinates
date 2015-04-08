@@ -64,8 +64,9 @@ void ModesWriter::writeCartesianModes(AnmEigen * eigen, std::vector<Atom*>& atom
 	file_handler.open(this->full_path.c_str());
 
 	writeHeader(file_handler, eigen->type);
-	writeResnames(file_handler, atoms );
 	writeAtomnames(file_handler, atoms);
+	writeResids(file_handler, atoms);
+	writeResnames(file_handler, atoms );
 	writeCoordinates(file_handler, atoms);
 
 	for (unsigned int i = 0; i < eigen->numberOfModes;++i){
@@ -93,9 +94,9 @@ void ModesWriter::writeCartesianModes(AnmEigen * eigen, const AnmNodeList* nodeL
 /// \author vgil
 /// \date 7/01/2015
 ///////////////////////////////////////////////////////////////
-void ModesWriter::writeInternalModes( AnmEigen * eigen, std::vector<Unit*>& units, bool toCartesian){
+void ModesWriter::writeInternalModes( AnmEigen * eigen, std::vector<Unit*>& units,
+		bool toCartesian, ModeWritingType type){
 	if (toCartesian){
-		bool onlyHeavyAtoms = true;
 		cout<<"DBG: converting to cartesian prior to writing"<<endl;
 		cout<<"DBG: first eigenvalue values ("<<eigen->vectors[0].size()<< ") "<<
 				eigen->vectors[0][0]<<" "<<
@@ -104,6 +105,7 @@ void ModesWriter::writeInternalModes( AnmEigen * eigen, std::vector<Unit*>& unit
 				eigen->vectors[0][3]<<" "<<
 				eigen->vectors[0][4]<<" "<<endl;
 		// First convert from internal to cartesian
+		bool onlyHeavyAtoms = (not type == ALL_ATOMS);
 		AnmEigen* converted = InternalModesCalculator::internalToCartesian(units, eigen, onlyHeavyAtoms);
 
 		cout<<"DBG: first converted values ("<<converted->vectors[0].size()<< ") "<<
@@ -112,17 +114,23 @@ void ModesWriter::writeInternalModes( AnmEigen * eigen, std::vector<Unit*>& unit
 				converted->vectors[0][2]<<" "<<
 				converted->vectors[0][3]<<" "<<
 				converted->vectors[0][4]<<" "<<endl;
+		if (type == CA_ATOMS){
+			vector<int> ca_atom_indices;
+			vector<Atom*> ca_atoms;
+			getCAsFromUnits(units, ca_atom_indices, ca_atoms);
 
-		vector<int> ca_atom_indices;
-		vector<Atom*> ca_atoms;
-		getCAsFromUnits(units, ca_atom_indices, ca_atoms);
+			// Then filter the modes
+			AnmEigen filtered;
+			filterEigenvectors(converted, &filtered, ca_atom_indices);
 
-		// Then filter the modes
-		AnmEigen filtered;
-		filterEigenvectors(converted, &filtered, ca_atom_indices);
-
-		// Write them!
-		this->writeCartesianModes( &filtered, ca_atoms);
+			// Write them!
+			this->writeCartesianModes( &filtered, ca_atoms);
+		}
+		else{
+			vector<Atom*> heavy_atoms;
+			UnitTools::getAllAtomsFromUnits(units, heavy_atoms, true);
+			this->writeCartesianModes( converted, heavy_atoms);
+		}
 
 		delete converted;
 	}
@@ -136,8 +144,9 @@ void ModesWriter::writeInternalModes( AnmEigen * eigen, std::vector<Unit*>& unit
 		vector<Atom*> bb_atoms;
 		getBBAtomsFromUnits(units, bb_atoms);
 
-		writeResnames(file_handler, bb_atoms);
 		writeAtomnames(file_handler, bb_atoms);
+		writeResids(file_handler, bb_atoms);
+		writeResnames(file_handler, bb_atoms);
 		writeCoordinates(file_handler, bb_atoms);
 
 		for (unsigned int i = 0; i < eigen->numberOfModes;++i){
@@ -148,10 +157,10 @@ void ModesWriter::writeInternalModes( AnmEigen * eigen, std::vector<Unit*>& unit
 	}
 }
 
-void ModesWriter::writeInternalModes(AnmEigen * eigen, const  AnmNodeList* nodeList, bool toCartesian){
+void ModesWriter::writeInternalModes(AnmEigen * eigen, const  AnmNodeList* nodeList, bool toCartesian, ModeWritingType type){
 	vector<Unit*> units = dynamic_cast<const AnmUnitNodeList*>(nodeList)->getNodeList();
 
-	writeInternalModes( eigen, units, toCartesian);
+	writeInternalModes( eigen, units, toCartesian, type);
 }
 
 void ModesWriter::writeHeader(std::ofstream& file_handler, ModeTypes::ModeType type){
@@ -172,6 +181,14 @@ void ModesWriter::writeAtomnames(ofstream& file_handler, vector<Atom*>& atoms){
 	file_handler << "atomnames " ;
 	for (unsigned int i = 0; i< atoms.size(); ++i){
 		file_handler<< atoms[i]->name<<" ";
+	}
+	file_handler << endl;
+}
+
+void ModesWriter::writeResids(ofstream& file_handler, vector<Atom*>& atoms){
+	file_handler << "resids " ;
+	for (unsigned int i = 0; i< atoms.size(); ++i){
+		file_handler<< atoms[i]->resSeq<<" ";
 	}
 	file_handler << endl;
 }

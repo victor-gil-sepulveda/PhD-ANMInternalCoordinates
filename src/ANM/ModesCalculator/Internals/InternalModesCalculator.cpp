@@ -69,7 +69,9 @@ void InternalModesCalculator::calculateEigenValuesAndVectors(AnmParameters * anm
 {
 	// We need to first update the model
 	AnmUnitNodeList &unitNodeList = dynamic_cast<AnmUnitNodeList &>(const_cast<AnmNodeList &>(node_list));
+
 	// Recenter
+	unitNodeList.centerAtCOM();
 
 	// Update nodes
 	unitNodeList.updateUnitList();

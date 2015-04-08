@@ -52,9 +52,9 @@ void TestMover::run()
 
     //TEST_FUNCTION(testIterativeAngleApplication)
 
-    TEST_FUNCTION(testIterativeAngleApplicationWithConversionUpdate)
+    //TEST_FUNCTION(testIterativeAngleApplicationWithConversionUpdate)
 
-    //TEST_FUNCTION(testIterativeAngleApplicationWithConversionUpdateToTarget)
+    TEST_FUNCTION(testIterativeAngleApplicationWithConversionUpdateToTarget)
 
     finish();
 }
@@ -179,7 +179,7 @@ bool TestMover::testIterativeAngleApplication(){
 	TestTools::load_vector( angular_increments, "src/ANM/Algorithms/AnmInternals/Test/data/it_ang_app/increments.txt");
 
 	PDBWriter writer;
-	for(unsigned int i = 0; i < 20; ++i){
+	for(unsigned int i = 0; i < 100; ++i){
 		apply_rotations(writer,	angular_increments,	current_angles,
 				units, complex, "test1/test.pdb", i);
 	}
@@ -227,14 +227,16 @@ bool TestMover::testIterativeAngleApplicationWithConversionUpdate(){
 	ModesWriterHandler whandler;
 	whandler.setDirectory("/home/user/workspace/ANMIC_AZ/test2");
 
-	for(unsigned int i = 0; i < 20; ++i){
+	for(unsigned int i = 0; i < 100; ++i){
+		whandler.setCounter(i);
+
 		AnmEigen* pca_ic_eigen = angles_from_eigen_conversion("src/ANM/Algorithms/AnmInternals/Test/data/it_ang_app/cc_pca_aa.nmd",
 				units,
 				angular_increments);
 
 		whandler.logStepAndVector("angular_increments", angular_increments);
 
-		whandler.getWriter("iteration")->writeInternalModes(pca_ic_eigen, units, true);
+		whandler.getWriter("pre_iteration")->writeInternalModes(pca_ic_eigen, units, true);
 
 		apply_rotations(writer, angular_increments,	current_angles,
 				units, complex, "/home/user/workspace/ANMIC_AZ/test2/test.pdb", i);
@@ -243,7 +245,7 @@ bool TestMover::testIterativeAngleApplicationWithConversionUpdate(){
 			units[j]->update();
 		}
 
-		whandler.setCounter(i);
+		whandler.getWriter("post_iteration")->writeInternalModes(pca_ic_eigen, units, true);
 
 		delete pca_ic_eigen;
 	}
@@ -293,20 +295,33 @@ bool TestMover::testIterativeAngleApplicationWithConversionUpdateToTarget(){
 	AnmEigen* eigen = SimpleModesLoader::load("src/ANM/Algorithms/AnmInternals/Test/data/it_ang_app/cc_pca_aa.nmd", true);
 
 	// Calculate target points
+	vector<Atom*> all_unit_atoms;
 	vector<Point> targetCCPoints;
+	UnitTools::getAllAtomsFromUnits(units,all_unit_atoms, true);
+
+	AnmNormalizer::normalizeByInverseLargestNorm(eigen->vectors[0]);
+	Math::multiplyVectorByScalar(eigen->vectors[0], 100);
+
 	for (unsigned int i =0; i< eigen->vectors[0].size()/3; ++i){
-		targetCCPoints.push_back(Point(&(Utils::vectorToPointer(eigen->vectors[0])[i*3])));
+		targetCCPoints.push_back(Point::add(
+				Point(&(Utils::vectorToPointer(eigen->vectors[0])[i*3])),
+				all_unit_atoms[i]->toPoint()));
 	}
 
 	PDBWriter writer;
 	ModesWriterHandler whandler;
 	whandler.setDirectory("/home/user/workspace/ANMIC_AZ/test3");
 
-	for(unsigned int i = 0; i < 20; ++i){
+	// Save initial state
+	vector<double> coords, icoords;
+	complex->saveCoordinates(coords,icoords);
+
+	for(unsigned int i = 0; i < 100; ++i){
+		whandler.setCounter(i);
 
 		// Calculate translations -> to AnmEigen structure
 		vector<double> mode;
-		vector<Atom*> all_unit_atoms;
+		all_unit_atoms.clear();
 		UnitTools::getAllAtomsFromUnits(units,all_unit_atoms, true);
 		for (unsigned int j =0; j< all_unit_atoms.size();++j){
 			Point translation = Point::subtract(targetCCPoints[j], all_unit_atoms[j]->toPoint());
@@ -315,36 +330,44 @@ bool TestMover::testIterativeAngleApplicationWithConversionUpdateToTarget(){
 			mode.push_back(translation.getZ());
 		}
 
-
 		vector<vector<double> > eigvecs; eigvecs.push_back(mode);
-		vector<double> eigvals(1,0);
+		vector<double> eigvals(1, 1.0);
 		AnmEigen * new_trans_eigen = new AnmEigen;
 		new_trans_eigen->type = ModeTypes::PCA_CC;
 		new_trans_eigen->initialize(eigvals, eigvecs, true);
+
+		whandler.getWriter("proposal")->writeCartesianModes(new_trans_eigen, all_unit_atoms);
+
 
 		AnmEigen* pca_ic_eigen = angles_from_eigen_conversion(new_trans_eigen,
 				units,
 				angular_increments);
 
-
-		vector<double> expected_angles(angular_increments.size(), 0);
+		whandler.getWriter("pre_iteration")->writeInternalModes(pca_ic_eigen, units, true);
 
 		apply_rotations(writer, angular_increments, current_angles,
 				units, complex, "/home/user/workspace/ANMIC_AZ/test3/test.pdb", i);
 
+		// After changes, remove rotations, translations and update units
+		// Remove external rotations
+		Math::superpose(coords.size()/3,
+			Utils::vectorToPointer(coords),
+			Utils::vectorToPointer(complex->getAllCartesianCoordinates()));
+
+		// Center at COM
+		//---------------
+
+		//-----------------
+
+		// Update units
 		for(unsigned int j = 0; j < units.size(); ++j)
 			units[j]->update();
 
+		whandler.getWriter("post_iteration")->writeInternalModes(pca_ic_eigen, units, true);
+
+
 		cout<<"units updated"<<endl;
-		whandler.setCounter(i);
 
-
-		AnmNodeList* node_list = new AnmUnitNodeList;
-		dynamic_cast<AnmUnitNodeList*>(node_list)->setNodeList(units);
-
-		whandler.getWriter("iteration")->writeInternalModes(pca_ic_eigen,
-				node_list,
-				true);
 
 		delete pca_ic_eigen;
 		delete new_trans_eigen;

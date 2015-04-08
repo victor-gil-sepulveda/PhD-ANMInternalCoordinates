@@ -21,6 +21,12 @@ class Unit;
 class Atom;
 class AnmNodeList;
 
+enum ModeWritingType{
+	CA_ATOMS,
+	HEAVY_ATOMS,
+	ALL_ATOMS
+};
+
 class ModesWriter {
 	public:
 		ModesWriter();
@@ -33,12 +39,13 @@ class ModesWriter {
 		void 	writeCartesianModes( AnmEigen * eigen, std::vector<double>& coordinates);
 		void 	writeCartesianModes(AnmEigen * eigen, const AnmNodeList* nodeList);
 		void 	writeCartesianModes(AnmEigen * eigen, std::vector<Atom*>& atoms);
-		void 	writeInternalModes( AnmEigen * eigen, const AnmNodeList* nodeList, bool toCartesian);
-		void 	writeInternalModes( AnmEigen * eigen, std::vector<Unit*>& units, bool toCartesian);
+		void 	writeInternalModes( AnmEigen * eigen, const AnmNodeList* nodeList, bool toCartesian, ModeWritingType type = CA_ATOMS);
+		void 	writeInternalModes( AnmEigen * eigen, std::vector<Unit*>& units, bool toCartesian, ModeWritingType type = CA_ATOMS);
 
 		void 	writeHeader(std::ofstream& file_handler, ModeTypes::ModeType type);
 		void 	writeResnames(std::ofstream& file_handler, std::vector<Atom*>& atoms);
 		void 	writeAtomnames(std::ofstream& file_handler, std::vector<Atom*>& atoms);
+		void 	writeResids(std::ofstream& file_handler, std::vector<Atom*>& atoms);
 		void 	writeCoordinates(std::ofstream& file_handler, std::vector<Atom*>& atoms);
 		void 	writeCoordinates(std::ofstream& file_handler, std::vector<double>& coordinates);
 		void 	writeOneMode(std::ofstream& file_handler, int mode_number, double eigenvalue, std::vector<double>& eigenvector);

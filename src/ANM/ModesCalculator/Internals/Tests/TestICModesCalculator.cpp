@@ -103,7 +103,9 @@ void TestICModesCalculator::run()
 //    			"src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/9WVG/9WVG.pdb",
 //    			1e-12);
 //
-    TEST_FUNCTION(testConvert9WVGStuff)
+//    TEST_FUNCTION(testConvert9WVGStuff)
+
+    TEST_FUNCTION(testConvert9WVGStuff_iterative_v)
 
 //    TEST_FUNCTION(testStrangeCase)
 //
@@ -330,24 +332,24 @@ bool TestICModesCalculator::testCartesianToInternal(const char* prot_path,
 }
 
 bool TestICModesCalculator::testConvert9WVGStuff(){
-		//	cout<<"K loading..."<<endl;
-		//	vector< vector<double> > Kv;
-		//	TestTools::load_vector_of_vectors(Kv, "src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/9WVG/K.txt");
-		//	// recover symmetry and printout matrix
-		//	cout<<"********************************"<<endl;
-		//	for(unsigned int i = 0; i< Kv.size();++i){
-		//		for (unsigned int j = 0; j< Kv.size();++j){
-		//			if(i<=j){
-		//				cout<<Kv[i][j]<<" ";
-		//			}
-		//			else{
-		//				cout<<Kv[j][i]<<" ";
-		//			}
-		//		}
-		//		cout<<endl;
-		//	}
-		//
-		//	cout<<"********************************"<<endl;
+	//	cout<<"K loading..."<<endl;
+	//	vector< vector<double> > Kv;
+	//	TestTools::load_vector_of_vectors(Kv, "src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/9WVG/K.txt");
+	//	//recover symmetry and printout matrix
+	//	cout<<"********************************"<<endl;
+	//	for(unsigned int i = 0; i< Kv.size();++i){
+	//		for (unsigned int j = 0; j< Kv.size();++j){
+	//			if(i<=j){
+	//				cout<<Kv[i][j]<<" ";
+	//			}
+	//			else{
+	//				cout<<Kv[j][i]<<" ";
+	//			}
+	//		}
+	//		cout<<endl;
+	//	}
+	//
+	//	cout<<"********************************"<<endl;
 
 
 	// Load structure
@@ -356,10 +358,10 @@ bool TestICModesCalculator::testConvert9WVGStuff(){
 	Complex* complex;
 	cout << "Loading model"<<endl;
 	TestANMICTools::createUnitsFromFile(
-			"/home/user/Desktop/cc_pca_2/CA_min/9WVG.minim.pdb",
+			"/home/user/workspace/ANMIC_AZ/src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/9WVG/9WVG.pdb",
 			units, complex, false);
 
-//	// Write the atoms
+//	// Write the atoms ("ordered atoms")
 //	vector<Atom*> atoms;
 //	UnitTools::getAllAtomsFromUnits(units, atoms, true);
 //	for(unsigned int i = 0; i< atoms.size();++i){
@@ -369,8 +371,8 @@ bool TestICModesCalculator::testConvert9WVGStuff(){
 	// Get pca modes
 	vector<double> values;
 	vector<vector<double> > vectors;
-	TestTools::load_vector(values, "/home/user/Desktop/cc_pca_2/CA_min/cc_pca_aa.values");
-	TestTools::load_vector_of_vectors(vectors, "/home/user/Desktop/cc_pca_2/CA_min/cc_pca_aa.vectors");
+	TestTools::load_vector(values, "/home/user/Desktop/TestsPCA/PCA_conversion_test/BB_PROP/cc_pca_aa_alt_alt.values");
+	TestTools::load_vector_of_vectors(vectors, "/home/user/Desktop/TestsPCA/PCA_conversion_test/BB_PROP/cc_pca_aa_alt_alt.vectors");
 	AnmEigen pca_modes;
 	pca_modes.initialize(values,vectors,true);
 
@@ -385,13 +387,52 @@ bool TestICModesCalculator::testConvert9WVGStuff(){
 	AnmUnitNodeList nodeList;
 	nodeList.setNodeList(units);
 
-	writer.setPath("/home/user/Desktop/cc_pca_2/CA_min/9WVG_PCA_CCtoIC.nmd");
+	writer.setPath("/home/user/Desktop/TestsPCA/PCA_conversion_test/BB_PROP/9WVG_PCA_CCtoIC_alt_alt.nmd");
 	writer.setName("9WVG_PCA_CCtoIC");
 	writer.writeInternalModes( pca_ic_eigen, &nodeList, false);
 
-	writer.setPath("/home/user/Desktop/cc_pca_2/CA_min/9WVG_PCA_CCtoICtoCC.nmd");
+	writer.setPath("/home/user/Desktop/TestsPCA/PCA_conversion_test/BB_PROP/9WVG_PCA_CCtoICtoCC_alt_alt.nmd");
 	writer.setName("9WVG_PCA_CCtoICtoCC");
-	writer.writeInternalModes( pca_ic_eigen, &nodeList, true);
+	writer.writeInternalModes( pca_ic_eigen, &nodeList, true, CA_ATOMS);
+
+	delete complex;
+	delete pca_ic_eigen;
+
+	return false;
+}
+
+bool TestICModesCalculator::testConvert9WVGStuff_iterative_v(){
+	// Load structure
+	System sys;
+	vector<Unit*> units;
+	Complex* complex;
+	cout << "Loading model"<<endl;
+	TestANMICTools::createUnitsFromFile(
+			"/home/user/workspace/ANMIC_AZ/src/ANM/ModesCalculator/Internals/MatrixCalculationFunctions/Tests/data/9WVG/9WVG.pdb",
+			units, complex, false);
+
+	// Get pca modes
+	vector<double> values;
+	vector<vector<double> > vectors;
+	TestTools::load_vector(values, "/home/user/Desktop/TestsPCA/PCA_conversion_test/BB_iterative/to_convert.values");
+	TestTools::load_vector_of_vectors(vectors, "/home/user/Desktop/TestsPCA/PCA_conversion_test/BB_iterative/to_convert.vectors");
+	AnmEigen pca_modes;
+	pca_modes.initialize(values,vectors,true);
+
+	// Perform the conversion
+	cout<<"Converting..."<<endl;
+	AnmEigen* pca_ic_eigen =  InternalModesCalculator::cartesianToInternal(units, &pca_modes);
+
+	// Write them!
+	cout<<"Writing..."<<endl;
+	ModesWriter writer;
+
+	AnmUnitNodeList nodeList;
+	nodeList.setNodeList(units);
+
+	writer.setPath("/home/user/Desktop/TestsPCA/PCA_conversion_test/BB_iterative/converted.nmd");
+	writer.setName("converted");
+	writer.writeInternalModes( pca_ic_eigen, &nodeList, true, HEAVY_ATOMS);
 
 	delete complex;
 	delete pca_ic_eigen;

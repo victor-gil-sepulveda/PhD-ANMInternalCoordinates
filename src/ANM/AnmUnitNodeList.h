@@ -22,6 +22,8 @@ class AnmUnitNodeList : public AnmNodeList {
 		std::vector<Unit*> getNodeList() const;
 		void setNodeList(std::vector<Unit*>& units);
 
+		void centerAtCOM();
+
 		std::string showNodeList();
 		unsigned int size();
 

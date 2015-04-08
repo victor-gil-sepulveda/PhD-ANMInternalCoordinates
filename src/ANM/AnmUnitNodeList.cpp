@@ -24,6 +24,11 @@ std::vector<Unit*> AnmUnitNodeList::getNodeList() const {
 	return this->nodeList;
 }
 
+void AnmUnitNodeList::centerAtCOM(){
+	//TODO: IMPLEMENT!
+	cout<<"***ATENTION****"<<endl<<"AnmUnitNodeList::centerAtCOM must be implemented"<<endl<<"*********"<<endl;
+}
+
 void AnmUnitNodeList::setNodeList(vector<Unit*>& units) {
 	this->nodeList = units;
 }
